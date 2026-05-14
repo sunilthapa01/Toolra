@@ -10,12 +10,12 @@ export default function Footer() {
       }}
     >
       <nav style={{ display: 'flex', gap: '56px' }}>
-        {['Features', 'Integrations', 'Pricing', 'About us', 'Contact'].map((item) => (
+        {['Features', 'How It Works', 'Pricing', 'About', 'Contact'].map((item) => (
           <a
             key={item}
             href="#"
             style={{
-              color: '#0a0a0a',
+              color: '#1C1917',
               textDecoration: 'none',
               fontSize: '17px',
             }}
@@ -31,7 +31,7 @@ export default function Footer() {
           href="#"
           aria-label="Facebook"
           style={{
-            color: '#0a0a0a',
+            color: '#1C1917',
             display: 'inline-flex',
             width: '30px',
             height: '30px',
@@ -49,7 +49,7 @@ export default function Footer() {
           href="#"
           aria-label="X"
           style={{
-            color: '#0a0a0a',
+            color: '#1C1917',
             display: 'inline-flex',
             width: '30px',
             height: '30px',
@@ -67,7 +67,7 @@ export default function Footer() {
           href="#"
           aria-label="Instagram"
           style={{
-            color: '#0a0a0a',
+            color: '#1C1917',
             display: 'inline-flex',
             width: '30px',
             height: '30px',
@@ -94,7 +94,7 @@ export default function Footer() {
           href="#"
           aria-label="LinkedIn"
           style={{
-            color: '#0a0a0a',
+            color: '#1C1917',
             display: 'inline-flex',
             width: '30px',
             height: '30px',

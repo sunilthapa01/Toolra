@@ -130,53 +130,53 @@ function StatPill({
 
 const statRows: StatRowData[] = [
   {
-    artBg: '#3826c6',
+    artBg: '#1C1917',
     artSvg: (
       <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
-        <rect width="240" height="240" fill="#3826c6" />
+        <rect width="240" height="240" fill="#1C1917" />
         <path
           d="M 60 80 Q 120 40 180 100 Q 200 140 150 160 Q 100 180 60 140 Z"
-          fill="#2618a0"
+          fill="#922B21"
         />
-        <circle cx="170" cy="100" r="12" fill="#4d8cff" />
-        <path d="M 80 70 L 92 50 L 96 70 Z" fill="#ff5ca8" />
-        <path d="M 90 60 Q 95 40 100 60" stroke="#ff5ca8" strokeWidth="2" fill="none" />
+        <circle cx="170" cy="100" r="12" fill="#FFD500" />
+        <path d="M 80 70 L 92 50 L 96 70 Z" fill="#C0392B" />
+        <path d="M 90 60 Q 95 40 100 60" stroke="#C0392B" strokeWidth="2" fill="none" />
         <rect
           x="100"
           y="140"
           width="60"
           height="50"
           rx="6"
-          fill="#ff7733"
+          fill="#C0392B"
           transform="rotate(-12 130 165)"
         />
         <path
           d="M 120 155 L 130 145 L 140 155 L 140 175 L 120 175 Z"
-          fill="#fbd838"
+          fill="#FFD500"
           transform="rotate(-12 130 165)"
         />
       </svg>
     ),
     prefix: '+',
-    countTo: 258,
+    countTo: 10,
     suffix: 'K',
-    pillColor: '#ff6b35',
-    pillLabel: 'Users',
-    desc: "Wollo's Intelligent Algorithms analyze social media data in real-time, offering actionable insights and recommendations",
+    pillColor: '#C0392B',
+    pillLabel: 'Concepts',
+    desc: "Prologue generates on-demand interactive visuals for thousands of concepts across every subject — growing with every student query.",
   },
   {
-    artBg: '#6f5fff',
+    artBg: '#C0392B',
     artSvg: (
       <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
-        <rect width="240" height="240" fill="#6f5fff" />
-        <ellipse cx="120" cy="120" rx="50" ry="80" fill="none" stroke="#3826c6" strokeWidth="14" />
+        <rect width="240" height="240" fill="#C0392B" />
+        <ellipse cx="120" cy="120" rx="50" ry="80" fill="none" stroke="#1C1917" strokeWidth="14" />
         <ellipse
           cx="120"
           cy="120"
           rx="50"
           ry="80"
           fill="none"
-          stroke="#3826c6"
+          stroke="#1C1917"
           strokeWidth="14"
           transform="rotate(60 120 120)"
         />
@@ -186,48 +186,48 @@ const statRows: StatRowData[] = [
           rx="50"
           ry="80"
           fill="none"
-          stroke="#5b4eff"
+          stroke="#C0392B"
           strokeWidth="14"
           transform="rotate(120 120 120)"
         />
-        <rect x="100" y="100" width="40" height="40" rx="4" fill="#fbd838" />
-        <path d="M 100 100 L 120 120 L 140 100" fill="#ff7733" />
+        <rect x="100" y="100" width="40" height="40" rx="4" fill="#FFD500" />
+        <path d="M 100 100 L 120 120 L 140 100" fill="#C0392B" />
       </svg>
     ),
     prefix: '',
     countTo: 8,
     suffix: 'X',
-    pillColor: '#ff5ca8',
-    pillLabel: 'Increase in Traffic',
-    desc: 'Track and analyze the impact of your social media campaigns in real-time, pinpointing which strategies drive the most traffic, allowing you to refine your approach',
+    pillColor: '#FFD500',
+    pillLabel: 'Better Retention',
+    desc: 'Research shows interactive, hands-on exploration produces up to 8x better long-term retention compared to passive reading or watching a video.',
   },
   {
-    artBg: '#3826c6',
+    artBg: '#1C1917',
     artSvg: (
       <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
-        <rect width="240" height="240" fill="#3826c6" />
-        <circle cx="80" cy="100" r="30" fill="#6f5fff" />
-        <circle cx="80" cy="100" r="14" fill="#fbd838" />
+        <rect width="240" height="240" fill="#1C1917" />
+        <circle cx="80" cy="100" r="30" fill="#C0392B" />
+        <circle cx="80" cy="100" r="14" fill="#FFD500" />
         <rect
           x="120"
           y="80"
           width="60"
           height="80"
           rx="10"
-          fill="#1a0e5e"
+          fill="#1C1917"
           transform="rotate(12 150 120)"
         />
-        <rect x="60" y="120" width="50" height="40" rx="8" fill="#ff8db8" />
-        <circle cx="80" cy="138" r="6" fill="#5b3cff" />
-        <circle cx="100" cy="138" r="6" fill="#5b3cff" />
+        <rect x="60" y="120" width="50" height="40" rx="8" fill="#E8967A" />
+        <circle cx="80" cy="138" r="6" fill="#C0392B" />
+        <circle cx="100" cy="138" r="6" fill="#C0392B" />
       </svg>
     ),
-    prefix: '+',
-    countTo: 39,
-    suffix: 'h',
-    pillColor: '#5b3cff',
-    pillLabel: 'Saved Weekly',
-    desc: 'Effortlessly save time and with our automated scheduling and content management tools, ensuring consistent posting and engagement',
+    prefix: '',
+    countTo: 85,
+    suffix: '%',
+    pillColor: '#1C1917',
+    pillLabel: 'Cache Hit Rate',
+    desc: 'After month one, more than 85% of student requests are served from cache — making learning near-instant and the per-student cost near zero.',
   },
 ]
 
@@ -260,11 +260,11 @@ export default function Stats() {
           margin: '0 auto 100px',
         }}
       >
-        {"Wollo's Intelligent Algorithms"}
+        {"Prologue's AI Engine"}
         <br />
-        Analyze Social Media Data in
+        Builds Live Visuals in
         <br />
-        Real-Time, offering...
+        Real-Time, giving you...
       </motion.h2>
 
       {statRows.map((row, i) => {
@@ -283,7 +283,7 @@ export default function Stats() {
               alignItems: 'center',
               gap: '60px',
               padding: '60px 0',
-              borderBottom: i < statRows.length - 1 ? '1px solid #ececef' : 'none',
+              borderBottom: i < statRows.length - 1 ? '1px solid #DDD5C6' : 'none',
             }}
           >
             {/* Art square */}
@@ -319,7 +319,7 @@ export default function Stats() {
               style={{
                 fontSize: '17px',
                 lineHeight: 1.55,
-                color: '#0a0a0a',
+                color: '#1C1917',
                 maxWidth: '320px',
               }}
             >

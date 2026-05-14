@@ -56,14 +56,14 @@ export default function Hero() {
           fontSize: 'clamp(48px, 6.6vw, 92px)',
           lineHeight: 1.0,
           letterSpacing: '-0.035em',
-          color: '#0a0a0a',
+          color: '#1C1917',
           maxWidth: '1100px',
           margin: '0 auto',
         }}
       >
-        Maximize Your Social
+        The Fastest Way
         <br />
-        Media Presence
+        To Understand Anything.
       </h1>
 
       <div
@@ -88,13 +88,13 @@ export default function Hero() {
             display: 'inline-flex',
             alignItems: 'center',
             transition: 'transform 0.2s, opacity 0.2s',
-            background: '#5b3cff',
+            background: '#C0392B',
             color: '#fff',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
         >
-          Start Free Trial
+          Start for Free
         </a>
         <a
           href="#"
@@ -105,18 +105,18 @@ export default function Hero() {
             fontSize: '15px',
             fontWeight: 400,
             cursor: 'pointer',
-            border: '1px solid #e0e0e3',
+            border: '1px solid #DDD5C6',
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
             transition: 'transform 0.2s, opacity 0.2s',
             background: '#fff',
-            color: '#0a0a0a',
+            color: '#1C1917',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
         >
-          Create Free Account
+          See It in Action
         </a>
       </div>
 
@@ -151,7 +151,7 @@ export default function Hero() {
               inset: 0,
               borderRadius: '36px',
               overflow: 'hidden',
-              background: '#fbd838',
+              background: '#FFD500',
               transform: 'translate(2.5%, -2%) rotate(2deg)',
               opacity: 0.95,
             }}
@@ -163,7 +163,7 @@ export default function Hero() {
               inset: 0,
               borderRadius: '36px',
               overflow: 'hidden',
-              background: '#ff5ca8',
+              background: '#C0392B',
               transform: 'translate(-1.5%, -0.5%) rotate(-1deg)',
             }}
           />
@@ -174,7 +174,7 @@ export default function Hero() {
               inset: 0,
               borderRadius: '36px',
               overflow: 'hidden',
-              background: '#3826c6',
+              background: '#1C1917',
               transform: 'rotate(0deg)',
             }}
           >
@@ -187,19 +187,19 @@ export default function Hero() {
               >
                 <defs>
                   <radialGradient id="lensG" cx="0.35" cy="0.35" r="0.7">
-                    <stop offset="0%" stopColor="#ffd6c2" />
-                    <stop offset="30%" stopColor="#c4a3e8" />
-                    <stop offset="70%" stopColor="#4a3aa8" />
-                    <stop offset="100%" stopColor="#1a0e5e" />
+                    <stop offset="0%" stopColor="#FFE566" />
+                    <stop offset="30%" stopColor="#F7F2EA" />
+                    <stop offset="70%" stopColor="#922B21" />
+                    <stop offset="100%" stopColor="#1C1917" />
                   </radialGradient>
                   <linearGradient id="heartG" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#ffd1e3" />
-                    <stop offset="50%" stopColor="#ff8dbf" />
-                    <stop offset="100%" stopColor="#e64a8f" />
+                    <stop offset="0%" stopColor="#FFE566" />
+                    <stop offset="50%" stopColor="#C0392B" />
+                    <stop offset="100%" stopColor="#A83226" />
                   </linearGradient>
                   <linearGradient id="heartSide" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ff8b3a" />
-                    <stop offset="100%" stopColor="#e25416" />
+                    <stop offset="0%" stopColor="#A83226" />
+                    <stop offset="100%" stopColor="#922B21" />
                   </linearGradient>
                   <pattern id="noise" width="3" height="3" patternUnits="userSpaceOnUse">
                     <rect width="3" height="3" fill="transparent" />
@@ -210,7 +210,7 @@ export default function Hero() {
                   </pattern>
                 </defs>
 
-                <rect width="1200" height="640" fill="#3826c6" />
+                <rect width="1200" height="640" fill="#1C1917" />
                 <rect width="1200" height="640" fill="url(#noise)" />
 
                 {/* white arcs */}
@@ -249,7 +249,7 @@ export default function Hero() {
                   />
                   <path
                     d="M 0 75 C -22 55, -60 60, -60 95 C -60 140, -10 175, 0 195 C 10 175, 60 140, 60 95 C 60 60, 22 55, 0 75 Z"
-                    fill="#1a0e5e"
+                    fill="#1C1917"
                   />
                   <path
                     d="M 0 75 C -22 55, -60 60, -60 95 C -60 140, -10 175, 0 195 C 10 175, 60 140, 60 95 C 60 60, 22 55, 0 75 Z"
@@ -263,7 +263,7 @@ export default function Hero() {
 
                 {/* small accents */}
                 <circle cx="170" cy="500" r="14" fill="rgba(255,255,255,0.25)" />
-                <path d="M 1050 540 l 8 -20 l 8 20 z" fill="#ff5ca8" />
+                <path d="M 1050 540 l 8 -20 l 8 20 z" fill="#C0392B" />
               </svg>
             </div>
           </div>

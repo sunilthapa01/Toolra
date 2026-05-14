@@ -11,45 +11,45 @@ interface TestimonialData {
 const col1: TestimonialData[] = [
   {
     quote:
-      "Wollo has transformed our social media team's efficiency. With streamlined scheduling and seamless performance tracking, our engagement has soared, resulting in a significant traffic increase. Highly recommend!",
-    name: 'Caleb Whitmore',
-    role: 'Team Lead',
+      "I'd been staring at derivatives for three weeks. One minute with Prologue's tangent-line visual and it finally clicked. It's the first time I actually understood something instead of just memorising a formula.",
+    name: 'Aanya Sharma',
+    role: 'Grade 10 Student, CBSE',
   },
   {
     quote:
-      "Since implementing Wollo, our social media strategies have reached new heights of efficiency and effectiveness. I've witnessed firsthand the impact of this powerful tool on our campaigns.",
-    name: 'Zephyr Finnegan',
-    role: 'Marketing Operations',
+      "I was nervous about AI in my classroom until I saw Prologue. It never gives students the answer — only the understanding. That's exactly what a good teacher does. It's the only AI tool I've recommended to my department.",
+    name: 'Ms. Rebecca Torres',
+    role: 'Math Teacher, Grade 7',
   },
 ]
 
 const col2: TestimonialData[] = [
   {
     quote:
-      "Initially skeptical, I'm thrilled with Wollo's SMM features. They've boosted our social media presence. The responsive support team ensures any queries are swiftly addressed.",
-    name: 'Elodie Harrington',
-    role: 'Brand Manager',
+      "My teacher explained supply and demand five times. I dragged one slider in Prologue and understood it immediately. I went back and explored four more related concepts on my own just because it was fun.",
+    name: 'Marcus Chen',
+    role: 'Grade 11 Student, AP Economics',
   },
   {
     quote:
-      "Of all the SMM management tools I've tried, this one stands out. Its intuitive interface and real-time analytics have elevated my social media strategy. It becomes an indispensable asset to my business.",
-    name: 'Azura Everly',
-    role: 'Content Strategist',
+      "When parents ask about AI in our school, I show them Prologue. It's structurally incapable of academic dishonesty. That's not a feature — that's the architecture. Every district administrator needs to see this.",
+    name: 'Dr. James Okonkwo',
+    role: 'Academic Director',
   },
 ]
 
 const col3: TestimonialData[] = [
   {
     quote:
-      "This affordable SMM management tool has revolutionized my small business's social media management. Its scheduling capabilities have saved me time, while analytics help me refine content.",
-    name: 'Xavier Sinclair',
-    role: 'Customer Strategist',
+      "The live gravity simulation during onboarding was my wow moment. I've explored 40+ concepts since then. It actually makes studying feel like something you choose to do, not something you have to.",
+    name: 'Sofia Reyes',
+    role: 'Grade 9 Student, Common Core',
   },
   {
     quote:
-      'Wollo has become an indispensable asset for our social media team. Its user-friendly interface and comprehensive analytics help us to craft compelling brand narratives and optimize audience engagement.',
-    name: 'Caspian Hawthorne',
-    role: 'SMM Manager',
+      "I used it all through AP Physics and Linear Algebra. The visuals adapt to my level, and the Q&A box answers questions about the specific thing I'm looking at without ever doing my homework for me.",
+    name: 'Ethan Blackwell',
+    role: 'Grade 12 Student, AP Track',
   },
 ]
 
@@ -61,7 +61,7 @@ function TestCard({ item, delay }: { item: TestimonialData; delay: number }) {
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.7, delay, ease: 'easeOut' }}
       style={{
-        background: '#f5f5f7',
+        background: '#EFE8DC',
         borderRadius: '24px',
         padding: '30px',
         display: 'flex',
@@ -71,7 +71,7 @@ function TestCard({ item, delay }: { item: TestimonialData; delay: number }) {
     >
       <div
         style={{
-          color: '#5b3cff',
+          color: '#C0392B',
           fontFamily: "'Outfit', sans-serif",
           fontSize: '36px',
           lineHeight: 1,
@@ -79,10 +79,10 @@ function TestCard({ item, delay }: { item: TestimonialData; delay: number }) {
       >
         &ldquo;
       </div>
-      <div style={{ fontSize: '16px', lineHeight: 1.5, color: '#0a0a0a' }}>{item.quote}</div>
+      <div style={{ fontSize: '16px', lineHeight: 1.5, color: '#1C1917' }}>{item.quote}</div>
       <div>
-        <div style={{ fontSize: '17px', fontWeight: 500, color: '#0a0a0a' }}>{item.name}</div>
-        <div style={{ fontSize: '14px', color: '#8a8a92', marginTop: '2px' }}>{item.role}</div>
+        <div style={{ fontSize: '17px', fontWeight: 500, color: '#1C1917' }}>{item.name}</div>
+        <div style={{ fontSize: '14px', color: '#7C7570', marginTop: '2px' }}>{item.role}</div>
       </div>
     </motion.div>
   )

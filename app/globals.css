@@ -5,23 +5,23 @@
 @tailwind utilities;
 
 :root {
-  --bg-page: #e7e7eb;
-  --bg-card: #ffffff;
-  --bg-soft: #f5f5f7;
-  --ink: #0a0a0a;
-  --ink-2: #1a1a1f;
-  --muted: #8a8a92;
-  --line: #ececef;
-  --purple: #5b3cff;
-  --purple-2: #4a2fdc;
-  --deep-purple: #3826c6;
-  --pink: #ff5ca8;
-  --pink-soft: #ffb3d1;
-  --pink-deep: #e63985;
-  --pink-card: #ff4f9c;
-  --yellow: #fbd838;
-  --orange: #ff6b35;
-  --orange-soft: #ff8a4d;
+  --paper:       #F7F2EA;
+  --cream:       #EFE8DC;
+  --ink:         #1C1917;
+  --vermillion:  #C0392B;
+  --gold:        #FFD500;
+
+  /* derived */
+  --bg-page:     var(--paper);
+  --bg-card:     var(--cream);
+  --bg-soft:     var(--cream);
+  --ink-2:       var(--ink);
+  --muted:       #7C7570;
+  --line:        #DDD5C6;
+  --vermillion-dark:  #922B21;
+  --vermillion-mid:   #A83226;
+  --vermillion-light: #E8967A;
+  --gold-soft:   #FFE566;
 }
 
 * {
@@ -44,7 +44,7 @@ body {
 }
 
 .shell {
-  background: var(--bg-card);
+  background: var(--cream);
   border-radius: 28px;
   overflow: hidden;
   position: relative;

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Wollo — Maximize Your Social Media Presence',
-  description: 'Wollo helps you maximize your social media presence with intelligent analytics, scheduling, and integrations.',
+  title: 'Prologue — Don\'t Read It. Touch It.',
+  description: 'Prologue is an interactive visual learning platform. Type any concept and get a live, manipulable visual that makes it click.',
 }
 
 export default function RootLayout({

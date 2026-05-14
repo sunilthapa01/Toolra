@@ -5,7 +5,7 @@ export default function CTA() {
     <section style={{ padding: '0 40px 40px' }}>
       <div
         style={{
-          background: '#7464ff',
+          background: '#1C1917',
           borderRadius: '36px',
           overflow: 'hidden',
           position: 'relative',
@@ -28,11 +28,11 @@ export default function CTA() {
               marginBottom: '38px',
             }}
           >
-            Reach More People
+            Understand Anything
             <br />
-            and Grow Your Brand
+            By Exploring It
             <br />
-            Awareness.
+            Yourself.
           </h2>
           <a
             href="#"
@@ -54,7 +54,7 @@ export default function CTA() {
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
-            Start Free Trial
+            Start for Free
           </a>
         </div>
 
@@ -76,8 +76,8 @@ export default function CTA() {
           >
             <defs>
               <linearGradient id="ctaCubeG" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a098ff" />
-                <stop offset="100%" stopColor="#5b3cff" />
+                <stop offset="0%" stopColor="#E8967A" />
+                <stop offset="100%" stopColor="#C0392B" />
               </linearGradient>
             </defs>
             <ellipse cx="320" cy="430" rx="180" ry="20" fill="rgba(0,0,0,0.18)" />
@@ -88,7 +88,7 @@ export default function CTA() {
               rx="170"
               ry="50"
               fill="none"
-              stroke="#3826c6"
+              stroke="#1C1917"
               strokeWidth="22"
               transform="rotate(-20 320 250)"
             />
@@ -98,24 +98,24 @@ export default function CTA() {
               rx="170"
               ry="50"
               fill="none"
-              stroke="#5b4eff"
+              stroke="#C0392B"
               strokeWidth="22"
               transform="rotate(40 320 250)"
             />
             {/* cube */}
             <rect x="240" y="170" width="170" height="170" rx="14" fill="url(#ctaCubeG)" />
-            <rect x="270" y="200" width="50" height="50" rx="6" fill="#fbd838" />
-            <path d="M 290 210 L 305 240 L 320 210 Z" fill="#ff7733" />
-            <rect x="340" y="240" width="40" height="60" rx="4" fill="#ff5ca8" />
-            <circle cx="320" cy="290" r="14" fill="#fbd838" />
+            <rect x="270" y="200" width="50" height="50" rx="6" fill="#FFD500" />
+            <path d="M 290 210 L 305 240 L 320 210 Z" fill="#C0392B" />
+            <rect x="340" y="240" width="40" height="60" rx="4" fill="#C0392B" />
+            <circle cx="320" cy="290" r="14" fill="#FFD500" />
             {/* pencil */}
             <g transform="rotate(28 470 160)">
-              <rect x="440" y="80" width="20" height="160" fill="#5b3cff" />
-              <path d="M 440 80 L 460 80 L 450 60 Z" fill="#fbd838" />
-              <rect x="440" y="240" width="20" height="14" fill="#ff7733" />
+              <rect x="440" y="80" width="20" height="160" fill="#C0392B" />
+              <path d="M 440 80 L 460 80 L 450 60 Z" fill="#FFD500" />
+              <rect x="440" y="240" width="20" height="14" fill="#C0392B" />
             </g>
             {/* yellow dot */}
-            <circle cx="380" cy="100" r="10" fill="#fbd838" />
+            <circle cx="380" cy="100" r="10" fill="#FFD500" />
           </svg>
         </div>
       </div>

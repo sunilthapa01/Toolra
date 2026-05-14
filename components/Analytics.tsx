@@ -4,25 +4,25 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 
 const VIEWS = [
-  { title: 'Hashtag Performance', barColor: '#5b3cff', barClass: 'bar-purple' },
-  { title: 'Audience Demographics', barColor: '#ff5ca8', barClass: 'bar-pink' },
-  { title: 'Average Response Time', barColor: '#fbd838', barClass: 'bar-yellow' },
+  { title: 'Concept Library', barColor: '#C0392B', barClass: 'bar-vermillion' },
+  { title: 'Grade Coverage', barColor: '#C0392B', barClass: 'bar-vermillion' },
+  { title: 'Generation Speed', barColor: '#FFD500', barClass: 'bar-gold' },
 ]
 
 function HashpileView() {
   const tags = [
-    { text: '#Nature', top: '18%', left: '32%', rotate: '-7deg' },
-    { text: '#Art', top: '20%', left: '52%', rotate: '6deg' },
-    { text: '#Cooking', top: '30%', left: '8%', rotate: '-9deg' },
-    { text: '#Photography', top: '32%', left: '64%', rotate: '-4deg' },
-    { text: '#Fun', top: '44%', left: '38%', rotate: '2deg' },
-    { text: '#AI', top: '44%', left: '56%', rotate: '-1deg' },
-    { text: '#Travel', top: '56%', left: '14%', rotate: '8deg' },
-    { text: '#Selfie', top: '58%', left: '30%', rotate: '-6deg' },
-    { text: '#Explore', top: '56%', left: '50%', rotate: '4deg' },
-    { text: '#Fitness', top: '56%', left: '70%', rotate: '-3deg' },
-    { text: '#Foodie', top: '72%', left: '30%', rotate: '-2deg' },
-    { text: '#Movie', top: '72%', left: '52%', rotate: '5deg' },
+    { text: 'Derivatives', top: '18%', left: '32%', rotate: '-7deg' },
+    { text: 'Photosynthesis', top: '20%', left: '52%', rotate: '6deg' },
+    { text: 'Gravity', top: '30%', left: '8%', rotate: '-9deg' },
+    { text: 'DNA Replication', top: '32%', left: '56%', rotate: '-4deg' },
+    { text: 'Supply & Demand', top: '44%', left: '34%', rotate: '2deg' },
+    { text: 'Pythagorean', top: '44%', left: '60%', rotate: '-1deg' },
+    { text: 'Osmosis', top: '56%', left: '10%', rotate: '8deg' },
+    { text: 'Trigonometry', top: '58%', left: '28%', rotate: '-6deg' },
+    { text: 'Linear Regression', top: '56%', left: '52%', rotate: '4deg' },
+    { text: 'Evolution', top: '72%', left: '14%', rotate: '-3deg' },
+    { text: 'Momentum', top: '72%', left: '38%', rotate: '-2deg' },
+    { text: 'Fractions', top: '72%', left: '60%', rotate: '5deg' },
   ]
 
   return (
@@ -32,14 +32,14 @@ function HashpileView() {
           key={tag.text}
           style={{
             position: 'absolute',
-            border: '1px solid #d8d8de',
+            border: '1px solid #DDD5C6',
             background: '#fff',
             borderRadius: '999px',
             padding: '10px 22px',
             fontSize: '19px',
             fontFamily: "'Outfit', sans-serif",
             fontWeight: 400,
-            color: '#0a0a0a',
+            color: '#1C1917',
             whiteSpace: 'nowrap',
             top: tag.top,
             left: tag.left,
@@ -55,12 +55,12 @@ function HashpileView() {
 
 function DemographicsView() {
   const rows = [
-    { label: 'Pet Owners', pct: 74 },
-    { label: 'Travelers', pct: 50 },
-    { label: 'Parents', pct: 45 },
-    { label: 'Foodies', pct: 42 },
-    { label: 'Fitness Enthusiasts', pct: 37 },
-    { label: 'Fashionistas', pct: 26 },
+    { label: 'Common Core (US)', pct: 74 },
+    { label: 'AP Track', pct: 62 },
+    { label: 'CBSE (India)', pct: 55 },
+    { label: 'Grade 9–12', pct: 48 },
+    { label: 'Grade 6–8', pct: 35 },
+    { label: 'International', pct: 26 },
   ]
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '8px 0' }}>
@@ -70,7 +70,7 @@ function DemographicsView() {
             style={{
               height: '36px',
               borderRadius: '999px',
-              background: 'linear-gradient(90deg, #ff6fb1 0%, #ffb3d1 100%)',
+              background: 'linear-gradient(90deg, #ff6fb1 0%, #FFE566 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
@@ -85,7 +85,7 @@ function DemographicsView() {
           >
             {row.pct}%
           </div>
-          <div style={{ fontSize: '16px', color: '#0a0a0a' }}>{row.label}</div>
+          <div style={{ fontSize: '16px', color: '#1C1917' }}>{row.label}</div>
         </div>
       ))}
     </div>
@@ -98,7 +98,7 @@ function ResponseTimeView() {
       <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
         <span
           style={{
-            background: '#0a0a0a',
+            background: '#1C1917',
             color: '#fff',
             borderRadius: '999px',
             padding: '6px 14px',
@@ -129,13 +129,13 @@ function ResponseTimeView() {
               />
             ))}
           </span>
-          by channel
+          by subject
         </span>
         <span
           style={{
             background: '#fff',
-            color: '#0a0a0a',
-            border: '1px solid #e0e0e3',
+            color: '#1C1917',
+            border: '1px solid #DDD5C6',
             borderRadius: '999px',
             padding: '6px 14px',
             fontSize: '13px',
@@ -165,25 +165,25 @@ function ResponseTimeView() {
               />
             ))}
           </span>
-          by content type
+          by grade
         </span>
       </div>
       <div style={{ position: 'relative', height: '280px' }}>
         <svg viewBox="0 0 400 250" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
           <path
             d="M 0 160 Q 40 100, 80 140 T 160 130 Q 200 160, 240 80 T 320 120 T 400 110"
-            stroke="#fbd838"
+            stroke="#FFD500"
             strokeWidth="4"
             fill="none"
             strokeLinecap="round"
           />
-          <circle cx="240" cy="98" r="6" fill="#fbd838" />
-          <line x1="240" y1="110" x2="240" y2="230" stroke="#d4d4d8" strokeWidth="1" strokeDasharray="2 3" />
+          <circle cx="240" cy="98" r="6" fill="#FFD500" />
+          <line x1="240" y1="110" x2="240" y2="230" stroke="#DDD5C6" strokeWidth="1" strokeDasharray="2 3" />
         </svg>
         <div
           style={{
             position: 'absolute',
-            background: '#0a0a0a',
+            background: '#1C1917',
             color: '#fff',
             fontSize: '12px',
             padding: '5px 10px',
@@ -194,7 +194,7 @@ function ResponseTimeView() {
             top: '36%',
           }}
         >
-          8:05 min
+          &lt; 1 sec
         </div>
         <div
           style={{
@@ -205,16 +205,16 @@ function ResponseTimeView() {
             display: 'flex',
             justifyContent: 'space-between',
             fontSize: '11px',
-            color: '#999',
+            color: '#7C7570',
           }}
         >
-          <span>Oct</span>
-          <span>Mar</span>
-          <span>Jul</span>
-          <span>Aug</span>
-          <span>Sep</span>
-          <span>Oct</span>
-          <span>Nov</span>
+          <span>Math</span>
+          <span>Physics</span>
+          <span>Chem</span>
+          <span>Bio</span>
+          <span>Econ</span>
+          <span>History</span>
+          <span>CS</span>
         </div>
       </div>
     </div>
@@ -285,9 +285,9 @@ export default function Analytics() {
           margin: '0 auto 64px',
         }}
       >
-        Advanced Analytics
+        Visual Intelligence
         <br />
-        and Reporting
+        For Every Student
       </motion.h2>
 
       <div
@@ -303,7 +303,7 @@ export default function Analytics() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.1, ease: 'easeOut' }}
           style={{
-            background: '#f5f5f7',
+            background: '#EFE8DC',
             borderRadius: '28px',
             padding: '36px 32px 32px',
             position: 'relative',
@@ -358,11 +358,11 @@ export default function Analytics() {
                   background:
                     i === viewIndex
                       ? i === 0
-                        ? '#5b3cff'
+                        ? '#C0392B'
                         : i === 1
-                        ? '#ff5ca8'
-                        : '#fbd838'
-                      : '#e5e5ea',
+                        ? '#C0392B'
+                        : '#FFD500'
+                      : '#DDD5C6',
                   transition: 'background 0.35s ease',
                 }}
               />
@@ -376,7 +376,7 @@ export default function Analytics() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
           style={{
-            background: '#f5f5f7',
+            background: '#EFE8DC',
             borderRadius: '28px',
             padding: '36px 32px 32px',
             position: 'relative',
@@ -392,7 +392,7 @@ export default function Analytics() {
               marginBottom: '24px',
             }}
           >
-            Optimizing Performance
+            Learning Performance
           </h3>
 
           <div
@@ -410,15 +410,15 @@ export default function Analytics() {
                 style={{
                   borderRadius: '18px',
                   padding: '22px',
-                  background: '#fbd838',
-                  color: '#0a0a0a',
+                  background: '#FFD500',
+                  color: '#1C1917',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   minHeight: '168px',
                 }}
               >
-                <div style={{ fontSize: '14px', opacity: 0.95 }}>Engagement Rate</div>
+                <div style={{ fontSize: '14px', opacity: 0.95 }}>Cache Hit Rate</div>
                 <div
                   style={{
                     fontFamily: "'Outfit', sans-serif",
@@ -428,14 +428,14 @@ export default function Analytics() {
                     lineHeight: 1,
                   }}
                 >
-                  +<Counter target={64} suffix="%" />
+                  +<Counter target={85} suffix="%" />
                 </div>
               </div>
               <div
                 style={{
                   borderRadius: '18px',
                   padding: '22px',
-                  background: '#ff5ca8',
+                  background: '#C0392B',
                   color: '#fff',
                   display: 'flex',
                   flexDirection: 'column',
@@ -443,7 +443,7 @@ export default function Analytics() {
                   minHeight: '168px',
                 }}
               >
-                <div style={{ fontSize: '14px', opacity: 0.95 }}>Followers</div>
+                <div style={{ fontSize: '14px', opacity: 0.95 }}>Concept Retention</div>
                 <div
                   style={{
                     fontFamily: "'Outfit', sans-serif",
@@ -453,7 +453,7 @@ export default function Analytics() {
                     lineHeight: 1,
                   }}
                 >
-                  +<Counter target={70} suffix=" %" />
+                  <Counter target={8} suffix="X" />
                 </div>
               </div>
             </div>
@@ -472,7 +472,7 @@ export default function Analytics() {
                 style={{
                   display: 'flex',
                   gap: '4px',
-                  background: '#f1f1f4',
+                  background: '#EFE8DC',
                   borderRadius: '999px',
                   padding: '5px',
                   alignSelf: 'flex-start',
@@ -486,8 +486,8 @@ export default function Analytics() {
                       fontSize: '13px',
                       padding: '6px 12px',
                       borderRadius: '999px',
-                      color: i === 1 ? '#fff' : '#0a0a0a',
-                      background: i === 1 ? '#0a0a0a' : 'transparent',
+                      color: i === 1 ? '#fff' : '#1C1917',
+                      background: i === 1 ? '#1C1917' : 'transparent',
                       cursor: 'pointer',
                     }}
                   >
@@ -500,11 +500,11 @@ export default function Analytics() {
                 <svg viewBox="0 0 500 250" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
                   <defs>
                     <linearGradient id="optAreaG" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ff5ca8" />
-                      <stop offset="100%" stopColor="#ff5ca8" stopOpacity="0" />
+                      <stop offset="0%" stopColor="#C0392B" />
+                      <stop offset="100%" stopColor="#C0392B" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  <g stroke="#e5e5ea" strokeWidth="1" strokeDasharray="3 4">
+                  <g stroke="#DDD5C6" strokeWidth="1" strokeDasharray="3 4">
                     <line x1="0" y1="50" x2="500" y2="50" />
                     <line x1="0" y1="100" x2="500" y2="100" />
                     <line x1="0" y1="150" x2="500" y2="150" />
@@ -512,7 +512,7 @@ export default function Analytics() {
                   </g>
                   <path
                     d="M 0 180 L 90 170 L 180 150 L 270 200 L 360 90 L 500 30"
-                    stroke="#ff5ca8"
+                    stroke="#C0392B"
                     strokeWidth="3.5"
                     fill="none"
                     strokeLinejoin="round"
@@ -523,15 +523,15 @@ export default function Analytics() {
                     fill="url(#optAreaG)"
                     opacity="0.18"
                   />
-                  <circle cx="180" cy="150" r="6" fill="#ff5ca8" />
-                  <circle cx="360" cy="90" r="6" fill="#ff5ca8" />
-                  <line x1="180" y1="158" x2="180" y2="250" stroke="#ff5ca8" strokeWidth="1" strokeDasharray="2 3" opacity="0.5" />
-                  <line x1="360" y1="98" x2="360" y2="250" stroke="#ff5ca8" strokeWidth="1" strokeDasharray="2 3" opacity="0.5" />
+                  <circle cx="180" cy="150" r="6" fill="#C0392B" />
+                  <circle cx="360" cy="90" r="6" fill="#C0392B" />
+                  <line x1="180" y1="158" x2="180" y2="250" stroke="#C0392B" strokeWidth="1" strokeDasharray="2 3" opacity="0.5" />
+                  <line x1="360" y1="98" x2="360" y2="250" stroke="#C0392B" strokeWidth="1" strokeDasharray="2 3" opacity="0.5" />
                 </svg>
                 <div
                   style={{
                     position: 'absolute',
-                    background: '#0a0a0a',
+                    background: '#1C1917',
                     color: '#fff',
                     fontSize: '12px',
                     padding: '5px 10px',
@@ -542,12 +542,12 @@ export default function Analytics() {
                     top: '50%',
                   }}
                 >
-                  +46%
+                  +3x
                 </div>
                 <div
                   style={{
                     position: 'absolute',
-                    background: '#0a0a0a',
+                    background: '#1C1917',
                     color: '#fff',
                     fontSize: '12px',
                     padding: '5px 10px',
@@ -558,7 +558,7 @@ export default function Analytics() {
                     top: '28%',
                   }}
                 >
-                  +67%
+                  +8x
                 </div>
               </div>
             </div>

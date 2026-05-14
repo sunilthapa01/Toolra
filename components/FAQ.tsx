@@ -10,23 +10,24 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: 'How does Wollo handle social media advertising integration?',
+    question: 'How is Prologue different from asking ChatGPT to explain a concept?',
     answer:
-      'Wollo integrates with all major ad platforms to centralize campaign creation, budget management, and performance tracking in one dashboard.',
+      "ChatGPT gives you text. Prologue gives you a working environment you control. You can't truly understand a derivative by reading about it — you need to drag the point and feel the slope change. One is passive; the other is physical.",
   },
   {
-    question: 'Can I manage multiple social media accounts from a single dashboard with Wollo?',
+    question: "Can students use Prologue to cheat on their homework?",
     answer:
-      'Yes. Connect unlimited accounts across every supported network and switch between them with a single click.',
+      "No — and this is by design. Prologue never completes a student's work. It only illuminates the underlying concept. A student who understands what a derivative is still has to solve their calculus problem themselves. The platform is structurally incapable of academic dishonesty.",
   },
   {
-    question: 'Is there a mobile app available for managing social media on the go with Wollo?',
-    answer: 'Native iOS and Android apps let you publish, reply, and review analytics from anywhere.',
+    question: 'What subjects and grade levels does Prologue support?',
+    answer:
+      'Prologue supports Common Core (US), AP (Grades 11–13), CBSE (India), and General/International — for Grades 6 through 13. Subjects include Math, Physics, Chemistry, Biology, Economics, History, and more.',
   },
   {
-    question: 'How does Wollo ensure data security and privacy for user accounts?',
+    question: 'How does Prologue handle content safety for schools?',
     answer:
-      'End-to-end encryption, SOC 2 Type II compliance, and granular role-based access controls keep your data safe.',
+      'Every student input is classified by a fast AI moderation layer before any visual generation happens. Inappropriate requests are blocked and logged to an audit trail. When a district asks what happens if a student misuses the tool, you show them the log.',
   },
 ]
 
@@ -51,7 +52,7 @@ export default function FAQ() {
           margin: '0 auto 64px',
         }}
       >
-        Frequently Asked
+        Frequently Asked Questions
       </motion.h2>
 
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
@@ -61,7 +62,7 @@ export default function FAQ() {
             <div
               key={i}
               style={{
-                borderBottom: '1px solid #ececef',
+                borderBottom: '1px solid #DDD5C6',
               }}
             >
               <button
@@ -86,7 +87,7 @@ export default function FAQ() {
                     fontWeight: 400,
                     fontSize: '22px',
                     letterSpacing: '-0.01em',
-                    color: '#0a0a0a',
+                    color: '#1C1917',
                   }}
                 >
                   {faq.question}
@@ -94,7 +95,7 @@ export default function FAQ() {
                 <motion.svg
                   animate={{ rotate: isOpen ? 180 : 0 }}
                   transition={{ duration: 0.3 }}
-                  style={{ width: '14px', height: '14px', color: '#0a0a0a', flexShrink: 0 }}
+                  style={{ width: '14px', height: '14px', color: '#1C1917', flexShrink: 0 }}
                   viewBox="0 0 24 24"
                   fill="none"
                 >
@@ -121,7 +122,7 @@ export default function FAQ() {
                     <div
                       style={{
                         padding: '0 4px 18px',
-                        color: '#8a8a92',
+                        color: '#7C7570',
                         fontSize: '15px',
                         lineHeight: 1.55,
                       }}

@@ -54,7 +54,7 @@ export default function Nav() {
           fontWeight: 700,
           fontSize: '28px',
           letterSpacing: '-0.04em',
-          color: isPink ? '#ff5ca8' : '#0a0a0a',
+          color: isPink ? '#C0392B' : '#1C1917',
           textDecoration: 'none',
           display: 'inline-flex',
           alignItems: 'baseline',
@@ -62,12 +62,12 @@ export default function Nav() {
           pointerEvents: 'auto',
         }}
       >
-        wollo
+        prologue
       </a>
 
       <div
         style={{
-          background: 'rgba(245, 245, 247, 0.92)',
+          background: 'rgba(239, 232, 220, 0.92)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
           borderRadius: '999px',
@@ -78,12 +78,12 @@ export default function Nav() {
         }}
         className="hidden md:flex"
       >
-        {['Features', 'Integrations', 'Pricing', 'About us', 'Contact'].map((item) => (
+        {['Features', 'How It Works', 'Pricing', 'About', 'Contact'].map((item) => (
           <a
             key={item}
             href={`#${item.toLowerCase().replace(' ', '')}`}
             style={{
-              color: '#0a0a0a',
+              color: '#1C1917',
               textDecoration: 'none',
               fontSize: '15px',
               fontWeight: 400,
@@ -110,7 +110,7 @@ export default function Nav() {
         <a
           href="#"
           style={{
-            color: '#0a0a0a',
+            color: '#1C1917',
             textDecoration: 'none',
             fontSize: '15px',
             padding: '8px 12px',
@@ -121,7 +121,7 @@ export default function Nav() {
         <a
           href="#"
           style={{
-            background: '#0a0a0a',
+            background: '#1C1917',
             color: '#fff',
             textDecoration: 'none',
             fontSize: '15px',
@@ -139,10 +139,10 @@ export default function Nav() {
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.background = '#0a0a0a'
+            e.currentTarget.style.background = '#1C1917'
           }}
         >
-          Start Free Trial
+          Start for Free
         </a>
       </div>
     </nav>

@@ -6,20 +6,20 @@ const featureCards = [
   {
     col: 1,
     yOffset: 80,
-    headText: 'Amplify Your Social\nMedia Reach',
-    label: 'Partnership Engaging',
+    headText: 'Any Concept,\nAny Grade',
+    label: 'AI Visual Generation',
     num: '01',
-    color: '#ff6b35',
-    cardClass: 'is-orange',
+    bg: '#C0392B',
+    textColor: '#fff',
     illu: (
       <svg
         style={{ position: 'absolute', right: '-6%', top: '-10%', width: '60%', opacity: 0.95 }}
         viewBox="0 0 200 200"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <ellipse cx="120" cy="80" rx="40" ry="50" fill="#ff8a4d" />
-        <rect x="110" y="40" width="20" height="20" fill="#ff5ca8" />
-        <path d="M 100 60 L 115 30 L 130 60 Z" fill="#fbd838" />
+        <ellipse cx="120" cy="80" rx="40" ry="50" fill="#E8967A" />
+        <rect x="110" y="40" width="20" height="20" fill="#FFD500" />
+        <path d="M 100 60 L 115 30 L 130 60 Z" fill="#FFE566" />
         <ellipse cx="120" cy="80" rx="22" ry="30" fill="rgba(0,0,0,0.2)" />
       </svg>
     ),
@@ -27,11 +27,11 @@ const featureCards = [
   {
     col: 2,
     yOffset: 0,
-    headText: 'Connect, Manage,\nand Analyze',
-    label: 'Content Scheduling',
+    headText: 'Touch, Drag,\nExplore',
+    label: 'Interactive Learning',
     num: '02',
-    color: '#ff4f9c',
-    cardClass: 'is-pink',
+    bg: '#FFD500',
+    textColor: '#1C1917',
     illu: (
       <svg
         style={{ position: 'absolute', right: '-6%', top: '-10%', width: '60%', opacity: 0.95 }}
@@ -40,16 +40,16 @@ const featureCards = [
       >
         <path
           d="M 100 50 C 70 30, 30 30, 30 70 C 30 110, 90 150, 100 165 C 110 150, 170 110, 170 70 C 170 30, 130 30, 100 50 Z"
-          fill="#ff8db8"
+          fill="#E8967A"
         />
         <path
           d="M 100 70 C 80 55, 50 55, 50 80 C 50 110, 95 145, 100 155 C 105 145, 150 110, 150 80 C 150 55, 120 55, 100 70 Z"
-          fill="#3826c6"
+          fill="#1C1917"
         />
         <path
           d="M 90 165 C 70 145, 30 110, 30 70 C 30 50, 38 38, 50 32 L 50 145 Z"
-          fill="#ff7733"
-          opacity="0.6"
+          fill="#C0392B"
+          opacity="0.5"
         />
       </svg>
     ),
@@ -57,11 +57,11 @@ const featureCards = [
   {
     col: 3,
     yOffset: 40,
-    headText: 'Centralize and Streamline\nCommunication',
-    label: 'Messages Management',
+    headText: 'Never Just\nan Answer',
+    label: 'Built for Understanding',
     num: '03',
-    color: '#5b3cff',
-    cardClass: 'is-purple',
+    bg: '#1C1917',
+    textColor: '#fff',
     illu: (
       <svg
         style={{ position: 'absolute', right: '-6%', top: '-10%', width: '60%', opacity: 0.95 }}
@@ -69,10 +69,10 @@ const featureCards = [
         xmlns="http://www.w3.org/2000/svg"
       >
         <g transform="rotate(-14 100 100)">
-          <rect x="20" y="60" width="160" height="100" rx="10" fill="#5b3cff" />
+          <rect x="20" y="60" width="160" height="100" rx="10" fill="#C0392B" />
           <path d="M 20 70 L 100 130 L 180 70" stroke="#fff" strokeWidth="2" fill="none" />
-          <circle cx="50" cy="120" r="8" fill="#fbd838" />
-          <rect x="130" y="80" width="30" height="30" rx="6" fill="#fff" />
+          <circle cx="50" cy="120" r="8" fill="#FFD500" />
+          <rect x="130" y="80" width="30" height="30" rx="6" fill="#EFE8DC" />
         </g>
       </svg>
     ),
@@ -106,7 +106,7 @@ export default function Features() {
             {/* Head */}
             <div
               style={{
-                background: '#f5f5f7',
+                background: '#EFE8DC',
                 borderRadius: '28px',
                 padding: '32px 30px 28px',
                 marginBottom: 0,
@@ -119,7 +119,7 @@ export default function Features() {
                   fontSize: '26px',
                   lineHeight: 1.15,
                   letterSpacing: '-0.015em',
-                  color: '#0a0a0a',
+                  color: '#1C1917',
                   minHeight: '64px',
                   whiteSpace: 'pre-line',
                 }}
@@ -135,7 +135,7 @@ export default function Features() {
               style={{
                 borderRadius: '28px',
                 padding: '28px 30px 30px',
-                color: '#fff',
+                color: card.textColor,
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: '280px',
@@ -143,7 +143,7 @@ export default function Features() {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 willChange: 'transform',
-                background: card.color,
+                background: card.bg,
                 marginTop: '14px',
                 cursor: 'pointer',
               }}
@@ -171,7 +171,7 @@ export default function Features() {
               >
                 <path
                   d="M5 12h14M13 6l6 6-6 6"
-                  stroke="#fff"
+                  stroke={card.textColor}
                   strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
