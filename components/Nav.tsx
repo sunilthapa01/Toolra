@@ -150,24 +150,12 @@ export default function Nav() {
         <a
           href="#"
           style={{
-            color: '#1C1917',
-            textDecoration: 'none',
-            fontSize: '15px',
-            padding: '8px 12px',
-          }}
-        >
-          Log in
-        </a>
-        <a
-          href="#"
-          style={{
             background: '#1C1917',
             color: '#fff',
             textDecoration: 'none',
             fontSize: '15px',
             padding: '12px 22px',
             borderRadius: '999px',
-            border: 'none',
             cursor: 'pointer',
             fontFamily: 'inherit',
             transition: 'transform 0.2s, background 0.2s',
@@ -182,7 +170,7 @@ export default function Nav() {
             e.currentTarget.style.background = '#1C1917'
           }}
         >
-          Start for Free
+          Log in
         </a>
       </div>
     </nav>

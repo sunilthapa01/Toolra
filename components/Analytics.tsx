@@ -1,59 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 
-const VIEWS = [
-  { title: 'Concept Library', barColor: '#C0392B', barClass: 'bar-vermillion' },
-  { title: 'Grade Coverage', barColor: '#C0392B', barClass: 'bar-vermillion' },
-  { title: 'Generation Speed', barColor: '#FFD500', barClass: 'bar-gold' },
-]
-
-function HashpileView() {
-  const tags = [
-    { text: 'Derivatives', top: '18%', left: '32%', rotate: '-7deg' },
-    { text: 'Photosynthesis', top: '20%', left: '52%', rotate: '6deg' },
-    { text: 'Gravity', top: '30%', left: '8%', rotate: '-9deg' },
-    { text: 'DNA Replication', top: '32%', left: '56%', rotate: '-4deg' },
-    { text: 'Supply & Demand', top: '44%', left: '34%', rotate: '2deg' },
-    { text: 'Pythagorean', top: '44%', left: '60%', rotate: '-1deg' },
-    { text: 'Osmosis', top: '56%', left: '10%', rotate: '8deg' },
-    { text: 'Trigonometry', top: '58%', left: '28%', rotate: '-6deg' },
-    { text: 'Linear Regression', top: '56%', left: '52%', rotate: '4deg' },
-    { text: 'Evolution', top: '72%', left: '14%', rotate: '-3deg' },
-    { text: 'Momentum', top: '72%', left: '38%', rotate: '-2deg' },
-    { text: 'Fractions', top: '72%', left: '60%', rotate: '5deg' },
-  ]
-
-  return (
-    <div style={{ position: 'relative', height: '280px' }}>
-      {tags.map((tag) => (
-        <div
-          key={tag.text}
-          style={{
-            position: 'absolute',
-            border: '1px solid #DDD5C6',
-            background: '#fff',
-            borderRadius: '999px',
-            padding: '10px 22px',
-            fontSize: '19px',
-            fontFamily: "'Outfit', sans-serif",
-            fontWeight: 400,
-            color: '#1C1917',
-            whiteSpace: 'nowrap',
-            top: tag.top,
-            left: tag.left,
-            transform: `rotate(${tag.rotate})`,
-          }}
-        >
-          {tag.text}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function DemographicsView() {
+function GradeCoverageView() {
   const rows = [
     { label: 'Common Core (US)', pct: 74 },
     { label: 'AP Track', pct: 62 },
@@ -62,161 +12,54 @@ function DemographicsView() {
     { label: 'Grade 6–8', pct: 35 },
     { label: 'International', pct: 26 },
   ]
+
+  const barRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(barRef, { once: true, amount: 0.3 })
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '8px 0' }}>
-      {rows.map((row) => (
-        <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+    <div
+      ref={barRef}
+      style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '8px 0' }}
+    >
+      {rows.map((row, index) => (
+        <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div
             style={{
-              height: '36px',
+              height: '38px',
               borderRadius: '999px',
-              background: 'linear-gradient(90deg, #ff6fb1 0%, #FFE566 100%)',
+              background: 'linear-gradient(90deg, #C0392B 0%, #FFD500 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              paddingRight: '14px',
+              paddingRight: '16px',
               color: '#fff',
-              fontWeight: 500,
+              fontWeight: 600,
               fontSize: '14px',
-              boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.4)',
-              width: `${row.pct}%`,
-              minWidth: '60px',
+              fontFamily: "'Outfit', sans-serif",
+              width: isInView ? `${row.pct}%` : '0%',
+              minWidth: isInView ? '60px' : '0px',
+              transition: `width 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.08}s, min-width 0.3s ease ${index * 0.08}s`,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
             }}
           >
             {row.pct}%
           </div>
-          <div style={{ fontSize: '16px', color: '#1C1917' }}>{row.label}</div>
+          <div
+            style={{
+              fontSize: '15px',
+              color: '#1C1917',
+              fontFamily: "'Outfit', sans-serif",
+              fontWeight: 400,
+              whiteSpace: 'nowrap',
+              opacity: isInView ? 1 : 0,
+              transition: `opacity 0.5s ease ${index * 0.08 + 0.3}s`,
+            }}
+          >
+            {row.label}
+          </div>
         </div>
       ))}
-    </div>
-  )
-}
-
-function ResponseTimeView() {
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
-        <span
-          style={{
-            background: '#1C1917',
-            color: '#fff',
-            borderRadius: '999px',
-            padding: '6px 14px',
-            fontSize: '13px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-          }}
-        >
-          <span
-            style={{
-              display: 'inline-grid',
-              gridTemplateColumns: 'repeat(2, 3px)',
-              gridTemplateRows: 'repeat(2, 3px)',
-              gap: '1px',
-            }}
-          >
-            {[0, 1, 2, 3].map((i) => (
-              <i
-                key={i}
-                style={{
-                  background: 'currentColor',
-                  display: 'block',
-                  width: '3px',
-                  height: '3px',
-                  borderRadius: '999px',
-                }}
-              />
-            ))}
-          </span>
-          by subject
-        </span>
-        <span
-          style={{
-            background: '#fff',
-            color: '#1C1917',
-            border: '1px solid #DDD5C6',
-            borderRadius: '999px',
-            padding: '6px 14px',
-            fontSize: '13px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-          }}
-        >
-          <span
-            style={{
-              display: 'inline-grid',
-              gridTemplateColumns: 'repeat(2, 3px)',
-              gridTemplateRows: 'repeat(2, 3px)',
-              gap: '1px',
-            }}
-          >
-            {[0, 1, 2, 3].map((i) => (
-              <i
-                key={i}
-                style={{
-                  background: 'currentColor',
-                  display: 'block',
-                  width: '3px',
-                  height: '3px',
-                  borderRadius: '999px',
-                }}
-              />
-            ))}
-          </span>
-          by grade
-        </span>
-      </div>
-      <div style={{ position: 'relative', height: '280px' }}>
-        <svg viewBox="0 0 400 250" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
-          <path
-            d="M 0 160 Q 40 100, 80 140 T 160 130 Q 200 160, 240 80 T 320 120 T 400 110"
-            stroke="#FFD500"
-            strokeWidth="4"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <circle cx="240" cy="98" r="6" fill="#FFD500" />
-          <line x1="240" y1="110" x2="240" y2="230" stroke="#DDD5C6" strokeWidth="1" strokeDasharray="2 3" />
-        </svg>
-        <div
-          style={{
-            position: 'absolute',
-            background: '#1C1917',
-            color: '#fff',
-            fontSize: '12px',
-            padding: '5px 10px',
-            borderRadius: '999px',
-            transform: 'translate(-50%, -120%)',
-            pointerEvents: 'none',
-            left: '60%',
-            top: '36%',
-          }}
-        >
-          &lt; 1 sec
-        </div>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '4px',
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: '11px',
-            color: '#7C7570',
-          }}
-        >
-          <span>Math</span>
-          <span>Physics</span>
-          <span>Chem</span>
-          <span>Bio</span>
-          <span>Econ</span>
-          <span>History</span>
-          <span>CS</span>
-        </div>
-      </div>
     </div>
   )
 }
@@ -252,15 +95,6 @@ function Counter({ target, suffix }: { target: number; suffix: string }) {
 }
 
 export default function Analytics() {
-  const [viewIndex, setViewIndex] = useState(0)
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setViewIndex((prev) => (prev + 1) % 3)
-    }, 3500)
-    return () => clearInterval(id)
-  }, [])
-
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
 
@@ -268,7 +102,7 @@ export default function Analytics() {
     <section
       ref={sectionRef}
       id="analytics"
-      style={{ padding: '120px 80px', position: 'relative' }}
+      style={{ padding: '170px 80px', position: 'relative' }}
     >
       <motion.h2
         initial={{ opacity: 0, y: 40 }}
@@ -297,7 +131,7 @@ export default function Analytics() {
           gap: '24px',
         }}
       >
-        {/* Left card — rotating views */}
+        {/* Left card — Grade Coverage */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -319,7 +153,7 @@ export default function Analytics() {
               marginBottom: '24px',
             }}
           >
-            {VIEWS[viewIndex].title}
+            Grade Coverage
           </h3>
           <div
             style={{
@@ -329,44 +163,12 @@ export default function Analytics() {
               minHeight: '360px',
               position: 'relative',
               overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
             }}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={viewIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35 }}
-              >
-                {viewIndex === 0 && <HashpileView />}
-                {viewIndex === 1 && <DemographicsView />}
-                {viewIndex === 2 && <ResponseTimeView />}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Progress bars */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '22px', padding: '0 4px' }}>
-            {VIEWS.map((v, i) => (
-              <span
-                key={i}
-                style={{
-                  height: '5px',
-                  flex: 1,
-                  borderRadius: '999px',
-                  background:
-                    i === viewIndex
-                      ? i === 0
-                        ? '#C0392B'
-                        : i === 1
-                        ? '#C0392B'
-                        : '#FFD500'
-                      : '#DDD5C6',
-                  transition: 'background 0.35s ease',
-                }}
-              />
-            ))}
+            <GradeCoverageView />
           </div>
         </motion.div>
 
