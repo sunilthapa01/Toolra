@@ -129,6 +129,7 @@ export default function Hero() {
           marginTop: '80px',
           height: '100vh',
           perspective: '1200px',
+          marginBottom: '100px',
         }}
       >
         <div
@@ -137,8 +138,8 @@ export default function Hero() {
             position: 'absolute',
             left: '50%',
             top: 0,
-            width: '100%',
-            aspectRatio: '16 / 8.5',
+            width: '90%',
+            height: '100%',
             transform: 'translateX(-50%) rotate(-6deg) scale(1)',
             transformOrigin: 'center center',
             willChange: 'transform',

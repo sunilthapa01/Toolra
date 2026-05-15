@@ -6,6 +6,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 export default function Nav() {
   const [isPink, setIsPink] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -34,7 +43,7 @@ export default function Nav() {
     <nav
       style={{
         position: 'fixed',
-        top: '28px',
+        top: scrolled ? '20px' : '28px',
         left: '50%',
         transform: 'translateX(-50%)',
         width: 'calc(100% - 96px)',
@@ -43,38 +52,69 @@ export default function Nav() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 32px',
+        padding: scrolled ? '12px 32px' : '0 32px',
         pointerEvents: 'none',
+        background: scrolled ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(16px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
+        borderRadius: scrolled ? '999px' : '0',
+        boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)' : 'none',
+        border: scrolled ? '1px solid rgba(255,255,255,0.6)' : '1px solid transparent',
+        transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       <a
         href="#"
         style={{
-          fontFamily: "'Outfit', sans-serif",
-          fontWeight: 700,
-          fontSize: '28px',
-          letterSpacing: '-0.04em',
-          color: isPink ? '#C0392B' : '#1C1917',
-          textDecoration: 'none',
           display: 'inline-flex',
-          alignItems: 'baseline',
-          transition: 'color 0.4s ease',
+          alignItems: 'center',
           pointerEvents: 'auto',
+          color: isPink ? '#C0392B' : '#1C1917',
+          transition: 'color 0.4s ease',
         }}
+        aria-label="Prologue Home"
       >
-        prologue
+        <svg
+          viewBox="50 40 320 90"
+          height="44"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M 72 47 C 108 47 126 62 126 85 C 126 108 108 123 72 123 Z" fill="#C4402F" />
+          <rect
+            x="60"
+            y="45"
+            width="16"
+            height="80"
+            rx="3"
+            fill="currentColor"
+          />
+          <text
+            x="144"
+            y="105"
+            fontSize="44"
+            fill="currentColor"
+            letterSpacing="5"
+            style={{
+              fontFamily: 'Georgia, "Book Antiqua", Palatino, serif',
+            }}
+          >
+            Prologue
+          </text>
+        </svg>
       </a>
 
       <div
         style={{
-          background: 'rgba(239, 232, 220, 0.92)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
+          background: scrolled ? 'transparent' : 'rgba(239, 232, 220, 0.92)',
+          backdropFilter: scrolled ? 'none' : 'blur(10px)',
+          WebkitBackdropFilter: scrolled ? 'none' : 'blur(10px)',
           borderRadius: '999px',
           padding: '12px 8px',
           display: 'flex',
           gap: '4px',
           pointerEvents: 'auto',
+          transition: 'background 0.35s ease',
         }}
         className="hidden md:flex"
       >

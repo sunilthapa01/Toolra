@@ -42,9 +42,13 @@ export default function Integrations() {
       id="integrations"
       style={{
         position: 'relative',
-        textAlign: 'left',
+        textAlign: 'center',
         padding: '200px 80px 200px',
         minHeight: '80vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       {/* Floating envelope */}
@@ -54,9 +58,10 @@ export default function Integrations() {
           position: 'absolute',
           width: '200px',
           height: '140px',
-          left: '14%',
+          left: 'calc(50% - 320px)',
           top: '16%',
           willChange: 'transform',
+          zIndex: 10,
         }}
       >
         <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>

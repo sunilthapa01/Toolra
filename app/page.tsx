@@ -4,7 +4,6 @@ import Analytics from '@/components/Analytics'
 import Integrations from '@/components/Integrations'
 import Features from '@/components/Features'
 import Stats from '@/components/Stats'
-import Testimonials from '@/components/Testimonials'
 import FAQ from '@/components/FAQ'
 import CTA from '@/components/CTA'
 import Footer from '@/components/Footer'
@@ -19,7 +18,6 @@ export default function Home() {
         <Integrations />
         <Features />
         <Stats />
-        <Testimonials />
         <FAQ />
         <CTA />
         <Footer />
