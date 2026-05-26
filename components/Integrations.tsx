@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 export default function Integrations() {
   const envRef = useRef<HTMLDivElement>(null)
+  const wordRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -37,6 +38,25 @@ export default function Integrations() {
     }
   }, [])
 
+  // Scroll-triggered letter animation for "prologue"
+  useEffect(() => {
+    const el = wordRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('in-view')
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.4 }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <section
       id="integrations"
@@ -57,23 +77,32 @@ export default function Integrations() {
         style={{
           position: 'absolute',
           width: '200px',
-          height: '140px',
+          height: '220px',
           left: 'calc(50% - 320px)',
           top: '16%',
           willChange: 'transform',
           zIndex: 10,
         }}
       >
-        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
-          <g transform="rotate(-12 100 70)">
-            <rect x="10" y="20" width="160" height="110" rx="10" fill="#1C1917" />
-            <path d="M 10 30 L 90 90 L 170 30" stroke="#fff" strokeWidth="2" fill="none" />
-            <circle cx="40" cy="80" r="8" fill="#FFD500" />
-            <rect x="120" y="40" width="32" height="32" rx="6" fill="#fff" />
-            <rect x="128" y="48" width="16" height="16" rx="3" fill="none" stroke="#1C1917" strokeWidth="2" />
-            <rect x="132" y="52" width="8" height="8" fill="#1C1917" />
-          </g>
-        </svg>
+        <div className="animated-mail-wrapper">
+          <div className="animated-mail">
+            <div className="back-fold"></div>
+            <div className="letter">
+              <div className="letter-border"></div>
+              <div className="letter-text">
+                <p className="letter-hi">Hi,</p>
+                <p className="letter-name">It&apos;s me<br/>Prologue</p>
+              </div>
+              <div className="letter-stamp">
+                <div className="letter-stamp-inner"></div>
+              </div>
+            </div>
+            <div className="top-fold"></div>
+            <div className="mail-body"></div>
+            <div className="left-fold"></div>
+          </div>
+          <div className="mail-shadow"></div>
+        </div>
       </div>
 
       {/* Giant heading */}
@@ -95,8 +124,7 @@ export default function Integrations() {
         <span
           style={{
             background: '#FFD500',
-            color: '#FFD500',
-            padding: '6px 22px 14px',
+            padding: '6px 22px 44px',
             borderRadius: '22px',
             marginLeft: '18px',
             transform: 'translateY(8px)',
@@ -106,16 +134,21 @@ export default function Integrations() {
             display: 'inline-block',
           }}
         >
-          <span
+          <div
+            ref={wordRef}
+            className="scroll-word-animate"
             style={{
-              color: 'rgba(0,0,0,0.18)',
+              display: 'inline-flex',
+              color: '#000000',
               fontFamily: "'Outfit', sans-serif",
               fontWeight: 700,
               letterSpacing: '-0.05em',
             }}
           >
-            prologue
-          </span>
+            {'prologue'.split('').map((char, i) => (
+              <span key={i}>{char}</span>
+            ))}
+          </div>
         </span>
       </div>
     </section>

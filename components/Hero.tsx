@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import HeroGraph from '@/components/HeroGraph'
 
 export default function Hero() {
   const heroArtRef = useRef<HTMLDivElement>(null)
@@ -179,6 +180,9 @@ export default function Hero() {
               transform: 'rotate(0deg)',
             }}
           >
+            {/* Animated knowledge graph — background layer */}
+            <HeroGraph />
+
             <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
               <svg
                 viewBox="0 0 1200 640"
@@ -211,7 +215,7 @@ export default function Hero() {
                   </pattern>
                 </defs>
 
-                <rect width="1200" height="640" fill="#1C1917" />
+                {/* No solid background rect — canvas shows through */}
                 <rect width="1200" height="640" fill="url(#noise)" />
 
                 {/* white arcs */}
