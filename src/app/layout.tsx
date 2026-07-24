@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { ContactProvider } from '@/components/ContactProvider';
 import { ToastProvider } from '@/components/ToastProvider';
 import ScrollToTop from '@/components/ScrollToTop';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +54,7 @@ export default function RootLayout({
             </ToastProvider>
           </ContactProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
