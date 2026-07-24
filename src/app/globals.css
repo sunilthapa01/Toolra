@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Warm Neutral "Timeless Premium Light" */
+  --background: #FAF9F6;
+  --foreground: #1E2229;
+
+  --card: #FFFFFF;
+  --card-foreground: #1E2229;
+
+  --primary: #2563EB; /* Royal Blue */
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #FAF8F5;
+  --secondary-foreground: #1E2229;
+
+  --muted: #6B7280;
+  --muted-foreground: #9CA3AF;
+
+  --accent: #2563EB; /* Royal Blue as default brand accent */
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #EF4444; /* Coral Red */
+  --destructive-foreground: #FFFFFF;
+
+  --border: #E8E6DF;
+  --input: #E8E6DF;
+  --ring: #2563EB;
+
+  /* Category colors */
+  --color-finance: #10B981;
+  --color-developer: #2563EB;
+  --color-pdf: #DC2626;
+  --color-ai: #7C3AED;
+  --color-business: #F59E0B;
+  --color-images: #EF4444;
+  --color-text: #64748B;
+}
+
+.dark {
+  /* Matching Timeless Dark */
+  --background: #11100F;
+  --foreground: #F5F4F0;
+
+  --card: #181716;
+  --card-foreground: #F5F4F0;
+
+  --primary: #3B82F6;
+  --primary-foreground: #11100F;
+
+  --secondary: #1F1E1D;
+  --secondary-foreground: #F5F4F0;
+
+  --muted: #9CA3AF;
+  --muted-foreground: #4B5563;
+
+  --accent: #3B82F6;
+  --accent-foreground: #11100F;
+
+  --destructive: #F87171;
+  --destructive-foreground: #F5F4F0;
+
+  --border: #2C2A28;
+  --input: #2C2A28;
+  --ring: #3B82F6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-color: var(--border);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  min-height: 100vh;
+}
+
+/* Premium calculations typography */
+.font-mono-calc {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Focus and input resets */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Active Segmented Tab Slider helper animation */
+.segment-slider {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Soft Premium Ambient Shadows */
+.shadow-premium-sm {
+  box-shadow: 0 1px 3px rgba(30, 34, 41, 0.03), 0 1px 2px rgba(30, 34, 41, 0.015);
+}
+
+.shadow-premium-md {
+  box-shadow: 0 6px 16px rgba(30, 34, 41, 0.04), 0 2px 6px rgba(30, 34, 41, 0.02);
+}
+
+.shadow-premium-lg {
+  box-shadow: 0 16px 36px rgba(30, 34, 41, 0.05), 0 4px 12px rgba(30, 34, 41, 0.025);
+}
+
+.shadow-premium-xl {
+  box-shadow: 0 24px 48px rgba(30, 34, 41, 0.06), 0 8px 24px rgba(30, 34, 41, 0.03);
+}
+
+/* Animations */
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s step-start infinite;
+}
