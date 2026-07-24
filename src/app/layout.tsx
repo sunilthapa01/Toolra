@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { ContactProvider } from '@/components/ContactProvider';
 import { ToastProvider } from '@/components/ToastProvider';
 import ScrollToTop from '@/components/ScrollToTop';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +54,12 @@ export default function RootLayout({
             </ToastProvider>
           </ContactProvider>
         </ThemeProvider>
+        {process.env.NODE_ENV === 'production' &&
+          process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+            <GoogleAnalytics
+              gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+            />
+          )}
       </body>
     </html>
   );

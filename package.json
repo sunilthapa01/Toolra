@@ -13,7 +13,8 @@
     "react-dom": "^18",
     "gsap": "^3.12.5",
     "framer-motion": "^11.3.19",
-    "@gsap/react": "^2.1.1"
+    "@gsap/react": "^2.1.1",
+    "@next/third-parties": "14.2.5"
   },
   "devDependencies": {
     "typescript": "^5",
