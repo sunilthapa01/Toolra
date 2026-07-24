@@ -5,6 +5,7 @@ import { ContactProvider } from '@/components/ContactProvider';
 import { ToastProvider } from '@/components/ToastProvider';
 import ScrollToTop from '@/components/ScrollToTop';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: {
@@ -60,6 +61,7 @@ export default function RootLayout({
               gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
             />
           )}
+   <Analytics />
       </body>
     </html>
   );
