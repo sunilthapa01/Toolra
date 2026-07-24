@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ContactProvider } from '@/components/ContactProvider';
+import { ToastProvider } from '@/components/ToastProvider';
 import ScrollToTop from '@/components/ScrollToTop';
 
 export const metadata: Metadata = {
@@ -46,8 +47,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground font-outfit antialiased selection:bg-accent selection:text-white transition-colors duration-300">
         <ThemeProvider>
           <ContactProvider>
-            <ScrollToTop />
-            {children}
+            <ToastProvider>
+              <ScrollToTop />
+              {children}
+            </ToastProvider>
           </ContactProvider>
         </ThemeProvider>
       </body>

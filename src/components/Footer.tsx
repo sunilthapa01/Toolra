@@ -3,41 +3,23 @@
 import React from 'react';
 import Link from 'next/link';
 import { useContact } from './ContactProvider';
+import { useToast } from './ToastProvider';
+import { FOOTER_SECTIONS, NavigationItem } from '@/config/navigation';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { openContactModal } = useContact();
+  const { showToast } = useToast();
 
-  const sections = [
-    {
-      title: 'Tools',
-      links: [
-        { name: 'GST Calculator', href: '/tools/gst-calculator' },
-        { name: 'EMI Calculator', href: '/tools/emi-calculator' },
-        { name: 'SIP Calculator', href: '/tools/sip-calculator' },
-        { name: 'Reverse GST', href: '/tools/reverse-gst-calculator' },
-      ],
-    },
-    {
-      title: 'Categories',
-      links: [
-        { name: 'Finance Tools', href: '/#finance' },
-        { name: 'PDF Tools', href: '/#pdf' },
-        { name: 'Developer Tools', href: '/#developer' },
-        { name: 'Text Tools', href: '/#text' },
-        { name: 'Business Tools', href: '/#business' },
-      ],
-    },
-    {
-      title: 'Company',
-      links: [
-        { name: 'About Toolora', href: '/about' },
-        { name: 'Privacy Policy', href: '/privacy' },
-        { name: 'Terms of Service', href: '/terms' },
-        { name: 'Contact', href: '#' },
-      ],
-    },
-  ];
+  const handleLinkClick = (e: React.MouseEvent, item: NavigationItem) => {
+    if (!item.implemented) {
+      e.preventDefault();
+      showToast("Coming soon! We're working on this page and it'll be available shortly.");
+    } else if (item.isAction === 'contact') {
+      e.preventDefault();
+      openContactModal();
+    }
+  };
 
   return (
     <footer className="w-full border-t border-border bg-card transition-colors duration-150 py-12 md:py-16 shadow-premium-sm">
@@ -59,29 +41,21 @@ export default function Footer() {
           </div>
 
           {/* Map Section Columns */}
-          {sections.map((section) => (
+          {FOOTER_SECTIONS.map((section) => (
             <div key={section.title} className="col-span-1">
               <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-foreground mb-4">
                 {section.title}
               </h3>
               <ul className="space-y-3">
                 {section.links.map((link) => (
-                  <li key={link.name}>
-                    {link.name === 'Contact' ? (
-                      <button
-                        onClick={openContactModal}
-                        className="text-xs font-semibold text-muted hover:text-primary transition-colors uppercase tracking-tight text-left outline-none"
-                      >
-                        {link.name}
-                      </button>
-                    ) : (
-                      <Link
-                        href={link.href}
-                        className="text-xs font-semibold text-muted hover:text-primary transition-colors uppercase tracking-tight"
-                      >
-                        {link.name}
-                      </Link>
-                    )}
+                  <li key={link.title}>
+                    <Link
+                      href={link.href}
+                      onClick={(e) => handleLinkClick(e, link)}
+                      className="text-xs font-semibold text-muted hover:text-primary transition-colors uppercase tracking-tight"
+                    >
+                      {link.title}
+                    </Link>
                   </li>
                 ))}
               </ul>

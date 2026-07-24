@@ -14,7 +14,6 @@ export default function Navbar() {
 
   const categories = [
     { name: 'Calculators', href: '/#explore' },
-    { name: 'Developer Tools', href: '/#explore' },
     { name: 'Business Suite', href: '/#explore' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '#' },
