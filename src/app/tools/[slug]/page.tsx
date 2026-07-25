@@ -63,6 +63,7 @@ export default function ToolPage({ params }: Props) {
         categoryName={tool.categoryName}
         faqs={tool.faqs}
         seoContent={tool.seoContent}
+        content={tool.content}
       >
         <ComingSoonToolPage tool={tool} />
       </ToolLayout>
@@ -80,6 +81,7 @@ export default function ToolPage({ params }: Props) {
       categoryName={tool.categoryName}
       faqs={tool.faqs}
       seoContent={tool.seoContent}
+      content={tool.content}
     >
       <ToolComponent />
     </ToolLayout>
