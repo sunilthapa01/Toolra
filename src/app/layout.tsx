@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { TransitionProvider } from '@/components/TransitionProvider';
+import { PageEntranceWrapper } from '@/components/AnimationAtoms';
 import { ContactProvider } from '@/components/ContactProvider';
 import { ToastProvider } from '@/components/ToastProvider';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -48,12 +50,16 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background text-foreground font-outfit antialiased selection:bg-accent selection:text-white transition-colors duration-300">
         <ThemeProvider>
-          <ContactProvider>
-            <ToastProvider>
-              <ScrollToTop />
-              {children}
-            </ToastProvider>
-          </ContactProvider>
+          <TransitionProvider>
+            <ContactProvider>
+              <ToastProvider>
+                <ScrollToTop />
+                <PageEntranceWrapper>
+                  {children}
+                </PageEntranceWrapper>
+              </ToastProvider>
+            </ContactProvider>
+          </TransitionProvider>
         </ThemeProvider>
         {process.env.NODE_ENV === 'production' &&
           process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (

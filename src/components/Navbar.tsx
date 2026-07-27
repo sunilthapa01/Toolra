@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useTheme } from './ThemeProvider';
 import { useContact } from './ContactProvider';
 import * as Icons from './Icons';
 import CommandPalette from './CommandPalette';
+import { usePageTransition } from './TransitionProvider';
+import { AnimatedNavLink } from './AnimationAtoms';
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { openContactModal } = useContact();
+  const { navigate } = usePageTransition();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const categories = [
@@ -36,14 +38,21 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo - Royal Blue accent */}
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-8.5 w-8.5 items-center justify-center rounded-xl bg-primary text-primary-foreground font-extrabold text-sm select-none shadow-premium-sm hover:scale-105 transition-transform duration-200">
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/');
+            }}
+            className="flex items-center gap-2.5 group cursor-pointer select-none"
+          >
+            <div className="flex h-8.5 w-8.5 items-center justify-center rounded-xl bg-primary text-primary-foreground font-extrabold text-sm select-none shadow-premium-sm hover:scale-105 active:scale-95 transition-all duration-200">
               T
             </div>
             <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
               Toolora
             </span>
-          </Link>
+          </a>
         </div>
 
         {/* Clear Search Field Bar - premium rounded border */}
@@ -71,20 +80,20 @@ export default function Navbar() {
                   <button
                     key={cat.name}
                     onClick={openContactModal}
-                    className="text-xs font-bold text-muted hover:text-primary transition-colors uppercase tracking-wider outline-none cursor-pointer"
+                    className="text-xs font-bold text-muted hover:text-primary transition-colors uppercase tracking-wider outline-none cursor-pointer nav-link-underline"
                   >
                     {cat.name}
                   </button>
                 );
               }
               return (
-                <Link
+                <AnimatedNavLink
                   key={cat.name}
                   href={cat.href}
-                  className="text-xs font-bold text-muted hover:text-primary transition-colors uppercase tracking-wider"
+                  className="text-xs font-bold uppercase tracking-wider"
                 >
                   {cat.name}
-                </Link>
+                </AnimatedNavLink>
               );
             })}
           </nav>
@@ -101,7 +110,7 @@ export default function Navbar() {
           {/* Theme Switcher */}
           <button
             onClick={toggleTheme}
-            className="flex h-9.5 w-9.5 items-center justify-center border border-border bg-card text-foreground hover:bg-secondary transition-colors rounded-xl shadow-premium-sm"
+            className="flex h-9.5 w-9.5 items-center justify-center border border-border bg-card text-foreground hover:bg-secondary active:scale-90 transition-all rounded-xl shadow-premium-sm"
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? (
@@ -145,14 +154,18 @@ export default function Navbar() {
               );
             }
             return (
-              <Link
+              <a
                 key={cat.name}
                 href={cat.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2.5 text-xs font-bold tracking-wider uppercase text-muted hover:text-primary border-b border-border/40 last:border-b-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setMobileMenuOpen(false);
+                  navigate(cat.href);
+                }}
+                className="block py-2.5 text-xs font-bold tracking-wider uppercase text-muted hover:text-primary border-b border-border/40 last:border-b-0 cursor-pointer"
               >
                 {cat.name}
-              </Link>
+              </a>
             );
           })}
         </div>

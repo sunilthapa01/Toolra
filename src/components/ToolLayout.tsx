@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import Breadcrumb from './Breadcrumb';
 import * as Icons from './Icons';
 import { toolsRegistry } from '@/tools/registry';
 import { FAQItem, ToolContent } from '@/tools/types';
+import { usePageTransition } from './TransitionProvider';
+import SkeletonLoader from './SkeletonLoader';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ScrollReveal } from './AnimationAtoms';
 
 interface ToolLayoutProps {
   slug: string;
@@ -34,6 +37,16 @@ export default function ToolLayout({
 }: ToolLayoutProps) {
   const [activeSection, setActiveSection] = useState('hero');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { navigate } = usePageTransition();
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [slug]);
 
   const breadcrumbSteps = [
     { name: categoryName, href: `/#${category}` },
@@ -58,31 +71,40 @@ export default function ToolLayout({
     ];
   }, [content, faqs]);
 
-  // Setup ScrollSpy with IntersectionObserver
+  // Setup ScrollSpy with window scroll listener to avoid mount race conditions
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find visible section
-        const visible = entries.find((entry) => entry.isIntersecting);
-        if (visible) {
-          setActiveSection(visible.target.id);
-        }
-      },
-      {
-        rootMargin: '-15% 0px -65% 0px', // Trigger in the upper-middle of viewport
-      }
-    );
+    const handleScrollSpy = () => {
+      const scrollPosition = window.scrollY + 140; // Offset to trigger highlight early
 
-    activeSections.forEach((section) => {
-      const el = document.getElementById(section.id);
-      if (el) observer.observe(el);
-    });
+      let current = 'hero';
+      
+      for (const section of activeSections) {
+        const el = document.getElementById(section.id);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          if (scrollPosition >= top) {
+            current = section.id;
+          }
+        }
+      }
+
+      // Default to last section if scrolled to the absolute bottom of page
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (window.scrollY >= maxScroll - 100) {
+        current = activeSections[activeSections.length - 1]?.id || current;
+      }
+
+      setActiveSection(current);
+    };
+
+    window.addEventListener('scroll', handleScrollSpy, { passive: true });
+    // Run initially and after a tiny delay to catch the loader layout shift
+    handleScrollSpy();
+    const timer = setTimeout(handleScrollSpy, 500);
 
     return () => {
-      activeSections.forEach((section) => {
-        const el = document.getElementById(section.id);
-        if (el) observer.unobserve(el);
-      });
+      window.removeEventListener('scroll', handleScrollSpy);
+      clearTimeout(timer);
     };
   }, [activeSections]);
 
@@ -254,6 +276,10 @@ export default function ToolLayout({
             
             {/* Left Column: Content Resource */}
             <div className="lg:col-span-8 xl:col-span-9 space-y-16">
+              {loading ? (
+                <SkeletonLoader />
+              ) : (
+                <div className="space-y-16 animate-fade-in duration-300">
               
               {/* Section 1: Hero & Calculator */}
               <section id="hero" className="scroll-mt-24 space-y-8">
@@ -310,7 +336,7 @@ export default function ToolLayout({
                 </div>
 
                 {/* Calculator Component Wrapper */}
-                <div className="rounded-3xl border border-border bg-card p-6 md:p-8 shadow-premium-md relative overflow-hidden">
+                <div className="rounded-3xl border border-border bg-card p-6 md:p-8 shadow-premium-md relative overflow-hidden premium-hover-border">
                   <div className={`absolute top-0 right-0 h-40 w-40 bg-gradient-to-bl ${theme.bg} rounded-full blur-3xl -z-10`} />
                   {children}
                 </div>
@@ -572,15 +598,21 @@ export default function ToolLayout({
                             </span>
                           </button>
 
-                          <div
-                            className={`transition-all duration-300 ease-in-out ${
-                              isOpen ? 'max-h-[500px] border-t border-border opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
-                            }`}
-                          >
-                            <div className="px-5 py-4 text-xs sm:text-sm text-muted leading-relaxed">
-                              {faq.answer}
-                            </div>
-                          </div>
+                          <AnimatePresence initial={false}>
+                            {isOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                className="border-t border-border overflow-hidden"
+                              >
+                                <div className="px-5 py-4 text-xs sm:text-sm text-muted leading-relaxed">
+                                  {faq.answer}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       );
                     })}
@@ -604,13 +636,17 @@ export default function ToolLayout({
                                    Icons.Briefcase;
 
                       return (
-                        <Link
+                        <a
                           key={tool.slug}
                           href={`/tools/${tool.slug}`}
-                          className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-premium-sm hover:border-primary/45 hover:shadow-premium-md transition-all duration-300"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/tools/${tool.slug}`, true);
+                          }}
+                          className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-premium-sm hover:bg-gradient-to-br hover:from-card hover:to-primary/[0.01] hover:border-primary/45 hover:shadow-premium-md cursor-pointer transition-all duration-300"
                         >
                           <div>
-                            <div className={`flex h-9 w-9 items-center justify-center rounded-xl border ${toolTheme.badge} transition-colors duration-300 mb-4`}>
+                            <div className={`flex h-9 w-9 items-center justify-center rounded-xl border ${toolTheme.badge} transition-colors duration-300 mb-4 group-hover:scale-105 group-hover:rotate-3`}>
                               <Icon className="h-4.5 w-4.5" />
                             </div>
                             <h3 className="text-base font-bold text-foreground font-outfit mb-1.5 group-hover:text-primary transition-colors">
@@ -624,7 +660,7 @@ export default function ToolLayout({
                             <span>Open Tool</span>
                             <Icons.ArrowRight className="h-3.5 w-3.5" />
                           </div>
-                        </Link>
+                        </a>
                       );
                     })}
                   </div>
@@ -666,6 +702,8 @@ export default function ToolLayout({
                   ))}
                 </div>
               </section>
+            </div>
+          )}
 
             </div>
 
@@ -684,6 +722,10 @@ export default function ToolLayout({
                       <a
                         key={section.id}
                         href={`#${section.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`#${section.id}`);
+                        }}
                         className={`block text-xs py-2 px-3 rounded-lg font-medium transition-all duration-200 border-l-2 ${
                           activeSection === section.id
                             ? 'text-primary bg-primary/5 border-primary font-bold'

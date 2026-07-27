@@ -8,6 +8,8 @@ import Footer from '@/components/Footer';
 import * as Icons from '@/components/Icons';
 import { toolsRegistry } from '@/tools/registry';
 import { ToolDefinition, ToolCategory } from '@/tools/types';
+import { usePageTransition } from '@/components/TransitionProvider';
+import { AnimatedButton, AnimatedCard, ScrollReveal, TextReveal } from '@/components/AnimationAtoms';
 
 // Category Definitions with descriptions and custom icons
 const CATEGORIES: { id: ToolCategory; label: string; desc: string; icon: React.ComponentType<any>; color: string; bg: string; border: string }[] = [
@@ -70,12 +72,14 @@ const SEARCH_PLACEHOLDERS = [
 
 export default function HomePage() {
   const router = useRouter();
+  const { navigate } = usePageTransition();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | 'all'>('all');
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [focused, setFocused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedComingSoonTool, setSelectedComingSoonTool] = useState<ToolDefinition | null>(null);
+  const [clickedSlug, setClickedSlug] = useState<string | null>(null);
   
   // Notification email signup state
   const [email, setEmail] = useState('');
@@ -159,7 +163,11 @@ export default function HomePage() {
       setEmail('');
       setSubscribed(false);
     } else {
-      router.push(`/tools/${tool.slug}`);
+      setClickedSlug(tool.slug);
+      setTimeout(() => {
+        navigate(`/tools/${tool.slug}`, true);
+        setClickedSlug(null);
+      }, 200);
     }
     setFocused(false);
   };
@@ -202,15 +210,21 @@ export default function HomePage() {
             
             {/* Title / Description */}
             <div className="space-y-4 max-w-3xl mx-auto">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-primary/5 text-primary border border-primary/10 shadow-premium-sm uppercase tracking-wider">
-                💡 Every tool runs locally in your browser
-              </span>
-              <h1 className="font-outfit text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-none text-foreground">
-                Online utilities, <span className="text-primary bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">simplified.</span>
+              <ScrollReveal direction="up" delay={0.1}>
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-primary/5 text-primary border border-primary/10 shadow-premium-sm uppercase tracking-wider">
+                  💡 Every tool runs locally in your browser
+                </span>
+              </ScrollReveal>
+              
+              <h1 className="font-outfit text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-none text-foreground py-1">
+                <TextReveal text="Online utilities, simplified." />
               </h1>
-              <p className="text-base sm:text-lg text-muted max-w-2xl mx-auto leading-relaxed">
-                A premium, ad-free collection of essential tools for students, shop owners, freelancers, and offices. Your data never leaves your computer.
-              </p>
+              
+              <ScrollReveal direction="up" delay={0.4}>
+                <p className="text-base sm:text-lg text-muted max-w-2xl mx-auto leading-relaxed">
+                  A premium, ad-free collection of essential tools for students, shop owners, freelancers, and offices. Your data never leaves your computer.
+                </p>
+              </ScrollReveal>
             </div>
 
             {/* Core Search Experience */}
@@ -350,7 +364,7 @@ export default function HomePage() {
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-16 space-y-12">
           
           {/* Category Selector Grid */}
-          <div className="space-y-6">
+          <ScrollReveal direction="up" className="space-y-6">
             <div className="text-center md:text-left">
               <h2 className="font-outfit text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                 Browse categories
@@ -362,7 +376,10 @@ export default function HomePage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {/* 'All' Category Card */}
-              <button
+              <motion.button
+                whileHover={{ y: -4, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 25 }}
                 onClick={() => setSelectedCategory('all')}
                 className={`flex flex-col items-center sm:items-start text-center sm:text-left justify-between p-5 rounded-2xl border transition-all duration-300 shadow-premium-sm group ${
                   selectedCategory === 'all'
@@ -370,7 +387,7 @@ export default function HomePage() {
                     : 'border-border bg-card hover:border-primary/45 hover:shadow-premium-md'
                 }`}
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary border border-border/80 text-foreground group-hover:scale-105 transition-transform duration-300 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary border border-border/80 text-foreground group-hover:scale-105 group-hover:rotate-6 transition-transform duration-300 mb-4">
                   <Icons.Sparkles className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -381,7 +398,7 @@ export default function HomePage() {
                     Show all 13 local browser tools
                   </p>
                 </div>
-              </button>
+              </motion.button>
 
               {/* 5 Specific Category Cards */}
               {CATEGORIES.map((cat) => {
@@ -390,8 +407,11 @@ export default function HomePage() {
                 const toolCount = toolsList.filter((t) => t.category === cat.id).length;
 
                 return (
-                  <button
+                  <motion.button
                     key={cat.id}
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: 'spring', stiffness: 450, damping: 25 }}
                     onClick={() => setSelectedCategory(cat.id)}
                     className={`flex flex-col items-center sm:items-start text-center sm:text-left justify-between p-5 rounded-2xl border transition-all duration-300 shadow-premium-sm group ${
                       isSelected
@@ -399,7 +419,7 @@ export default function HomePage() {
                         : 'border-border bg-card hover:border-primary/45 hover:shadow-premium-md'
                     }`}
                   >
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${cat.bg} ${cat.border} ${cat.color} group-hover:scale-105 transition-transform duration-300 mb-4`}>
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${cat.bg} ${cat.border} ${cat.color} group-hover:scale-105 group-hover:rotate-6 transition-transform duration-300 mb-4`}>
                       <IconComponent className="h-5 w-5" />
                     </div>
                     <div>
@@ -410,11 +430,11 @@ export default function HomePage() {
                         {toolCount} tools available
                       </p>
                     </div>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Tools Grid Section */}
           <div className="space-y-6">
@@ -432,21 +452,24 @@ export default function HomePage() {
                 {filteredTools.map((tool) => {
                   const catMeta = CATEGORIES.find((c) => c.id === tool.category) || CATEGORIES[0];
                   const Icon = catMeta.icon;
+                  const isClicked = clickedSlug === tool.slug;
 
                   return (
                     <motion.div
                       layout
                       initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
+                      animate={isClicked ? { scale: 0.93, y: 3, opacity: 0.8 } : { opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
+                      whileHover={isClicked ? {} : { y: -4, scale: 1.015 }}
+                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                       key={tool.slug}
-                      className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-premium-sm hover:border-primary/45 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300"
+                      className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-premium-sm hover:bg-gradient-to-br hover:from-card hover:to-primary/[0.012] premium-hover-border cursor-pointer select-none transition-all duration-300"
+                      onClick={() => handleToolSelect(tool)}
                     >
                       <div>
                         {/* Card Header (Icon & Category tag) */}
                         <div className="flex items-center justify-between mb-4">
-                          <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${catMeta.bg} ${catMeta.border} ${catMeta.color} transition-colors duration-300`}>
+                          <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${catMeta.bg} ${catMeta.border} ${catMeta.color} group-hover:scale-105 group-hover:rotate-6 transition-all duration-350`}>
                             <Icon className="h-5 w-5" />
                           </div>
                           
@@ -465,12 +488,11 @@ export default function HomePage() {
                       </div>
 
                       {/* Launch Trigger */}
-                      <button
-                        onClick={() => handleToolSelect(tool)}
+                      <div
                         className={`w-full text-center py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-premium-sm flex items-center justify-center gap-1.5 ${
                           tool.comingSoon
-                            ? 'bg-secondary text-muted hover:bg-secondary/70 border border-border/80'
-                            : 'bg-primary text-primary-foreground hover:bg-primary/95'
+                            ? 'bg-secondary text-muted border border-border/80'
+                            : 'bg-primary text-primary-foreground group-hover:bg-primary/95'
                         }`}
                       >
                         {tool.comingSoon ? (
@@ -484,7 +506,7 @@ export default function HomePage() {
                             <Icons.ArrowRight className="h-3.5 w-3.5" />
                           </>
                         )}
-                      </button>
+                      </div>
                     </motion.div>
                   );
                 })}
@@ -495,7 +517,7 @@ export default function HomePage() {
         </section>
 
         {/* TRUST / ACCESSIBILITY BENEFITS SECTION */}
-        <section className="w-full bg-secondary/30 border-y border-border/50 py-16 mt-20">
+        <ScrollReveal direction="up" className="w-full bg-secondary/30 border-y border-border/50 py-16 mt-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-3">
               <h2 className="font-outfit text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
@@ -506,9 +528,12 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <ScrollReveal stagger className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Benefit 1 */}
-              <div className="bg-card border border-border p-6 rounded-2xl shadow-premium-sm text-center md:text-left space-y-4">
+              <motion.div
+                variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
+                className="bg-card border border-border p-6 rounded-2xl shadow-premium-sm text-center md:text-left space-y-4 premium-hover-border hover:-translate-y-1 transition-all duration-300"
+              >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mx-auto md:mx-0">
                   <Icons.Shield className="h-5.5 w-5.5" />
                 </div>
@@ -518,10 +543,13 @@ export default function HomePage() {
                 <p className="text-xs sm:text-sm text-muted leading-relaxed font-medium">
                   We value security. All calculations and text processing happen locally inside your web browser. We never upload your text, data, or files to any server.
                 </p>
-              </div>
+              </motion.div>
 
               {/* Benefit 2 */}
-              <div className="bg-card border border-border p-6 rounded-2xl shadow-premium-sm text-center md:text-left space-y-4">
+              <motion.div
+                variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
+                className="bg-card border border-border p-6 rounded-2xl shadow-premium-sm text-center md:text-left space-y-4 premium-hover-border hover:-translate-y-1 transition-all duration-300"
+              >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 mx-auto md:mx-0">
                   <Icons.Lock className="h-5.5 w-5.5" />
                 </div>
@@ -531,10 +559,13 @@ export default function HomePage() {
                 <p className="text-xs sm:text-sm text-muted leading-relaxed font-medium">
                   No subscription models, no hidden paywalls, and absolutely no annoying banner ads or popup spam. Just clean utility pages ready to help you finish your tasks.
                 </p>
-              </div>
+              </motion.div>
 
               {/* Benefit 3 */}
-              <div className="bg-card border border-border p-6 rounded-2xl shadow-premium-sm text-center md:text-left space-y-4">
+              <motion.div
+                variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
+                className="bg-card border border-border p-6 rounded-2xl shadow-premium-sm text-center md:text-left space-y-4 premium-hover-border hover:-translate-y-1 transition-all duration-300"
+              >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 border border-purple-500/20 mx-auto md:mx-0">
                   <Icons.Zap className="h-5.5 w-5.5" />
                 </div>
@@ -544,14 +575,16 @@ export default function HomePage() {
                 <p className="text-xs sm:text-sm text-muted leading-relaxed font-medium">
                   Because everything is running locally using your browser's computational power, calculations and page rendering happen instantly. No lag, no latency.
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </ScrollReveal>
           </div>
-        </section>
+        </ScrollReveal>
 
         {/* NEWSLETTER SIGNUP SECTION */}
-        <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 mt-20">
-          <div className="bg-card border border-border rounded-3xl p-8 md:p-12 text-center space-y-6 shadow-premium-md relative overflow-hidden">
+        <ScrollReveal direction="up" className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 mt-20">
+          <div className="bg-card border border-border rounded-3xl p-8 md:p-12 text-center space-y-6 shadow-premium-md relative overflow-hidden premium-hover-border">
+            <div className="absolute top-0 right-0 h-40 w-40 bg-gradient-to-bl from-primary/5 to-transparent rounded-full blur-3xl -z-10" />
+            
             <div className="space-y-2 max-w-lg mx-auto">
               <h3 className="font-outfit text-2xl font-extrabold tracking-tight text-foreground">
                 Get updates on new tools
@@ -562,7 +595,7 @@ export default function HomePage() {
             </div>
 
             {generalSubscribed ? (
-              <div className="max-w-md mx-auto border border-emerald-500 bg-emerald-500/5 p-4 rounded-xl flex items-center justify-center gap-3 text-emerald-600">
+              <div className="max-w-md mx-auto border border-emerald-500 bg-emerald-500/5 p-4 rounded-xl flex items-center justify-center gap-3 text-emerald-600 animate-fade-in">
                 <Icons.Check className="h-5 w-5 shrink-0" />
                 <span className="text-xs font-bold uppercase tracking-wider">
                   You've successfully subscribed to tool updates!
@@ -578,17 +611,18 @@ export default function HomePage() {
                   placeholder="Enter your email address"
                   className="flex-1 border border-border bg-background px-4 py-3 rounded-xl text-xs sm:text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 />
-                <button
+                <AnimatedButton
                   type="submit"
                   disabled={generalSubscribing}
-                  className="bg-primary text-primary-foreground px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-primary/95 disabled:opacity-50 transition-all shadow-premium-sm"
+                  variant="primary"
+                  className="px-6 py-3"
                 >
                   {generalSubscribing ? 'Subscribing...' : 'Subscribe'}
-                </button>
+                </AnimatedButton>
               </form>
             )}
           </div>
-        </section>
+        </ScrollReveal>
 
       </main>
 

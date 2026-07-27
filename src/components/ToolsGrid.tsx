@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Link from 'next/link';
 import { toolsRegistry } from '@/tools/registry';
 import { ToolCategory } from '@/tools/types';
 import * as Icons from './Icons';
+import { usePageTransition } from './TransitionProvider';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CategoryTab {
   id: 'all' | ToolCategory;
@@ -13,8 +14,10 @@ interface CategoryTab {
 }
 
 export default function ToolsGrid() {
+  const { navigate } = usePageTransition();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<'all' | ToolCategory>('all');
+  const [clickedSlug, setClickedSlug] = useState<string | null>(null);
 
   const categories: CategoryTab[] = [
     { id: 'all', name: 'All Tools', icon: Icons.Sparkles },
@@ -44,13 +47,21 @@ export default function ToolsGrid() {
     });
   }, [tools, activeCategory, searchQuery]);
 
+  const handleToolSelect = (slug: string) => {
+    setClickedSlug(slug);
+    setTimeout(() => {
+      navigate(`/tools/${slug}`, true);
+      setClickedSlug(null);
+    }, 200);
+  };
+
   return (
     <section id="explore" className="w-full py-16 bg-background transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Search Bar Container */}
         <div className="mx-auto max-w-2xl mb-12">
-          <div className="relative rounded-2xl border border-border bg-card p-2 shadow-md flex items-center transition-all focus-within:ring-2 focus-within:ring-accent focus-within:border-accent">
+          <div className="relative rounded-2xl border border-border bg-card p-2 shadow-premium-sm flex items-center transition-all focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary premium-hover-border">
             <Icons.Search className="h-5 w-5 text-muted ml-3 shrink-0" />
             <input
               type="text"
@@ -77,18 +88,20 @@ export default function ToolsGrid() {
             const CatIcon = cat.icon;
             const isActive = activeCategory === cat.id;
             return (
-              <button
+              <motion.button
                 key={cat.id}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-2 px-4.5 py-2.5 rounded-xl border text-sm font-semibold font-outfit transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4.5 py-2.5 rounded-xl border text-sm font-semibold font-outfit transition-all duration-200 shadow-premium-sm ${
                   isActive
-                    ? 'border-accent bg-accent/5 text-accent shadow-sm'
-                    : 'border-border bg-card text-foreground hover:bg-secondary'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-border bg-card text-foreground hover:border-primary/45'
                 }`}
               >
-                <CatIcon className="h-4.5 w-4.5" />
+                <CatIcon className={`h-4.5 w-4.5 ${isActive ? 'text-primary' : 'text-muted'}`} />
                 <span>{cat.name}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -96,50 +109,57 @@ export default function ToolsGrid() {
         {/* Tools Cards Grid */}
         {filteredTools.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTools.map((tool) => (
-              <Link
-                key={tool.slug}
-                href={`/tools/${tool.slug}`}
-                className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 hover:border-accent hover:shadow-lg hover:shadow-accent/5 transition-all duration-300"
-              >
-                <div>
-                  {(() => {
-                    const Icon = tool.category === 'finance' ? Icons.Calculator :
-                                 tool.category === 'pdf' ? Icons.FileText :
-                                 tool.category === 'developer' ? Icons.Code :
-                                 tool.category === 'text' ? Icons.Type :
-                                 Icons.Briefcase;
-                    return (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-foreground group-hover:bg-accent group-hover:text-white transition-colors duration-300 mb-5">
+            <AnimatePresence mode="popLayout">
+              {filteredTools.map((tool) => {
+                const isClicked = clickedSlug === tool.slug;
+                const Icon = tool.category === 'finance' ? Icons.Calculator :
+                             tool.category === 'pdf' ? Icons.FileText :
+                             tool.category === 'developer' ? Icons.Code :
+                             tool.category === 'text' ? Icons.Type :
+                             Icons.Briefcase;
+                return (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={isClicked ? { scale: 0.93, y: 3, opacity: 0.8 } : { opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    whileHover={isClicked ? {} : { y: -4, scale: 1.015 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    key={tool.slug}
+                    onClick={() => handleToolSelect(tool.slug)}
+                    className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-premium-sm hover:bg-gradient-to-br hover:from-card hover:to-primary/[0.012] premium-hover-border cursor-pointer select-none transition-all duration-300"
+                  >
+                    <div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary border border-border/80 text-foreground group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300 mb-5">
                         <Icon className="h-5 w-5" />
                       </div>
-                    );
-                  })()}
-                  
-                  {/* Category tag */}
-                  <span className="text-xs font-semibold text-accent uppercase tracking-wider mb-2 block">
-                    {tool.categoryName}
-                  </span>
+                      
+                      {/* Category tag */}
+                      <span className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 block">
+                        {tool.categoryName}
+                      </span>
 
-                  <h3 className="text-xl font-bold text-foreground font-outfit mb-2 group-hover:text-accent transition-colors">
-                    {tool.title}
-                  </h3>
-                  
-                  <p className="text-sm text-muted leading-relaxed mb-6">
-                    {tool.description}
-                  </p>
-                </div>
+                      <h3 className="text-xl font-bold text-foreground font-outfit mb-2 group-hover:text-primary transition-colors">
+                        {tool.title}
+                      </h3>
+                      
+                      <p className="text-sm text-muted leading-relaxed mb-6">
+                        {tool.description}
+                      </p>
+                    </div>
 
-                <div className="flex items-center gap-1.5 text-sm font-bold text-accent group-hover:translate-x-1 transition-transform">
-                  <span>Open Tool</span>
-                  <Icons.ArrowRight className="h-4 w-4" />
-                </div>
-              </Link>
-            ))}
+                    <div className="flex items-center gap-1.5 text-sm font-bold text-primary group-hover:translate-x-1 transition-transform">
+                      <span>Open Tool</span>
+                      <Icons.ArrowRight className="h-4 w-4" />
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         ) : (
-          <div className="text-center py-16 rounded-2xl border border-dashed border-border bg-card max-w-xl mx-auto">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-muted mb-4">
+          <div className="text-center py-16 rounded-2xl border border-dashed border-border bg-card max-w-xl mx-auto shadow-premium-sm">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-muted mb-4 border border-border">
               <Icons.AlertCircle className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold text-foreground font-outfit mb-1">No tools found</h3>
@@ -151,7 +171,7 @@ export default function ToolsGrid() {
                 setSearchQuery('');
                 setActiveCategory('all');
               }}
-              className="text-sm font-semibold text-accent hover:underline"
+              className="text-sm font-semibold text-primary hover:underline"
             >
               Reset Filters
             </button>

@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import * as Icons from './Icons';
 import { toolsRegistry } from '@/tools/registry';
+import { usePageTransition } from './TransitionProvider';
+import { motion } from 'framer-motion';
 
 interface RelatedToolsProps {
   currentSlug: string;
@@ -11,6 +12,7 @@ interface RelatedToolsProps {
 }
 
 export default function RelatedTools({ currentSlug, category }: RelatedToolsProps) {
+  const { navigate } = usePageTransition();
   // Find other tools matching the same category, up to 3 items
   const related = Object.values(toolsRegistry)
     .filter((t) => t.category === category && t.slug !== currentSlug)
@@ -42,13 +44,20 @@ export default function RelatedTools({ currentSlug, category }: RelatedToolsProp
                          Icons.Briefcase;
 
             return (
-              <Link
+              <motion.a
                 key={tool.slug}
                 href={`/tools/${tool.slug}`}
-                className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-premium-sm hover:border-primary/45 hover:shadow-premium-md transition-all duration-300"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/tools/${tool.slug}`, true);
+                }}
+                whileHover={{ y: -4, scale: 1.015 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-premium-sm hover:bg-gradient-to-br hover:from-card hover:to-primary/[0.012] premium-hover-border cursor-pointer select-none transition-all duration-300"
               >
                 <div>
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${colorClass} transition-colors duration-300 mb-4`}>
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${colorClass} group-hover:scale-105 group-hover:rotate-3 transition-colors duration-300 mb-4`}>
                     <Icon className="h-5 w-5" />
                   </div>
                   <h3 className="text-lg font-bold text-foreground font-outfit mb-2 group-hover:text-primary transition-colors">
@@ -62,7 +71,7 @@ export default function RelatedTools({ currentSlug, category }: RelatedToolsProp
                   <span>Try Tool</span>
                   <Icons.ArrowRight className="h-3.5 w-3.5" />
                 </div>
-              </Link>
+              </motion.a>
             );
           })}
         </div>
