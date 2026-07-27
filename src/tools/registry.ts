@@ -7,6 +7,7 @@ import { emiCalculatorContent, emiCalculatorFaqs } from './content/emi-calculato
 import { sipCalculatorContent, sipCalculatorFaqs } from './content/sip-calculator';
 import { loanCalculatorContent, loanCalculatorFaqs } from './content/loan-calculator';
 import { incomeTaxCalculatorContent, incomeTaxCalculatorFaqs } from './content/income-tax-calculator-india';
+import { pdfMergeCombineContent, pdfMergeCombineFaqs } from './content/pdf-merge-combine';
 
 
 export const toolsRegistry: Record<string, ToolDefinition> = {
@@ -138,15 +139,31 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     faqs: [],
     comingSoon: true
   },
-  'pdf-merge': {
-    slug: 'pdf-merge',
+  'pdf-merge-combine': {
+    slug: 'pdf-merge-combine',
     title: 'PDF Merge & Combine',
-    description: 'Combine multiple PDF files into a single document entirely in your browser. No files are uploaded to any server.',
+    description: 'Merge multiple PDF files into one document online for free. Fast, secure, privacy-first PDF merger that works entirely in your browser.',
     category: 'pdf',
     categoryName: 'PDF',
-    keywords: ['merge pdf', 'combine documents', 'join pdfs', 'pdf joiner'],
-    faqs: [],
-    comingSoon: true
+    keywords: [
+      'merge pdf',
+      'combine pdf',
+      'pdf merger',
+      'merge pdf online',
+      'combine pdf online',
+      'merge multiple pdfs',
+      'join pdf',
+      'merge pdf free',
+      'merge pdf browser',
+      'online pdf merger',
+      'pdf combine tool'
+    ],
+    faqs: pdfMergeCombineFaqs,
+    content: pdfMergeCombineContent,
+    component: dynamic(() => import('@/features/pdf/PDFMergeCombine'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading PDF Merge & Combine...'),
+      ssr: false
+    })
   },
   'pdf-split': {
     slug: 'pdf-split',
