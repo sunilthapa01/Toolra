@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { toolsRegistry } from '@/tools/registry';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://toolora.com';
+  const baseUrl = 'https://toolora.prologuelearn.com';
 
   const routes = [
     {
