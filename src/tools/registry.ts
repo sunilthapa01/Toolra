@@ -5,6 +5,9 @@ import { gstCalculatorContent, gstCalculatorFaqs } from './content/gst-calculato
 import { reverseGstCalculatorContent, reverseGstCalculatorFaqs } from './content/reverse-gst-calculator';
 import { emiCalculatorContent, emiCalculatorFaqs } from './content/emi-calculator';
 import { sipCalculatorContent, sipCalculatorFaqs } from './content/sip-calculator';
+import { loanCalculatorContent, loanCalculatorFaqs } from './content/loan-calculator';
+import { incomeTaxCalculatorContent, incomeTaxCalculatorFaqs } from './content/income-tax-calculator-india';
+
 
 export const toolsRegistry: Record<string, ToolDefinition> = {
   'gst-calculator': {
@@ -54,6 +57,60 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     content: emiCalculatorContent,
     component: dynamic(() => import('@/features/calculators/EMICalculator'), {
       loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading EMI Calculator...'),
+      ssr: false
+    })
+  },
+  'loan-calculator': {
+    slug: 'loan-calculator',
+    title: 'Loan Calculator',
+    description: 'Calculate monthly payments, total interest, and amortization schedule instantly with our free online calculator. Compare loans or simulate extra prepayments.',
+    category: 'finance',
+    categoryName: 'Finance',
+    keywords: [
+      'loan calculator',
+      'monthly payment calculator',
+      'loan payment calculator',
+      'emi calculator',
+      'interest calculator',
+      'mortgage calculator',
+      'personal loan calculator',
+      'home loan calculator',
+      'car loan calculator',
+      'business loan calculator',
+      'student loan calculator',
+      'repayment calculator',
+      'loan amortization calculator'
+    ],
+    faqs: loanCalculatorFaqs,
+    content: loanCalculatorContent,
+    component: dynamic(() => import('@/features/calculators/LoanCalculator'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading Loan Calculator...'),
+      ssr: false
+    })
+  },
+  'income-tax-calculator-india': {
+    slug: 'income-tax-calculator-india',
+    title: 'Income Tax Calculator India',
+    description: 'Calculate and compare your income tax liability under both the Old and New Tax Regimes for the latest Financial Year (FY 2024-25, FY 2025-26, and FY 2026-27). Estimate deductions, calculate HRA exemptions, and export your summary.',
+    category: 'finance',
+    categoryName: 'Finance',
+    keywords: [
+      'income tax calculator',
+      'income tax calculator india',
+      'tax calculator india',
+      'old tax regime calculator',
+      'new tax regime calculator',
+      'salary tax calculator',
+      'income tax calculator fy',
+      'tax slab calculator',
+      'annual income tax',
+      'income tax estimate',
+      'tax comparison calculator'
+    ],
+    faqs: incomeTaxCalculatorFaqs,
+    content: incomeTaxCalculatorContent,
+    component: dynamic(() => import('@/features/calculators/IncomeTaxCalculator'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading Income Tax Calculator...'),
       ssr: false
     })
   },

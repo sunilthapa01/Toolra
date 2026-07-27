@@ -205,7 +205,7 @@ export default function HomePage() {
       <main className="flex-1 w-full pb-20">
         
         {/* HERO SECTION */}
-        <section className="relative w-full py-16 md:py-24 overflow-hidden border-b border-border/40 bg-radial-gradient">
+        <section className="relative w-full py-16 md:py-24 border-b border-border/40 bg-radial-gradient z-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-8 relative z-10">
             
             {/* Title / Description */}
@@ -228,7 +228,7 @@ export default function HomePage() {
             </div>
 
             {/* Core Search Experience */}
-            <div className="w-full max-w-2xl mx-auto relative">
+            <div className="w-full max-w-2xl mx-auto relative z-30">
               <div 
                 className={`bg-card border rounded-2xl p-2 transition-all duration-300 ${
                   focused 

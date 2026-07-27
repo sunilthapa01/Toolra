@@ -45,3 +45,23 @@ export function formatCompactIndianCurrency(amount: number): string {
   const numericStr = parseFloat(formattedVal).toString();
   return `₹${sign}${numericStr}${unit}`;
 }
+
+/**
+ * Formats a number to a specified currency style (supports USD, EUR, GBP, INR, AUD, CAD)
+ * For INR, uses local formats (Lakh/Crore if compact).
+ * For other currencies, uses standard localized notation.
+ */
+export function formatCurrency(amount: number, currencyCode: string = 'USD', compact: boolean = false): string {
+  if (currencyCode === 'INR') {
+    return compact ? formatCompactIndianCurrency(amount) : formatExactIndianCurrency(amount);
+  }
+  
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currencyCode,
+    notation: compact ? 'compact' : 'standard',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: compact ? 0 : 2,
+  }).format(amount);
+}
+
