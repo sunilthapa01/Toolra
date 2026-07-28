@@ -30,6 +30,7 @@ export const FOOTER_SECTIONS: NavigationSection[] = [
       { title: 'SIP Calculator', href: '/tools/sip-calculator', implemented: true },
       { title: 'Reverse GST', href: '/tools/reverse-gst-calculator', implemented: true },
       { title: 'PDF Merger', href: '/tools/pdf-merge-combine', implemented: true },
+      { title: 'PDF Splitter', href: '/tools/pdf-split', implemented: true },
     ],
   },
   {

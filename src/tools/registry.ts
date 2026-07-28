@@ -8,6 +8,7 @@ import { sipCalculatorContent, sipCalculatorFaqs } from './content/sip-calculato
 import { loanCalculatorContent, loanCalculatorFaqs } from './content/loan-calculator';
 import { incomeTaxCalculatorContent, incomeTaxCalculatorFaqs } from './content/income-tax-calculator-india';
 import { pdfMergeCombineContent, pdfMergeCombineFaqs } from './content/pdf-merge-combine';
+import { pdfSplitContent, pdfSplitFaqs } from './content/pdf-split';
 
 
 export const toolsRegistry: Record<string, ToolDefinition> = {
@@ -171,9 +172,20 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Extract specific pages or split pages of a PDF document into separate files instantly in your browser.',
     category: 'pdf',
     categoryName: 'PDF',
-    keywords: ['split pdf', 'extract pdf pages', 'separate pdf pages'],
-    faqs: [],
-    comingSoon: true
+    keywords: [
+      'split pdf',
+      'extract pdf pages',
+      'separate pdf pages',
+      'extract pages from pdf',
+      'pdf page splitter',
+      'split pdf document'
+    ],
+    faqs: pdfSplitFaqs,
+    content: pdfSplitContent,
+    component: dynamic(() => import('@/features/pdf/PDFSplit'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading PDF Page Splitter...'),
+      ssr: false
+    })
   },
   'json-formatter': {
     slug: 'json-formatter',
