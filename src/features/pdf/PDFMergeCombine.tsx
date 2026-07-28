@@ -1056,7 +1056,7 @@ export default function PDFMergeCombine() {
                                   setFiles(prev => prev.map(f => f.id === fileObj.id ? { ...f, pageRange: val } : f));
                                 }}
                                 placeholder="e.g. 1-3, 5 (or 'all')"
-                                className="flex-1 max-w-[160px] border border-border bg-background px-2.5 py-1 rounded-lg text-xs font-mono-calc text-foreground focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none"
+                                className="flex-1 max-w-[160px] border border-border bg-background px-2.5 py-1 rounded-lg text-xs font-mono text-foreground focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none"
                               />
                             </div>
                           )}
