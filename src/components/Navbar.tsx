@@ -32,7 +32,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="w-full border-b border-border bg-card shadow-premium-sm transition-colors duration-150 relative z-40">
+    <header className="sticky top-0 w-full border-b border-border bg-card/80 backdrop-blur-md shadow-premium-sm transition-colors duration-150 z-50">
       <CommandPalette />
 
       <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -46,8 +46,28 @@ export default function Navbar() {
             }}
             className="flex items-center gap-2.5 group cursor-pointer select-none"
           >
-            <div className="flex h-8.5 w-8.5 items-center justify-center rounded-xl bg-primary text-primary-foreground font-extrabold text-sm select-none shadow-premium-sm hover:scale-105 active:scale-95 transition-all duration-200">
-              T
+            <div className="flex h-9 w-9 items-center justify-center select-none hover:scale-105 active:scale-95 transition-all duration-200 shrink-0">
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Horizontal crossbar of the T: Vermillion */}
+                <rect x="3" y="5" width="18" height="4.5" rx="2.25" fill="#C0392B" />
+                
+                {/* Vertical stem of the T: currentColor */}
+                <rect x="10" y="9.5" width="4" height="10.5" rx="2" fill="currentColor" />
+                
+                {/* Ruler ticks: filled with var(--card) to act as cutouts */}
+                <rect x="12" y="11.5" width="2" height="1" fill="var(--card)" />
+                <rect x="12" y="14.5" width="2" height="1" fill="var(--card)" />
+                <rect x="12" y="17.5" width="2" height="1" fill="var(--card)" />
+                
+                {/* Gold accent dot */}
+                <circle cx="18" cy="14.5" r="1.5" fill="#FFD500" />
+              </svg>
             </div>
             <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
               Toolora
@@ -101,7 +121,7 @@ export default function Navbar() {
           {/* Search Trigger for Mobile */}
           <button
             onClick={triggerSearch}
-            className="flex h-9.5 w-9.5 items-center justify-center border border-border bg-card text-foreground md:hidden hover:bg-secondary transition-colors rounded-xl shadow-premium-sm"
+            className="flex h-10 w-10 items-center justify-center border border-border bg-card text-foreground md:hidden hover:bg-secondary transition-colors rounded-xl shadow-premium-sm"
             aria-label="Search Palette"
           >
             <Icons.Search className="h-4.5 w-4.5" />
@@ -110,20 +130,20 @@ export default function Navbar() {
           {/* Theme Switcher */}
           <button
             onClick={toggleTheme}
-            className="flex h-9.5 w-9.5 items-center justify-center border border-border bg-card text-foreground hover:bg-secondary active:scale-90 transition-all rounded-xl shadow-premium-sm"
+            className="flex h-12 w-12 items-center justify-center border border-border bg-card text-foreground hover:bg-secondary active:scale-90 transition-all rounded-xl shadow-premium-sm"
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? (
-              <Icons.Sun className="h-4.5 w-4.5 text-amber-500 animate-spin-slow" />
+              <Icons.Sun className="h-5.5 w-5.5 text-amber-500 animate-spin-slow" />
             ) : (
-              <Icons.Moon className="h-4.5 w-4.5 text-primary" />
+              <Icons.Moon className="h-5.5 w-5.5 text-primary" />
             )}
           </button>
 
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9.5 w-9.5 items-center justify-center border border-border bg-card text-foreground sm:hidden hover:bg-secondary transition-colors rounded-xl shadow-premium-sm"
+            className="flex h-10 w-10 items-center justify-center border border-border bg-card text-foreground sm:hidden hover:bg-secondary transition-colors rounded-xl shadow-premium-sm"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? (

@@ -5,68 +5,71 @@
 @tailwind utilities;
 
 :root {
-  /* Warm Neutral "Timeless Premium Light" */
-  --background: #FAF9F6;
-  --foreground: #1E2229;
+  /* PrologueLearn Light Mode */
+  --background: #F7F2EA;
+  --foreground: #1C1917;
 
-  --card: #FFFFFF;
-  --card-foreground: #1E2229;
+  --card: #EFE8DC;
+  --card-foreground: #1C1917;
 
-  --primary: #2563EB; /* Royal Blue */
-  --primary-foreground: #FFFFFF;
+  --primary: #C0392B;
+  --primary-foreground: #F7F2EA;
 
-  --secondary: #FAF8F5;
-  --secondary-foreground: #1E2229;
+  --secondary: #E5DAC8;
+  --secondary-foreground: #1C1917;
 
-  --muted: #6B7280;
-  --muted-foreground: #9CA3AF;
+  /* Fix: Muted text variables mapped to readable text colors instead of backgrounds */
+  --muted: #7A746E;
+  --muted-foreground: #7A746E;
 
-  --accent: #2563EB; /* Royal Blue as default brand accent */
-  --accent-foreground: #FFFFFF;
+  --accent: #C0392B;
+  --accent-foreground: #F7F2EA;
 
-  --destructive: #EF4444; /* Coral Red */
-  --destructive-foreground: #FFFFFF;
+  --destructive: #C0392B;
+  --destructive-foreground: #F7F2EA;
 
-  --border: #E8E6DF;
-  --input: #E8E6DF;
-  --ring: #2563EB;
+  --border: #D8D3CC;
+  --input: #D8D3CC;
+  --ring: #C0392B;
 
-  /* Category colors */
-  --color-finance: #10B981;
-  --color-developer: #2563EB;
-  --color-pdf: #DC2626;
-  --color-ai: #7C3AED;
-  --color-business: #F59E0B;
-  --color-images: #EF4444;
-  --color-text: #64748B;
+  /* Category colors adapted to PrologueLearn */
+  --color-finance: #15803D;
+  --color-developer: #1C1917;
+  --color-pdf: #C0392B;
+  --color-ai: #FFD500;
+  --color-business: #7A746E;
+  --color-images: #C0392B;
+  --color-text: #7A746E;
 }
 
 .dark {
-  /* Matching Timeless Dark */
-  --background: #11100F;
-  --foreground: #F5F4F0;
+  /* PrologueLearn Dark Mode */
+  --background: #1C1917;
+  --foreground: #F7F2EA;
 
-  --card: #181716;
-  --card-foreground: #F5F4F0;
+  --card: #2D2A27;
+  --card-foreground: #F7F2EA;
 
-  --primary: #3B82F6;
-  --primary-foreground: #11100F;
+  --primary: #C0392B;
+  --primary-foreground: #F7F2EA;
 
-  --secondary: #1F1E1D;
-  --secondary-foreground: #F5F4F0;
+  /* Fix: Secondary background slightly lighter than card background (#2D2A27) for subtle depth */
+  --secondary: #3A3734;
+  --secondary-foreground: #F7F2EA;
 
-  --muted: #9CA3AF;
-  --muted-foreground: #4B5563;
+  /* Fix: Muted text variables mapped to readable light gray instead of dark background */
+  --muted: #A39F99;
+  --muted-foreground: #7A746E;
 
-  --accent: #3B82F6;
-  --accent-foreground: #11100F;
+  --accent: #C0392B;
+  --accent-foreground: #F7F2EA;
 
-  --destructive: #F87171;
-  --destructive-foreground: #F5F4F0;
+  --destructive: #C0392B;
+  --destructive-foreground: #F7F2EA;
 
-  --border: #2C2A28;
-  --input: #2C2A28;
-  --ring: #3B82F6;
+  --border: #3D3935;
+  --input: #3D3935;
+  --ring: #C0392B;
 }
 
 * {

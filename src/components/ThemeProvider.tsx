@@ -12,14 +12,13 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark'); // Default to dark mode for premium look
+  const [theme, setTheme] = useState<Theme>('light'); // Default to light mode to match PrologueLearn
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Check local storage or system preference
+    // Check local storage
     const savedTheme = localStorage.getItem('toolora-theme') as Theme;
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const activeTheme = savedTheme || systemTheme || 'dark';
+    const activeTheme = savedTheme || 'light';
 
     setTheme(activeTheme);
     document.documentElement.classList.toggle('dark', activeTheme === 'dark');
