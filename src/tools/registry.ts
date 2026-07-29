@@ -9,6 +9,9 @@ import { loanCalculatorContent, loanCalculatorFaqs } from './content/loan-calcul
 import { incomeTaxCalculatorContent, incomeTaxCalculatorFaqs } from './content/income-tax-calculator-india';
 import { pdfMergeCombineContent, pdfMergeCombineFaqs } from './content/pdf-merge-combine';
 import { pdfSplitContent, pdfSplitFaqs } from './content/pdf-split';
+import { jsonFormatterContent, jsonFormatterFaqs } from './content/json-formatter';
+import { base64EncoderDecoderContent, base64EncoderDecoderFaqs } from './content/base64-encoder-decoder';
+
 
 
 export const toolsRegistry: Record<string, ToolDefinition> = {
@@ -193,19 +196,36 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Prettify, parse, validate, and minify your JSON data locally. Clean syntax highlighting with auto-formatting.',
     category: 'developer',
     categoryName: 'Developer',
-    keywords: ['json parser', 'json format', 'validate json', 'json lint'],
-    faqs: [],
-    comingSoon: true
+    keywords: ['json parser', 'json format', 'validate json', 'json lint', 'json beautify', 'json minify'],
+    faqs: jsonFormatterFaqs,
+    content: jsonFormatterContent,
+    component: dynamic(() => import('@/features/developer/JSONFormatter'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading JSON Formatter...'),
+      ssr: false
+    })
   },
-  'base64-converter': {
-    slug: 'base64-converter',
+  'base64-encoder-decoder': {
+    slug: 'base64-encoder-decoder',
     title: 'Base64 Encoder & Decoder',
     description: 'Encode text strings into Base64 format or decode Base64 back into readable text locally and securely.',
     category: 'developer',
     categoryName: 'Developer',
-    keywords: ['base64 encoder', 'base64 decoder', 'encode text', 'decode base64'],
-    faqs: [],
-    comingSoon: true
+    keywords: [
+      'base64 encoder',
+      'base64 decoder',
+      'encode text',
+      'decode base64',
+      'base64 url',
+      'convert base64',
+      'text to base64',
+      'binary to text'
+    ],
+    faqs: base64EncoderDecoderFaqs,
+    content: base64EncoderDecoderContent,
+    component: dynamic(() => import('@/features/developer/Base64EncoderDecoder'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading Base64 Encoder & Decoder...'),
+      ssr: false
+    })
   },
   'word-counter': {
     slug: 'word-counter',
