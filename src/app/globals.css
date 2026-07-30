@@ -290,3 +290,136 @@ html.lenis body {
     linear-gradient(to right, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.008) 1px, transparent 1px);
 }
+
+/* Print Stylesheet optimizations for neat, clean reports */
+@media print {
+  html, body {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #111827 !important; /* Higher contrast text */
+    font-size: 13px !important; /* More legible base size */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide interactive, navigational, search and descriptive elements */
+  header,
+  footer,
+  nav,
+  aside,
+  button,
+  .no-print,
+  .print-hidden,
+  .print\:hidden,
+  [aria-label="Breadcrumb"],
+  .blur-3xl {
+    display: none !important;
+  }
+
+  /* Flatten layout grids and flex boxes so content fills page width */
+  main,
+  .mx-auto,
+  .lg\:grid-cols-12,
+  .lg\:col-span-8,
+  .xl\:col-span-9,
+  .lg\:col-span-7,
+  .space-y-16,
+  section#hero {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  /* Hide non-calculator sections when printing */
+  section:not(#hero) {
+    display: none !important;
+  }
+
+  /* Hide headers and details within hero section */
+  section#hero > header,
+  section#hero > .grid {
+    display: none !important;
+  }
+
+  /* Optimize calculator component wrapper border/shadows for print */
+  section#hero > div {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Format ledger table/boxes with clean, crisp borders */
+  .border,
+  .border-t,
+  .border-b,
+  .border-r,
+  .border-l,
+  .border-dashed {
+    border-color: #d1d5db !important;
+  }
+
+  /* Optimize the main card and background boxes */
+  .bg-card {
+    background-color: #ffffff !important; /* Pure white background for paper */
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Comparison Cards Layout - keep grid structure side-by-side */
+  .grid.grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .bg-secondary\/20 {
+    background-color: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    page-break-inside: avoid;
+  }
+
+  /* Add spacing between calculator component and the recommendation banner */
+  .mb-6, .mb-10, .pb-6 {
+    margin-bottom: 20px !important;
+  }
+
+  /* Nice table rows styling for the computation ledger */
+  .space-y-3.text-xs {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .space-y-3.text-xs > .flex {
+    display: flex !important;
+    justify-content: justify-between !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px dashed #e5e7eb !important;
+    margin: 0 !important;
+  }
+
+  .space-y-3.text-xs > .flex:last-child {
+    border-bottom: none !important;
+  }
+
+  /* Bold highlight rows for net values */
+  .space-y-3.text-xs > .flex:nth-child(3), /* Net Taxable Income */
+  .space-y-3.text-xs > .flex:last-child {  /* Net Take-Home */
+    font-weight: bold !important;
+    border-bottom: 1.5px solid #111827 !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+}

@@ -296,7 +296,7 @@ export default function ToolLayout({
                 </header>
 
                 {/* Trust Badges */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl border border-border bg-card shadow-premium-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl border border-border bg-card shadow-premium-sm print:hidden">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary border border-primary/10">
                       <Icons.Lock className="h-5 w-5" />

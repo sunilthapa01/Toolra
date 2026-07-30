@@ -995,7 +995,7 @@ Calculated securely at: Toolora.com`;
 
           {/* Optimal Recommendation Banner */}
           {taxRegime === 'compare' && (
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 text-white rounded-3xl p-6 shadow-premium-lg flex items-center justify-between print:bg-white print:text-foreground print:border print:border-border">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 text-white rounded-3xl p-6 shadow-premium-lg flex items-center justify-between print:bg-none print:bg-white print:text-foreground print:border print:border-border">
               <div className="space-y-1">
                 <span className="text-[9px] font-black bg-white/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider block w-fit print:border print:border-border print:text-black">
                   Recommended Choice

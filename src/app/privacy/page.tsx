@@ -274,11 +274,11 @@ export default function PrivacyPolicyPage() {
                   <p className="text-xs text-muted">We respond to all privacy-related tickets within 48 business hours.</p>
                 </div>
                 <a
-                  href="mailto:privacy@toolora.com"
+                  href="mailto:npsofoact@gmail.com"
                   className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground font-bold px-5 py-3 rounded-xl text-xs uppercase tracking-wider hover:opacity-95 transition-opacity"
                 >
                   <Icons.Share2 className="h-4 w-4" />
-                  <span>privacy@toolora.com</span>
+                  <span>npsofoact@gmail.com</span>
                 </a>
               </div>
             </section>
