@@ -56,6 +56,7 @@ export default function SearchHero() {
     'emi-calculator': { saved: 'Saves 5m', runs: '6.7k runs' },
     'invoice-generator': { saved: 'Saves 6m', runs: '5.1k runs' },
     'json-formatter': { saved: 'Saves 1m', runs: '19.2k runs' },
+    'markdown-preview': { saved: 'Saves 4m', runs: '12.6k runs' },
     'pdf-merge-combine': { saved: 'Saves 3m', runs: '11.3k runs' },
     'pdf-split': { saved: 'Saves 4m', runs: '8.4k runs' },
   };

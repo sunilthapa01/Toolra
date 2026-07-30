@@ -17,14 +17,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const canonicalUrl = `${baseUrl}/tools/${tool.slug}`;
 
   return {
-    title: `${tool.title} — Premium Online Tool | Toolora`,
+    title: tool.seoTitle || `${tool.title} — Premium Online Tool | Toolora`,
     description: tool.description,
     keywords: tool.keywords,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${tool.title} — Toolora`,
+      title: tool.seoTitle || `${tool.title} — Toolora`,
       description: tool.description,
       url: canonicalUrl,
       type: 'website',
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${tool.title} — Toolora`,
+      title: tool.seoTitle || `${tool.title} — Toolora`,
       description: tool.description,
     },
   };

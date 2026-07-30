@@ -11,6 +11,8 @@ import { pdfMergeCombineContent, pdfMergeCombineFaqs } from './content/pdf-merge
 import { pdfSplitContent, pdfSplitFaqs } from './content/pdf-split';
 import { jsonFormatterContent, jsonFormatterFaqs } from './content/json-formatter';
 import { base64EncoderDecoderContent, base64EncoderDecoderFaqs } from './content/base64-encoder-decoder';
+import { hashGeneratorContent, hashGeneratorFaqs } from './content/hash-generator';
+import { markdownPreviewContent, markdownPreviewFaqs } from './content/markdown-preview';
 
 
 
@@ -224,6 +226,55 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     content: base64EncoderDecoderContent,
     component: dynamic(() => import('@/features/developer/Base64EncoderDecoder'), {
       loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading Base64 Encoder & Decoder...'),
+      ssr: false
+    })
+  },
+  'hash-generator': {
+    slug: 'hash-generator',
+    title: 'Hash Generator',
+    seoTitle: 'Hash Generator – Generate MD5, SHA-256, SHA-512 Hash Online | Toolora',
+    description: 'Generate MD5, SHA-1, SHA-256, SHA-384 and SHA-512 hashes instantly. Secure, free and browser-based.',
+    category: 'developer',
+    categoryName: 'Developer',
+    keywords: [
+      'hash generator',
+      'md5 generator',
+      'sha256 generator',
+      'sha512 generator',
+      'sha1 generator',
+      'cryptographic hash',
+      'checksum generator',
+      'online hash generator',
+      'file hash'
+    ],
+    faqs: hashGeneratorFaqs,
+    content: hashGeneratorContent,
+    component: dynamic(() => import('@/features/developer/HashGenerator'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading Hash Generator...'),
+      ssr: false
+    })
+  },
+  'markdown-preview': {
+    slug: 'markdown-preview',
+    title: 'Markdown Preview',
+    seoTitle: 'Markdown Preview Editor Online | Toolora',
+    description: 'Write Markdown and preview it instantly in real time. Full screen editor, copy parsed HTML, copy markdown, export code, and upload files locally.',
+    category: 'developer',
+    categoryName: 'Developer',
+    keywords: [
+      'markdown preview',
+      'markdown editor',
+      'md viewer',
+      'markdown to html',
+      'online markdown editor',
+      'github markdown preview',
+      'render markdown',
+      'live preview markdown'
+    ],
+    faqs: markdownPreviewFaqs,
+    content: markdownPreviewContent,
+    component: dynamic(() => import('@/features/developer/MarkdownPreview'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading Markdown Preview...'),
       ssr: false
     })
   },

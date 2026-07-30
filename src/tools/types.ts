@@ -54,6 +54,7 @@ export interface ToolContent {
 export interface ToolDefinition {
   slug: string;
   title: string;
+  seoTitle?: string;
   description: string;
   category: ToolCategory;
   categoryName: string;
