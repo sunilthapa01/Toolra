@@ -8,16 +8,17 @@ import CommandPalette from './CommandPalette';
 import { usePageTransition } from './TransitionProvider';
 import { AnimatedNavLink } from './AnimationAtoms';
 
-export default function Navbar() {
+interface NavbarProps {
+  onToggleSidebar?: () => void;
+}
+
+export default function Navbar({ onToggleSidebar }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const { openContactModal } = useContact();
   const { navigate } = usePageTransition();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const categories = [
-    { name: 'Calculators', href: '/#explore' },
-    { name: 'Business Suite', href: '/#explore' },
-    { name: 'About', href: '/about' },
     { name: 'Contact', href: '#' },
   ];
 
@@ -32,12 +33,23 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 w-full border-b border-border bg-card/80 backdrop-blur-md shadow-premium-sm transition-colors duration-150 z-50">
+    <header className="sticky top-0 w-full border-b border-border bg-card/90 backdrop-blur-md transition-colors duration-150 z-50">
       <CommandPalette />
 
-      <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand Logo - Royal Blue accent */}
+      <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand Logo & Sidebar Toggle */}
         <div className="flex items-center gap-2">
+          {onToggleSidebar && (
+            <button
+              onClick={onToggleSidebar}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-secondary active:scale-95 transition-all mr-1 cursor-pointer"
+              aria-label="Toggle Sidebar"
+              title="Toggle Sidebar"
+            >
+              <Icons.Menu className="h-4.5 w-4.5" />
+            </button>
+          )}
+
           <a
             href="/"
             onClick={(e) => {
@@ -54,19 +66,19 @@ export default function Navbar() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* Horizontal crossbar of the T: Vermillion */}
-                <rect x="3" y="5" width="18" height="4.5" rx="2.25" fill="#C0392B" />
+                {/* Horizontal crossbar of the T */}
+                <rect x="3" y="5" width="18" height="4.5" rx="2.25" fill="var(--primary)" />
                 
-                {/* Vertical stem of the T: currentColor */}
-                <rect x="10" y="9.5" width="4" height="10.5" rx="2" fill="currentColor" />
+                {/* Vertical stem of the T */}
+                <rect x="10" y="9.5" width="4" height="10.5" rx="2" fill="var(--foreground)" />
                 
-                {/* Ruler ticks: filled with var(--card) to act as cutouts */}
+                {/* Ruler ticks cutouts */}
                 <rect x="12" y="11.5" width="2" height="1" fill="var(--card)" />
                 <rect x="12" y="14.5" width="2" height="1" fill="var(--card)" />
                 <rect x="12" y="17.5" width="2" height="1" fill="var(--card)" />
                 
-                {/* Gold accent dot */}
-                <circle cx="18" cy="14.5" r="1.5" fill="#FFD500" />
+                {/* Accent dot */}
+                <circle cx="18" cy="14.5" r="1.5" fill="var(--muted)" />
               </svg>
             </div>
             <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
@@ -75,32 +87,32 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Clear Search Field Bar - premium rounded border */}
+        {/* Clear Search Field Bar */}
         <div className="flex-1 max-w-xs sm:max-w-sm mx-4 hidden md:block">
           <button
             onClick={triggerSearch}
-            className="w-full flex items-center justify-between bg-secondary hover:bg-secondary/80 px-4 py-2 text-xs text-muted transition-all cursor-pointer outline-none border border-border rounded-xl shadow-premium-sm hover:border-primary/45"
+            className="w-full flex items-center justify-between bg-secondary hover:bg-secondary/80 px-4 py-2 text-xs text-muted transition-all cursor-pointer outline-none border border-border rounded-xl hover:border-foreground/40"
           >
             <div className="flex items-center gap-2">
-              <Icons.Search className="h-3.5 w-3.5 text-muted/80" />
+              <Icons.Search className="h-3.5 w-3.5 text-muted" />
               <span className="font-medium">Search utilities...</span>
             </div>
-            <span className="inline-flex items-center gap-0.5 border border-border bg-card px-1.5 py-0.5 text-[9px] font-bold text-muted rounded shadow-premium-sm">
+            <span className="inline-flex items-center gap-0.5 border border-border bg-card px-1.5 py-0.5 text-[9px] font-bold text-foreground rounded">
               Ctrl K
             </span>
           </button>
         </div>
 
         {/* Navigation Action list */}
-        <div className="flex items-center gap-4">
-          <nav className="hidden sm:flex items-center gap-6 mr-2">
+        <div className="flex items-center gap-3">
+          <nav className="hidden sm:flex items-center gap-6 mr-1">
             {categories.map((cat) => {
               if (cat.name === 'Contact') {
                 return (
                   <button
                     key={cat.name}
                     onClick={openContactModal}
-                    className="text-xs font-bold text-muted hover:text-primary transition-colors uppercase tracking-wider outline-none cursor-pointer nav-link-underline"
+                    className="text-xs font-bold text-foreground hover:text-muted transition-colors uppercase tracking-wider outline-none cursor-pointer"
                   >
                     {cat.name}
                   </button>
@@ -110,7 +122,7 @@ export default function Navbar() {
                 <AnimatedNavLink
                   key={cat.name}
                   href={cat.href}
-                  className="text-xs font-bold uppercase tracking-wider"
+                  className="text-xs font-bold uppercase tracking-wider text-foreground hover:text-muted"
                 >
                   {cat.name}
                 </AnimatedNavLink>
@@ -118,32 +130,33 @@ export default function Navbar() {
             })}
           </nav>
 
+          {/* Theme Switcher Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="flex h-9 w-9 items-center justify-center border border-border bg-card text-foreground hover:bg-secondary active:scale-90 transition-all rounded-xl cursor-pointer"
+            aria-label="Toggle Theme"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {theme === 'dark' ? (
+              <Icons.Sun className="h-4.5 w-4.5 text-amber-400" />
+            ) : (
+              <Icons.Moon className="h-4.5 w-4.5 text-foreground" />
+            )}
+          </button>
+
           {/* Search Trigger for Mobile */}
           <button
             onClick={triggerSearch}
-            className="flex h-10 w-10 items-center justify-center border border-border bg-card text-foreground md:hidden hover:bg-secondary transition-colors rounded-xl shadow-premium-sm"
+            className="flex h-9 w-9 items-center justify-center border border-border bg-card text-foreground md:hidden hover:bg-secondary transition-colors rounded-xl"
             aria-label="Search Palette"
           >
             <Icons.Search className="h-4.5 w-4.5" />
           </button>
 
-          {/* Theme Switcher */}
-          <button
-            onClick={toggleTheme}
-            className="flex h-12 w-12 items-center justify-center border border-border bg-card text-foreground hover:bg-secondary active:scale-90 transition-all rounded-xl shadow-premium-sm"
-            aria-label="Toggle Theme"
-          >
-            {theme === 'dark' ? (
-              <Icons.Sun className="h-5.5 w-5.5 text-amber-500 animate-spin-slow" />
-            ) : (
-              <Icons.Moon className="h-5.5 w-5.5 text-primary" />
-            )}
-          </button>
-
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center border border-border bg-card text-foreground sm:hidden hover:bg-secondary transition-colors rounded-xl shadow-premium-sm"
+            className="flex h-9 w-9 items-center justify-center border border-border bg-card text-foreground sm:hidden hover:bg-secondary transition-colors rounded-xl"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? (

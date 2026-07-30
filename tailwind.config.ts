@@ -18,11 +18,18 @@ const config: Config = {
         foreground: 'var(--foreground)',
         primary: {
           DEFAULT: 'var(--primary)',
+          hover: 'var(--primary-hover)',
+          pressed: 'var(--primary-pressed)',
           foreground: 'var(--primary-foreground)',
         },
         secondary: {
           DEFAULT: 'var(--secondary)',
           foreground: 'var(--secondary-foreground)',
+        },
+        surface: {
+          DEFAULT: 'var(--card)',
+          elevated: 'var(--surface-elevated)',
+          hover: 'var(--surface-hover)',
         },
         destructive: {
           DEFAULT: 'var(--destructive)',

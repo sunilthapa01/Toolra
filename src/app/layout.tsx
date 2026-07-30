@@ -6,6 +6,7 @@ import { PageEntranceWrapper } from '@/components/AnimationAtoms';
 import { ContactProvider } from '@/components/ContactProvider';
 import { ToastProvider } from '@/components/ToastProvider';
 import ScrollToTop from '@/components/ScrollToTop';
+import MobileNoticePopup from '@/components/MobileNoticePopup';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -54,6 +55,7 @@ export default function RootLayout({
             <ContactProvider>
               <ToastProvider>
                 <ScrollToTop />
+                <MobileNoticePopup />
                 <PageEntranceWrapper>
                   {children}
                 </PageEntranceWrapper>

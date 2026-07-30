@@ -366,20 +366,7 @@ export default function JSONFormatter() {
 
   return (
     <div className="space-y-6">
-      {/* 1. Section Header Info */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-border/50">
-        <div className="space-y-1">
-          <h3 className="text-sm font-bold font-outfit text-foreground uppercase tracking-widest flex items-center gap-2">
-            <Icons.Code className="h-4 w-4 text-primary" />
-            JSON Workspace
-          </h3>
-          <p className="text-[11px] text-muted">
-            Format, validate, and minify your JSON payloads locally with a VS Code-grade editor.
-          </p>
-        </div>
-      </div>
-
-      {/* 2. Structured Grouped Toolbar */}
+      {/* 1. Structured Grouped Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-3 rounded-2xl bg-secondary/15 border border-border/80 shadow-premium-sm">
         {/* Left: Input & Processing groups */}
         <div className="flex flex-wrap items-center gap-6">

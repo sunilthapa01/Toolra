@@ -8,9 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Sample text for the paste sample option
 const SAMPLE_TEXT = `Toolora Cryptographic Hash Workspace
 ------------------------------------
-This tool runs 100% locally in your web browser.
-No files or inputs are ever uploaded to any server.
-Verify checksums or generate digests with absolute privacy.`;
+Generate digests and verify checksums across multiple algorithms.`;
 
 // Supported algorithms
 type HashAlgorithm = 'MD5' | 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
@@ -364,7 +362,7 @@ export default function HashGenerator() {
             Cryptographic Hash Workspace
           </h3>
           <p className="text-[11px] text-muted">
-            Secure client-side hashing engine running 100% offline. No logs, zero network overhead.
+            Fast cryptographic hashing engine supporting MD5, SHA-1, SHA-256, SHA-384, and SHA-512.
           </p>
         </div>
 

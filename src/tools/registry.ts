@@ -23,6 +23,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Calculate Goods and Services Tax (GST) for transactions. Supports GST Exclusive and Inclusive calculations with complete CGST, SGST, and IGST breakdowns.',
     category: 'finance',
     categoryName: 'Finance',
+    capabilities: ['Inclusive / Exclusive', 'CGST & SGST Split', 'Tax Summary'],
     keywords: [
       'gst calculator',
       'exclusive gst',
@@ -45,6 +46,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Extract the base tax amount and original price from a GST inclusive total price quickly and accurately.',
     category: 'finance',
     categoryName: 'Finance',
+    capabilities: ['Extract Base Price', 'Tax Portion', 'Instant Calc'],
     keywords: ['reverse tax', 'gst extraction', 'backwards gst', 'inclusive tax'],
     faqs: reverseGstCalculatorFaqs,
     content: reverseGstCalculatorContent,
@@ -59,6 +61,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Calculate monthly home, car, or personal loan repayments with full amortization charts and interest breakdowns.',
     category: 'finance',
     categoryName: 'Finance',
+    capabilities: ['Monthly Repayment', 'Amortization Chart', 'Interest Split'],
     keywords: ['loan emi', 'repayment calculator', 'mortgage calculator', 'amortization', 'loan interest'],
     faqs: emiCalculatorFaqs,
     content: emiCalculatorContent,
@@ -73,6 +76,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Calculate monthly payments, total interest, and amortization schedule instantly with our free online calculator. Compare loans or simulate extra prepayments.',
     category: 'finance',
     categoryName: 'Finance',
+    capabilities: ['Prepayment Sim', 'Amortization', 'Interest Breakdown'],
     keywords: [
       'loan calculator',
       'monthly payment calculator',
@@ -101,6 +105,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Calculate and compare your income tax liability under both the Old and New Tax Regimes for the latest Financial Year (FY 2024-25, FY 2025-26, and FY 2026-27). Estimate deductions, calculate HRA exemptions, and export your summary.',
     category: 'finance',
     categoryName: 'Finance',
+    capabilities: ['Old vs New Regime', 'FY 25-26 Slabs', 'Deduction Calc'],
     keywords: [
       'income tax calculator',
       'income tax calculator india',
@@ -127,6 +132,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Calculate the future value of your monthly Systemic Investment Plan (SIP) or one-time Lumpsum mutual funds.',
     category: 'finance',
     categoryName: 'Finance',
+    capabilities: ['SIP & Lumpsum', 'Wealth Growth', 'Returns Projection'],
     keywords: ['sip calculator', 'lumpsum calculator', 'mutual fund projection', 'wealth calculator', 'step up sip'],
     faqs: sipCalculatorFaqs,
     content: sipCalculatorContent,
@@ -141,6 +147,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Split bills and shared transaction invoices between partners, isolating tax portions and raw pricing splits.',
     category: 'finance',
     categoryName: 'Finance',
+    capabilities: ['Bill Splitting', 'Tax Isolator', 'Partner Split'],
     keywords: ['split bill', 'gst split', 'shared expense calculator', 'invoice split'],
     faqs: [],
     comingSoon: true
@@ -151,6 +158,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Merge multiple PDF files into one document online for free. Fast, secure, privacy-first PDF merger that works entirely in your browser.',
     category: 'pdf',
     categoryName: 'PDF',
+    capabilities: ['Combine PDFs', 'Page Reordering', '100% Local'],
     keywords: [
       'merge pdf',
       'combine pdf',
@@ -177,6 +185,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Extract specific pages or split pages of a PDF document into separate files instantly in your browser.',
     category: 'pdf',
     categoryName: 'PDF',
+    capabilities: ['Extract Pages', 'Range Split', 'Zero Uploads'],
     keywords: [
       'split pdf',
       'extract pdf pages',
@@ -198,6 +207,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Prettify, parse, validate, and minify your JSON data locally. Clean syntax highlighting with auto-formatting.',
     category: 'developer',
     categoryName: 'Developer',
+    capabilities: ['Prettify & Parse', 'Minify JSON', 'Syntax Check'],
     keywords: ['json parser', 'json format', 'validate json', 'json lint', 'json beautify', 'json minify'],
     faqs: jsonFormatterFaqs,
     content: jsonFormatterContent,
@@ -212,6 +222,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Encode text strings into Base64 format or decode Base64 back into readable text locally and securely.',
     category: 'developer',
     categoryName: 'Developer',
+    capabilities: ['Encode String', 'Decode Base64', 'UTF-8 Support'],
     keywords: [
       'base64 encoder',
       'base64 decoder',
@@ -236,6 +247,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Generate MD5, SHA-1, SHA-256, SHA-384 and SHA-512 hashes instantly. Secure, free and browser-based.',
     category: 'developer',
     categoryName: 'Developer',
+    capabilities: ['MD5 / SHA-256', 'SHA-512 Hash', 'Checksum'],
     keywords: [
       'hash generator',
       'md5 generator',
@@ -261,6 +273,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Write Markdown and preview it instantly in real time. Full screen editor, copy parsed HTML, copy markdown, export code, and upload files locally.',
     category: 'developer',
     categoryName: 'Developer',
+    capabilities: ['Live Preview', 'HTML Export', 'Monaco Editor'],
     keywords: [
       'markdown preview',
       'markdown editor',
@@ -284,6 +297,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Count words, characters, sentences, paragraphs, and reading times for any text input instantly.',
     category: 'text',
     categoryName: 'Text',
+    capabilities: ['Word Count', 'Reading Time', 'Sentence Count'],
     keywords: ['word counter', 'character count', 'text counter', 'reading time'],
     faqs: [],
     comingSoon: true
@@ -294,6 +308,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Convert text between UPPERCASE, lowercase, camelCase, snake_case, titleCase, and sentence case easily.',
     category: 'text',
     categoryName: 'Text',
+    capabilities: ['UPPER / lowercase', 'camelCase', 'snake_case'],
     keywords: ['case converter', 'camelcase', 'snakecase', 'uppercase lowercase'],
     faqs: [],
     comingSoon: true
@@ -304,6 +319,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Create standard, GST-compliant PDF invoice receipts for clients and downloads them directly.',
     category: 'business',
     categoryName: 'Business',
+    capabilities: ['GST Compliant', 'PDF Invoice', 'Receipt Maker'],
     keywords: ['gst invoice', 'invoice generator', 'gst bill maker', 'pdf invoice'],
     faqs: [],
     comingSoon: true
@@ -314,6 +330,7 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     description: 'Generate professional business invoices and simple receipts for general clients and billing records.',
     category: 'business',
     categoryName: 'Business',
+    capabilities: ['Client Billing', 'Simple Receipt', 'Instant PDF'],
     keywords: ['receipt maker', 'client invoice', 'commercial receipt'],
     faqs: [],
     comingSoon: true

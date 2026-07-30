@@ -624,14 +624,6 @@ export default function PDFSplit() {
               >
                 Browse File
               </button>
-
-              <div className="text-[10px] text-muted/65 uppercase tracking-wider font-semibold mt-4 flex items-center gap-3">
-                <span>🔒 CLIENT-SIDE</span>
-                <span>•</span>
-                <span>⚡ SECURE</span>
-                <span>•</span>
-                <span>💻 WORKS OFFLINE</span>
-              </div>
             </div>
             
           ) : splitResult ? (
@@ -1204,18 +1196,6 @@ export default function PDFSplit() {
           </div>
 
           <div className="space-y-6">
-            <h3 className="text-xs font-black uppercase tracking-widest text-muted border-b border-border/40 pb-2.5">Private Sandbox Guarantee</h3>
-            
-            <div className="rounded-2xl border border-border bg-gradient-to-br from-card to-secondary/30 p-5 space-y-4 shadow-premium-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-premium-sm">
-                <Icons.Shield className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-outfit text-sm font-bold text-foreground">Zero-Upload Privacy</h4>
-                <p className="text-xs text-muted leading-relaxed mt-1">We do not store or process files on remote servers. All calculations and compiles execute locally inside your browser tab.</p>
-              </div>
-            </div>
-
             <div className="rounded-2xl border border-border p-5 space-y-4 shadow-premium-sm">
               <h4 className="font-outfit text-xs font-black text-foreground uppercase tracking-wider">Internal Links</h4>
               <ul className="space-y-2.5 text-xs font-bold uppercase tracking-wider text-muted">

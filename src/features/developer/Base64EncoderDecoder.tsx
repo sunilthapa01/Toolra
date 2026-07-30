@@ -10,8 +10,7 @@ import { ValidationError } from '@/utils/jsonValidator';
 // Sample plain text loaded instantly
 const SAMPLE_TEXT = `Hello World! 🚀
 Welcome to Toolora.
-This is a secure, 100% offline Base64 Encoder & Decoder.
-Everything happens locally in your web browser. No server uploads.`;
+Base64 Encoder & Decoder utility.`;
 
 // Stack-safe, Unicode-safe Base64 Encoding
 const utf8ToBase64 = (str: string): string => {
@@ -434,7 +433,7 @@ export default function Base64EncoderDecoder() {
             Base64 Workspace
           </h3>
           <p className="text-[11px] text-muted">
-            Secure client-side encoding and decoding with zero network overhead.
+            Encode plain text strings or decode Base64 data.
           </p>
         </div>
 

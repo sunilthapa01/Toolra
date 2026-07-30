@@ -61,6 +61,7 @@ export interface ToolDefinition {
   keywords: string[];
   faqs: FAQItem[];
   comingSoon?: boolean;
+  capabilities?: string[];
   component?: React.ComponentType<any>;
   seoContent?: React.ReactNode;
   content?: ToolContent;

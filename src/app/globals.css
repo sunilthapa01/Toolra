@@ -5,71 +5,75 @@
 @tailwind utilities;
 
 :root {
-  /* PrologueLearn Light Mode */
-  --background: #F7F2EA;
-  --foreground: #1C1917;
+  /* Precision Utility Light Mode (Apple Precision Theme) */
+  --background: #EBEBEB;
+  --foreground: #1A1A1A;
 
-  --card: #EFE8DC;
-  --card-foreground: #1C1917;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
 
-  --primary: #C0392B;
-  --primary-foreground: #F7F2EA;
+  --primary: #1A1A1A;
+  --primary-hover: #2A2A2A;
+  --primary-pressed: #000000;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: #E5DAC8;
-  --secondary-foreground: #1C1917;
+  --secondary: #F5F5F5;
+  --secondary-foreground: #1A1A1A;
 
-  /* Fix: Muted text variables mapped to readable text colors instead of backgrounds */
-  --muted: #7A746E;
-  --muted-foreground: #7A746E;
+  --surface-elevated: #FFFFFF;
+  --surface-hover: #E2E2E2;
 
-  --accent: #C0392B;
-  --accent-foreground: #F7F2EA;
+  --muted: #797676;
+  --muted-foreground: #525252;
 
-  --destructive: #C0392B;
-  --destructive-foreground: #F7F2EA;
+  --accent: #1A1A1A;
+  --accent-foreground: #FFFFFF;
 
-  --border: #D8D3CC;
-  --input: #D8D3CC;
-  --ring: #C0392B;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
 
-  /* Category colors adapted to PrologueLearn */
-  --color-finance: #15803D;
-  --color-developer: #1C1917;
-  --color-pdf: #C0392B;
-  --color-ai: #FFD500;
-  --color-business: #7A746E;
-  --color-images: #C0392B;
-  --color-text: #7A746E;
+  --border: #D8D8D8;
+  --input: #E0E0E0;
+  --ring: #1A1A1A;
+
+  --sidebar-bg: #E2E2E2;
+  --sidebar-border: #D8D8D8;
 }
 
 .dark {
-  /* PrologueLearn Dark Mode */
-  --background: #1C1917;
-  --foreground: #F7F2EA;
+  /* Precision Utility Dark Mode (Apple Charcoal Warm Dark Theme) */
+  --background: #121214;
+  --foreground: #F5F5F7;
 
-  --card: #2D2A27;
-  --card-foreground: #F7F2EA;
+  --card: #1E1E22;
+  --card-foreground: #F5F5F7;
 
-  --primary: #C0392B;
-  --primary-foreground: #F7F2EA;
+  --primary: #F5F5F7;
+  --primary-hover: #FFFFFF;
+  --primary-pressed: #D8D8D8;
+  --primary-foreground: #121214;
 
-  /* Fix: Secondary background slightly lighter than card background (#2D2A27) for subtle depth */
-  --secondary: #3A3734;
-  --secondary-foreground: #F7F2EA;
+  --secondary: #18181B;
+  --secondary-foreground: #C7C7CE;
 
-  /* Fix: Muted text variables mapped to readable light gray instead of dark background */
-  --muted: #A39F99;
-  --muted-foreground: #7A746E;
+  --surface-elevated: #25252B;
+  --surface-hover: #2D2D34;
 
-  --accent: #C0392B;
-  --accent-foreground: #F7F2EA;
+  --muted: #9A9AA3;
+  --muted-foreground: #72727B;
 
-  --destructive: #C0392B;
-  --destructive-foreground: #F7F2EA;
+  --accent: #F5F5F7;
+  --accent-foreground: #121214;
 
-  --border: #3D3935;
-  --input: #3D3935;
-  --ring: #C0392B;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #2A2A30;
+  --input: #2A2A30;
+  --ring: #F5F5F7;
+
+  --sidebar-bg: #101012;
+  --sidebar-border: #2A2A30;
 }
 
 * {

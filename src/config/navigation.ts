@@ -44,12 +44,14 @@ export const FOOTER_SECTIONS: NavigationSection[] = [
     ],
   },
   {
-    title: 'Company',
+    title: 'Company & Resources',
     links: [
       { title: 'About Toolora', href: '/about', implemented: true },
       { title: 'Privacy Policy', href: '/privacy', implemented: true },
       { title: 'Terms of Service', href: '/terms', implemented: true },
       { title: 'Contact Us', href: '#', implemented: true, isAction: 'contact' },
+      { title: 'GitHub', href: 'https://github.com', implemented: true },
+      { title: 'Status', href: '#', implemented: true },
     ],
   },
 ];

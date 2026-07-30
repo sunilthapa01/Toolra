@@ -1588,20 +1588,8 @@ export default function PDFMergeCombine() {
 
           </div>
 
-          {/* Quick links & Privacy Info (Right) */}
+          {/* Quick links (Right) */}
           <div className="space-y-6">
-            <h3 className="text-xs font-black uppercase tracking-widest text-muted border-b border-border/40 pb-2.5">Private Sandbox Guarantee</h3>
-            
-            <div className="rounded-2xl border border-border bg-gradient-to-br from-card to-secondary/30 p-5 space-y-4 shadow-premium-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-premium-sm">
-                <Icons.Shield className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-outfit text-sm font-bold text-foreground">100% Serverless Execution</h4>
-                <p className="text-xs text-muted leading-relaxed mt-1">Toolora uses standard Web APIs and client-side JavaScript. This page operates fully offline. Your document contents are never stored, logged, or analyzed by third parties.</p>
-              </div>
-            </div>
-
             <div className="rounded-2xl border border-border p-5 space-y-4 shadow-premium-sm">
               <h4 className="font-outfit text-xs font-black text-foreground uppercase tracking-wider">Internal Links</h4>
               <ul className="space-y-2.5 text-xs font-bold uppercase tracking-wider text-muted">

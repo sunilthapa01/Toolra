@@ -76,23 +76,24 @@ export default function MonacoEditor({
       if (!active || !containerRef.current) return;
       monacoRef.current = monaco;
 
-      // Define themes that integrate nicely with Toolora's palette
+      // Define themes that integrate cleanly with Toolora's Precision palette
       monaco.editor.defineTheme('toolora-dark', {
         base: 'vs-dark',
         inherit: true,
         rules: [
-          { token: 'string.key.json', foreground: 'F472B6', fontStyle: 'bold' }, // Pink/Rose keys
-          { token: 'string.value.json', foreground: '34D399' }, // Emerald values
-          { token: 'number', foreground: 'F59E0B' }, // Amber numbers
-          { token: 'keyword.json', foreground: '60A5FA', fontStyle: 'bold' }, // Blue booleans/null
+          { token: 'string.key.json', foreground: '38BDF8', fontStyle: 'bold' }, // Vibrant sky blue keys
+          { token: 'string.value.json', foreground: '34D399' }, // Bright emerald values
+          { token: 'number', foreground: 'FBBF24' }, // Warm amber numbers
+          { token: 'keyword.json', foreground: 'A78BFA', fontStyle: 'bold' }, // Violet booleans/null
+          { token: 'delimiter', foreground: '94A3B8' },
         ],
         colors: {
-          'editor.background': '#2D2A27', // Card dark background
-          'editor.foreground': '#F7F2EA', // Foreground light color
-          'editor.lineHighlightBackground': '#3A3734', // Secondary dark background
-          'editorLineNumber.foreground': '#7A746E',
-          'editorLineNumber.activeForeground': '#F7F2EA',
-          'editor.selectionBackground': '#C0392B40',
+          'editor.background': '#131315', // Pure dark charcoal background
+          'editor.foreground': '#F8FAFC', // Crisp white text
+          'editor.lineHighlightBackground': '#1E1E22', // Subtle line highlight
+          'editorLineNumber.foreground': '#64748B',
+          'editorLineNumber.activeForeground': '#F8FAFC',
+          'editor.selectionBackground': '#2D2D34',
         }
       });
 
@@ -100,18 +101,19 @@ export default function MonacoEditor({
         base: 'vs',
         inherit: true,
         rules: [
-          { token: 'string.key.json', foreground: 'DC2626', fontStyle: 'bold' }, // Red keys
-          { token: 'string.value.json', foreground: '059669' }, // Emerald values
-          { token: 'number', foreground: 'D97706' }, // Amber numbers
-          { token: 'keyword.json', foreground: '2563EB', fontStyle: 'bold' }, // Blue booleans/null
+          { token: 'string.key.json', foreground: '2563EB', fontStyle: 'bold' }, // Deep blue keys
+          { token: 'string.value.json', foreground: '059669' }, // Rich emerald values
+          { token: 'number', foreground: 'D97706' }, // Warm amber numbers
+          { token: 'keyword.json', foreground: '7C3AED', fontStyle: 'bold' }, // Vibrant purple booleans/null
+          { token: 'delimiter', foreground: '475569' },
         ],
         colors: {
-          'editor.background': '#EFE8DC', // Card light background
-          'editor.foreground': '#1C1917', // Foreground dark color
-          'editor.lineHighlightBackground': '#E5DAC8', // Secondary light background
-          'editorLineNumber.foreground': '#7A746E',
-          'editorLineNumber.activeForeground': '#1C1917',
-          'editor.selectionBackground': '#C0392B25',
+          'editor.background': '#FAFAFA', // Clean crisp white/slate background
+          'editor.foreground': '#0F172A', // Deep slate navy foreground text
+          'editor.lineHighlightBackground': '#F1F5F9', // Crisp light highlight
+          'editorLineNumber.foreground': '#94A3B8',
+          'editorLineNumber.activeForeground': '#0F172A',
+          'editor.selectionBackground': '#E2E8F0',
         }
       });
 
