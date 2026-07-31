@@ -438,6 +438,16 @@ export default function JSONFormatter() {
                 <Icons.Sparkles className="h-3.5 w-3.5 text-primary" />
                 <span>Auto Fix</span>
               </button>
+              {errors.length > 0 && (
+                <button
+                  onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
+                  title="Toggle Problems Panel"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-destructive/10 border border-destructive/20 text-destructive rounded-xl text-xs font-bold hover:bg-destructive/20 transition-all"
+                >
+                  <Icons.AlertCircle className="h-3.5 w-3.5" />
+                  <span>Problems ({errors.length})</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -539,105 +549,7 @@ export default function JSONFormatter() {
         </div>
       </div>
 
-      {/* 4. Side-by-Side or Stacked Editors */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Left Side: Input Editor */}
-        <div className="flex flex-col space-y-1.5">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-[10px] font-black uppercase text-muted tracking-widest">JSON Input</span>
-            <button
-              onClick={handleValidate}
-              className="text-[10px] font-bold text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
-            >
-              <Icons.Shield className="h-3 w-3" />
-              Validate Only
-            </button>
-          </div>
-          <div className="h-[550px] relative border border-border/80 rounded-2xl overflow-hidden shadow-premium-sm">
-            <MonacoEditor
-              value={inputJSON}
-              onChange={handleInputChange}
-              language="json"
-              theme={theme}
-              options={{ wordWrap: wrapLines ? 'on' : 'off' }}
-              onEditorMount={handleInputEditorMount}
-              onCursorChange={(line, col) => setCursorPos({ line, column: col })}
-            />
-          </div>
-        </div>
-
-        {/* Right Side: Formatted Output */}
-        <div className="flex flex-col space-y-1.5">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-[10px] font-black uppercase text-muted tracking-widest flex items-center gap-2">
-              Formatted Output
-              {isSuccessAnimated && (
-                <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase animate-fade-in-out">
-                  Formatted
-                </span>
-              )}
-            </span>
-            <button
-              onClick={() => handleCopy(outputJSON, 'output')}
-              disabled={!outputJSON}
-              className="text-[10px] font-bold text-primary hover:underline disabled:opacity-50 flex items-center gap-1"
-            >
-              <Icons.Copy className="h-3 w-3" />
-              Copy Output
-            </button>
-          </div>
-          <div className="h-[550px] relative border border-border/80 rounded-2xl overflow-hidden shadow-premium-sm">
-            <MonacoEditor
-              value={outputJSON}
-              readOnly={true}
-              language="json"
-              theme={theme}
-              options={{ wordWrap: wrapLines ? 'on' : 'off' }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 5. VS Code Status Bar */}
-      <div className="flex flex-wrap items-center justify-between bg-card border border-border/80 rounded-2xl px-4 py-2 text-[11px] font-mono-calc text-muted shadow-premium-sm">
-        {/* Left side: Validity status */}
-        <div className="flex items-center gap-2">
-          {!inputJSON.trim() ? (
-            <span className="flex items-center gap-1.5 text-muted-foreground/60">
-              <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
-              <span>JSON: Empty</span>
-            </span>
-          ) : errors.length === 0 ? (
-            <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>JSON: Valid</span>
-            </span>
-          ) : errors.some(e => e.severity === 'error') ? (
-            <span className="flex items-center gap-1.5 text-destructive font-bold">
-              <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-              <span>JSON: Invalid ({errors.filter(e => e.severity === 'error').length} errors)</span>
-            </span>
-          ) : (
-            <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500 font-bold">
-              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-              <span>JSON: Warnings ({errors.filter(e => e.severity === 'warning').length} warnings)</span>
-            </span>
-          )}
-        </div>
-
-        {/* Right side: cursor, lines, size, spacing */}
-        <div className="flex items-center gap-4">
-          <span>Ln {cursorPos.line}, Col {cursorPos.column}</span>
-          <span className="h-3.5 w-px bg-border" />
-          <span>{inputJSON.split('\n').length} lines</span>
-          <span className="h-3.5 w-px bg-border" />
-          <span>{formatFileSize(new Blob([inputJSON]).size)}</span>
-          <span className="h-3.5 w-px bg-border" />
-          <span>Spaces: {indentSize === 'tab' ? 'Tab' : indentSize}</span>
-        </div>
-      </div>
-
-      {/* 6. Collapsible Problems Panel */}
+      {/* 4. Collapsible Problems Panel (Upper Area) */}
       <div className="border border-border/80 rounded-2xl overflow-hidden bg-card shadow-premium-sm transition-all duration-300">
         {/* Panel Header */}
         <button
@@ -658,12 +570,17 @@ export default function JSONFormatter() {
               Problems
               {errors.length > 0 && (
                 <span className="text-[10px] text-muted font-normal lowercase">
-                  ({errors.filter(e => e.severity === 'error').length} errors, {errors.filter(e => e.severity === 'warning').length} warnings)
+                  ({errors.filter(e => e.severity === 'error').length} error{errors.filter(e => e.severity === 'error').length === 1 ? '' : 's'}, {errors.filter(e => e.severity === 'warning').length} warning{errors.filter(e => e.severity === 'warning').length === 1 ? '' : 's'})
                 </span>
               )}
             </span>
           </div>
-          <Icons.ChevronDown className={`h-4 w-4 text-muted transition-transform duration-300 ${isProblemsExpanded ? '' : 'rotate-180'}`} />
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-muted font-medium hidden sm:inline">
+              {isProblemsExpanded ? 'Hide' : 'Show'}
+            </span>
+            <Icons.ChevronDown className={`h-4 w-4 text-muted transition-transform duration-300 ${isProblemsExpanded ? '' : 'rotate-180'}`} />
+          </div>
         </button>
 
         {/* Panel Content (Errors List) */}
@@ -728,6 +645,119 @@ export default function JSONFormatter() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* 5. Side-by-Side or Stacked Editors */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left Side: Input Editor */}
+        <div className="flex flex-col space-y-1.5">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-black uppercase text-muted tracking-widest">JSON Input</span>
+            <div className="flex items-center gap-3">
+              {errors.length > 0 && (
+                <button
+                  onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
+                  className="text-[10px] font-bold text-destructive hover:underline uppercase tracking-wider flex items-center gap-1"
+                >
+                  <Icons.AlertCircle className="h-3 w-3" />
+                  {errors.length} Issue{errors.length === 1 ? '' : 's'}
+                </button>
+              )}
+              <button
+                onClick={handleValidate}
+                className="text-[10px] font-bold text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
+              >
+                <Icons.Shield className="h-3 w-3" />
+                Validate Only
+              </button>
+            </div>
+          </div>
+          <div className="h-[550px] relative border border-border/80 rounded-2xl overflow-hidden shadow-premium-sm">
+            <MonacoEditor
+              value={inputJSON}
+              onChange={handleInputChange}
+              language="json"
+              theme={theme}
+              options={{ wordWrap: wrapLines ? 'on' : 'off' }}
+              onEditorMount={handleInputEditorMount}
+              onCursorChange={(line, col) => setCursorPos({ line, column: col })}
+            />
+          </div>
+        </div>
+
+        {/* Right Side: Formatted Output */}
+        <div className="flex flex-col space-y-1.5">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-black uppercase text-muted tracking-widest flex items-center gap-2">
+              Formatted Output
+              {isSuccessAnimated && (
+                <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase animate-fade-in-out">
+                  Formatted
+                </span>
+              )}
+            </span>
+            <button
+              onClick={() => handleCopy(outputJSON, 'output')}
+              disabled={!outputJSON}
+              className="text-[10px] font-bold text-primary hover:underline disabled:opacity-50 flex items-center gap-1"
+            >
+              <Icons.Copy className="h-3 w-3" />
+              Copy Output
+            </button>
+          </div>
+          <div className="h-[550px] relative border border-border/80 rounded-2xl overflow-hidden shadow-premium-sm">
+            <MonacoEditor
+              value={outputJSON}
+              readOnly={true}
+              language="json"
+              theme={theme}
+              options={{ wordWrap: wrapLines ? 'on' : 'off' }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 6. VS Code Status Bar */}
+      <div className="flex flex-wrap items-center justify-between bg-card border border-border/80 rounded-2xl px-4 py-2 text-[11px] font-mono-calc text-muted shadow-premium-sm">
+        {/* Left side: Validity status */}
+        <button
+          onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity text-left cursor-pointer"
+          title="Click to toggle Problems panel"
+        >
+          {!inputJSON.trim() ? (
+            <span className="flex items-center gap-1.5 text-muted-foreground/60">
+              <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+              <span>JSON: Empty</span>
+            </span>
+          ) : errors.length === 0 ? (
+            <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>JSON: Valid</span>
+            </span>
+          ) : errors.some(e => e.severity === 'error') ? (
+            <span className="flex items-center gap-1.5 text-destructive font-bold">
+              <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+              <span>JSON: Invalid ({errors.filter(e => e.severity === 'error').length} errors)</span>
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500 font-bold">
+              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+              <span>JSON: Warnings ({errors.filter(e => e.severity === 'warning').length} warnings)</span>
+            </span>
+          )}
+        </button>
+
+        {/* Right side: cursor, lines, size, spacing */}
+        <div className="flex items-center gap-4">
+          <span>Ln {cursorPos.line}, Col {cursorPos.column}</span>
+          <span className="h-3.5 w-px bg-border" />
+          <span>{inputJSON.split('\n').length} lines</span>
+          <span className="h-3.5 w-px bg-border" />
+          <span>{formatFileSize(new Blob([inputJSON]).size)}</span>
+          <span className="h-3.5 w-px bg-border" />
+          <span>Spaces: {indentSize === 'tab' ? 'Tab' : indentSize}</span>
+        </div>
       </div>
     </div>
   );

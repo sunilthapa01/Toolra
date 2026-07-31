@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { AnimatePresence } from 'framer-motion';
 import PremiumLoader from './PremiumLoader';
 import gsap from 'gsap';
 
@@ -41,7 +42,7 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
 
     const handleWheel = (e: WheelEvent) => {
       // Don't intercept if loader is open
-      if (state === 'loading') return;
+      if (state === 'loading' || state === 'exiting') return;
       
       // Check if user is scrolling inside an element that should prevent smooth scroll
       let target = e.target as HTMLElement | null;
@@ -104,31 +105,22 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
   // Handle back/forward buttons or direct path modifications
   useEffect(() => {
     if (pathname !== currentPath) {
-      if (state !== 'loading' && state !== 'exiting') {
-        setState('entering');
-        setCurrentPath(pathname);
-        const timer = setTimeout(() => {
-          setState('idle');
-        }, 400);
-        return () => clearTimeout(timer);
-      } else {
-        setState('entering');
-        setCurrentPath(pathname);
-        const timer = setTimeout(() => {
-          setState('idle');
-        }, 450);
-        
-        // Reset scroll position instantly on new page render
-        window.scrollTo(0, 0);
-        targetScrollY.current = 0;
-        
-        return () => clearTimeout(timer);
-      }
+      setCurrentPath(pathname);
+      setState('entering');
+      const timer = setTimeout(() => {
+        setState('idle');
+      }, 250);
+      
+      // Reset scroll position instantly on new page render
+      window.scrollTo(0, 0);
+      targetScrollY.current = 0;
+      
+      return () => clearTimeout(timer);
     }
-  }, [pathname, currentPath, state]);
+  }, [pathname, currentPath]);
 
   // Navigate function that intercepts default routing
-  const navigate = (href: string, showLoader = false) => {
+  const navigate = (href: string, showLoader = true) => {
     // If it is an anchor, let standard scrolling handle it or use smooth scroll
     if (href.startsWith('/#') || href.startsWith('#')) {
       const targetId = href.split('#')[1];
@@ -174,30 +166,20 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
       setState('exiting');
       setTimeout(() => {
         router.push(href);
-      }, 150);
+      }, 100);
       return;
     }
 
-    if (showLoader) {
-      setState('exiting');
-      setTimeout(() => {
-        setState('loading');
-        // Minimum loader duration 650ms (total ~950ms transition)
-        setTimeout(() => {
-          router.push(href);
-        }, 650);
-      }, 300);
-    } else {
-      setState('exiting');
-      setTimeout(() => {
-        router.push(href);
-      }, 300);
-    }
+    // Trigger smooth blur loader transition
+    setState('loading');
+    setTimeout(() => {
+      router.push(href);
+    }, 500);
   };
 
   // Lock scroll when loader is active
   useEffect(() => {
-    if (state === 'loading') {
+    if (state === 'loading' || state === 'exiting') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -206,6 +188,9 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
 
   return (
     <TransitionContext.Provider value={{ state, navigate, shouldReduceMotion }}>
+      <AnimatePresence mode="wait">
+        {(state === 'loading' || state === 'exiting') && <PremiumLoader key="loader" />}
+      </AnimatePresence>
       {children}
     </TransitionContext.Provider>
   );
