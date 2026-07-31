@@ -39,17 +39,17 @@ export default function JSONTreeExplorer({
   }, [jsonString]);
 
   // Collapse / Expand handlers
-  const toggleCollapse = (nodeId: string, e?: React.MouseEvent) => {
+  const toggleCollapse = React.useCallback((nodeId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
     setCollapsedNodes(prev => ({
       ...prev,
       [nodeId]: !prev[nodeId]
     }));
-  };
+  }, []);
 
-  const handleExpandAll = () => setCollapsedNodes({});
-  
-  const handleCollapseAll = () => {
+  const handleExpandAll = React.useCallback(() => setCollapsedNodes({}), []);
+
+  const handleCollapseAll = React.useCallback(() => {
     if (!rootNode) return;
     const allCollapsed: Record<string, boolean> = {};
     function markAll(node: TreeNode) {
@@ -60,24 +60,24 @@ export default function JSONTreeExplorer({
     }
     markAll(rootNode);
     setCollapsedNodes(allCollapsed);
-  };
+  }, [rootNode]);
 
   // Context menu actions
-  const handleCopy = (text: string, label: string) => {
+  const handleCopy = React.useCallback((text: string, label: string) => {
     navigator.clipboard.writeText(text);
     showToast(`Copied ${label}: "${text}"`);
     setContextMenu(null);
-  };
+  }, [showToast]);
 
-  const handleNodeClick = (node: TreeNode) => {
+  const handleNodeClick = React.useCallback((node: TreeNode) => {
     const line = findLineForPath(jsonString, node.path);
     if (onSelectNodePath) {
       onSelectNodePath(node.path, line);
     }
-  };
+  }, [jsonString, onSelectNodePath]);
 
-  // Filter check for search query
-  const matchesSearch = (node: TreeNode, query: string): boolean => {
+  // Filter check for search query with memoization
+  const matchesSearch = React.useCallback((node: TreeNode, query: string): boolean => {
     if (!query) return true;
     const q = query.toLowerCase();
     if (node.key.toLowerCase().includes(q)) return true;
@@ -86,7 +86,7 @@ export default function JSONTreeExplorer({
     if (typeof node.value === 'number' && String(node.value).includes(q)) return true;
     if (node.children && node.children.some(child => matchesSearch(child, query))) return true;
     return false;
-  };
+  }, []);
 
   // Render individual node recursively
   const renderNode = (node: TreeNode, depth = 0) => {

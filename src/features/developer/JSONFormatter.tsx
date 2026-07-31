@@ -148,6 +148,7 @@ export default function JSONFormatter() {
     setIsValidated(true);
 
     if (hasErrors) {
+      setOutputJSON('');
       showToast('JSON has syntax errors. Diagnostics displayed in Problems panel above.');
       setIsProblemsExpanded(true);
       trackEvent('Format', { status: 'failure', errorsCount: validationResult.length });
@@ -166,6 +167,7 @@ export default function JSONFormatter() {
       showToast('JSON formatted successfully.');
       trackEvent('Format', { status: 'success', indent: indentSize });
     } catch (e: any) {
+      setOutputJSON('');
       setErrors([{
         line: 1,
         column: 1,
@@ -301,9 +303,88 @@ export default function JSONFormatter() {
     monacoInstance.editor.setModelMarkers(model, 'json-validation', markers);
   }, [errors, inputEditor, monacoInstance]);
 
+  // Search Matches State & Logic
+  const [searchMatches, setSearchMatches] = useState<any[]>([]);
+  const [searchMatchIndex, setSearchMatchIndex] = useState(0);
+  const searchDecorationsRef = useRef<string[]>([]);
+
+  // Sync Search Matches with Monaco Model
+  useEffect(() => {
+    if (!inputEditor || !monacoInstance) {
+      setSearchMatches([]);
+      setSearchMatchIndex(0);
+      return;
+    }
+
+    const model = inputEditor.getModel();
+    if (!model || !searchQuery) {
+      setSearchMatches([]);
+      setSearchMatchIndex(0);
+      if (searchDecorationsRef.current.length > 0) {
+        searchDecorationsRef.current = inputEditor.deltaDecorations(searchDecorationsRef.current, []);
+      }
+      return;
+    }
+
+    try {
+      const rawMatches = model.findMatches(
+        searchQuery,
+        false,
+        searchIsRegex,
+        searchMatchCase,
+        null,
+        true
+      );
+      const matchesList = rawMatches.map((m: any) => m.range);
+      setSearchMatches(matchesList);
+
+      if (matchesList.length > 0) {
+        const validIdx = searchMatchIndex >= matchesList.length ? 0 : searchMatchIndex;
+        if (validIdx !== searchMatchIndex) setSearchMatchIndex(validIdx);
+
+        const newDecorations = matchesList.map((range: any, idx: number) => ({
+          range: range,
+          options: {
+            isWholeLine: false,
+            className: idx === validIdx ? 'bg-amber-400/60 dark:bg-amber-500/60 font-black border border-amber-500 rounded-sm' : 'bg-yellow-200/40 dark:bg-yellow-500/25 border border-yellow-400/50 rounded-sm',
+          }
+        }));
+        searchDecorationsRef.current = inputEditor.deltaDecorations(searchDecorationsRef.current, newDecorations);
+      } else {
+        setSearchMatchIndex(0);
+        searchDecorationsRef.current = inputEditor.deltaDecorations(searchDecorationsRef.current, []);
+      }
+    } catch {
+      setSearchMatches([]);
+      setSearchMatchIndex(0);
+    }
+  }, [searchQuery, searchMatchCase, searchIsRegex, inputJSON, inputEditor, monacoInstance, searchMatchIndex]);
+
+  const handleNextSearchMatch = () => {
+    if (searchMatches.length === 0 || !inputEditor) return;
+    const nextIdx = (searchMatchIndex + 1) % searchMatches.length;
+    setSearchMatchIndex(nextIdx);
+    const range = searchMatches[nextIdx];
+    inputEditor.revealRangeInCenter(range);
+    inputEditor.setSelection(range);
+    inputEditor.focus();
+  };
+
+  const handlePrevSearchMatch = () => {
+    if (searchMatches.length === 0 || !inputEditor) return;
+    const prevIdx = (searchMatchIndex - 1 + searchMatches.length) % searchMatches.length;
+    setSearchMatchIndex(prevIdx);
+    const range = searchMatches[prevIdx];
+    inputEditor.revealRangeInCenter(range);
+    inputEditor.setSelection(range);
+    inputEditor.focus();
+  };
+
   // Global Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const activeElem = document.activeElement as HTMLElement | null;
+      const isEditingInput = ['INPUT', 'TEXTAREA'].includes(activeElem?.tagName || '') || Boolean(activeElem?.closest('.monaco-editor'));
       const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 
       if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'p') {
@@ -311,7 +392,12 @@ export default function JSONFormatter() {
         setIsCommandPaletteOpen(prev => !prev);
       }
 
-      if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+      if (isCtrlOrCmd && !e.shiftKey && e.key.toLowerCase() === 'f' && !isEditingInput) {
+        e.preventDefault();
+        setIsSearchBarOpen(prev => !prev);
+      }
+
+      if (e.key === '?' && !isEditingInput) {
         e.preventDefault();
         setIsShortcutsOpen(true);
       }
@@ -364,12 +450,43 @@ export default function JSONFormatter() {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       if (handleFormatRef.current) handleFormatRef.current();
     });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, () => {
+      setIsSearchBarOpen(true);
+    });
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyM, () => {
       if (handleMinifyRef.current) handleMinifyRef.current();
     });
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => {
       if (handleAutoFixRef.current) handleAutoFixRef.current();
     });
+  };
+
+  // Safe File Processing Handler (Upload & Drag-and-Drop Validation)
+  const processFile = (file: File) => {
+    const fileName = file.name || 'document';
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    const allowedExts = ['json', 'txt'];
+
+    if (!allowedExts.includes(ext)) {
+      showToast(`Cannot open "${fileName}". Only .json and .txt files are supported (rejected .${ext}).`);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = (event.target?.result as string) || '';
+      if (/\u0000/.test(text)) {
+        showToast(`Cannot open "${fileName}". File contains binary data and cannot be opened as text.`);
+        return;
+      }
+      setInputJSON(text);
+      handleFormat(text);
+      showToast(`Loaded file "${fileName}".`);
+    };
+    reader.onerror = () => {
+      showToast(`Error reading file "${fileName}".`);
+    };
+    reader.readAsText(file);
   };
 
   // Drag & Drop handlers
@@ -386,14 +503,7 @@ export default function JSONFormatter() {
 
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target?.result as string;
-        setInputJSON(text);
-        handleFormat(text);
-        showToast(`Dropped "${file.name}" into workspace.`);
-      };
-      reader.readAsText(file);
+      processFile(file);
     }
   };
 
@@ -401,15 +511,7 @@ export default function JSONFormatter() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      setInputJSON(text);
-      handleFormat(text);
-      showToast(`Loaded file "${file.name}".`);
-    };
-    reader.readAsText(file);
+    processFile(file);
     e.target.value = '';
   };
 
@@ -462,6 +564,7 @@ export default function JSONFormatter() {
 
   // Command Palette Items Mapping
   const commandItems: CommandItem[] = useMemo(() => [
+    { id: 'find', title: 'Find & Search in Editor', category: 'Edit', shortcut: 'Ctrl+F', description: 'Open search overlay to find text matches in editor', icon: 'Search', action: () => setIsSearchBarOpen(true) },
     { id: 'format', title: 'Format / Beautify JSON', category: 'Format', shortcut: 'Ctrl+Enter', description: 'Beautify JSON payload with custom indentation', icon: 'Zap', action: () => handleFormat() },
     { id: 'validate', title: 'Validate Syntax Diagnostics', category: 'Action', description: 'Run deep syntax validation & check for errors', icon: 'Shield', action: handleValidate },
     { id: 'minify', title: 'Minify to Single Line', category: 'Format', shortcut: 'Ctrl+Shift+M', description: 'Remove all whitespace and minify JSON into single line', icon: 'Terminal', action: handleMinify },
@@ -719,8 +822,10 @@ export default function JSONFormatter() {
               onMatchCaseChange={setSearchMatchCase}
               isRegex={searchIsRegex}
               onIsRegexChange={setSearchIsRegex}
-              onNextMatch={() => {}}
-              onPrevMatch={() => {}}
+              onNextMatch={handleNextSearchMatch}
+              onPrevMatch={handlePrevSearchMatch}
+              matchCount={searchMatches.length}
+              currentMatchIndex={searchMatchIndex}
             />
             <MonacoEditor
               value={inputJSON}
@@ -780,13 +885,29 @@ export default function JSONFormatter() {
 
           <div className="h-[580px] relative border-2 border-border rounded-2xl overflow-hidden shadow-premium-sm bg-card">
             {activeRightTab === 'output' ? (
-              <MonacoEditor
-                value={outputJSON}
-                readOnly={true}
-                language="json"
-                theme={theme}
-                options={{ wordWrap: wrapLines ? 'on' : 'off' }}
-              />
+              outputJSON ? (
+                <MonacoEditor
+                  value={outputJSON}
+                  readOnly={true}
+                  language="json"
+                  theme={theme}
+                  options={{ wordWrap: wrapLines ? 'on' : 'off' }}
+                />
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground font-semibold space-y-3 bg-secondary/10 font-outfit">
+                  <Icons.AlertCircle className="h-10 w-10 text-amber-500/80 shrink-0" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-extrabold text-foreground">
+                      No Formatted Output Available
+                    </p>
+                    <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
+                      {errors.some(e => e.severity === 'error')
+                        ? 'Formatting failed due to syntax errors. Inspect and resolve issues in the Problems panel above.'
+                        : 'Enter a valid JSON payload and click Format to generate formatted code.'}
+                    </p>
+                  </div>
+                </div>
+              )
             ) : (
               <JSONTreeExplorer
                 jsonString={inputJSON}

@@ -10,6 +10,7 @@ export interface JSONStats {
   stringsCount: number;
   booleansCount: number;
   nullsCount: number;
+  isValid: boolean;
 }
 
 export interface TreeNode {
@@ -43,9 +44,13 @@ export function calculateJSONStats(jsonStr: string): JSONStats {
     stringsCount: 0,
     booleansCount: 0,
     nullsCount: 0,
+    isValid: true,
   };
 
-  if (!jsonStr.trim()) return stats;
+  if (!jsonStr.trim()) {
+    stats.isValid = true;
+    return stats;
+  }
 
   try {
     const parsed = JSON.parse(jsonStr);
@@ -76,7 +81,7 @@ export function calculateJSONStats(jsonStr: string): JSONStats {
 
     traverse(parsed, 1);
   } catch {
-    // If parsing fails, stats remain safely calculated based on text metrics
+    stats.isValid = false;
   }
 
   return stats;
@@ -153,23 +158,111 @@ export function buildJSONTree(
 }
 
 /**
- * Locates the line number for a specific JSON Path inside a JSON string
+ * Locates the exact line number for a specific JSON Path inside a JSON string
  */
 export function findLineForPath(jsonStr: string, path: string): number {
   if (!jsonStr.trim() || !path) return 1;
 
   const lines = jsonStr.split('\n');
-  const pathParts = path.split('.').flatMap(p => p.split('[').map(s => s.replace(']', ''))).filter(Boolean);
+  if (lines.length <= 1) return 1;
 
-  if (pathParts.length === 0) return 1;
-  const lastKey = pathParts[pathParts.length - 1];
+  // Normalize target path (e.g. "company.id" or "users[0].name" -> parts: ["company", "id"])
+  const normalizedTarget = path;
+  
+  // Track stack of keys / scopes
+  interface Scope {
+    key: string;
+    type: 'object' | 'array';
+    arrayIndex?: number;
+  }
+  const scopeStack: Scope[] = [];
+
+  const getKeyPathString = (currentKey?: string): string => {
+    let p = '';
+    for (const scope of scopeStack) {
+      if (scope.type === 'object') {
+        p = p ? `${p}.${scope.key}` : scope.key;
+      } else if (scope.type === 'array') {
+        p = `${p}[${scope.arrayIndex ?? 0}]`;
+      }
+    }
+    if (currentKey !== undefined) {
+      if (scopeStack.length > 0 && scopeStack[scopeStack.length - 1].type === 'array') {
+        // Current item in array
+        p = `${p}${currentKey}`;
+      } else {
+        p = p ? `${p}.${currentKey}` : currentKey;
+      }
+    }
+    return p;
+  };
 
   for (let i = 0; i < lines.length; i++) {
-    const lineStr = lines[i];
-    if (lineStr.includes(`"${lastKey}"`) || lineStr.includes(`'${lastKey}'`)) {
-      return i + 1;
+    const lineStr = lines[i].trim();
+    if (!lineStr) continue;
+
+    // Check key extraction: "key": or 'key':
+    const keyMatch = lineStr.match(/^"([^"]+)"\s*:/) || lineStr.match(/^'([^']+)'\s*:/);
+    const keyName = keyMatch ? keyMatch[1] : undefined;
+
+    if (keyName !== undefined) {
+      const currentPath = getKeyPathString(keyName);
+      if (currentPath === normalizedTarget) {
+        return i + 1;
+      }
+
+      if (lineStr.endsWith('{')) {
+        scopeStack.push({ key: keyName, type: 'object' });
+      } else if (lineStr.endsWith('[')) {
+        scopeStack.push({ key: keyName, type: 'array', arrayIndex: 0 });
+      }
+    } else {
+      // Line without explicit key, e.g. array elements or closing brackets
+      if (lineStr.startsWith('{') || lineStr.startsWith('[')) {
+        const top = scopeStack[scopeStack.length - 1];
+        if (top && top.type === 'array' && top.arrayIndex !== undefined) {
+          const currentPath = getKeyPathString();
+          if (currentPath === normalizedTarget) {
+            return i + 1;
+          }
+        }
+      }
+
+      if (lineStr.startsWith('}') || lineStr.startsWith('},') || lineStr.startsWith(']')) {
+        if (scopeStack.length > 0) {
+          scopeStack.pop();
+          // If popped into parent array scope, increment array index
+          const parent = scopeStack[scopeStack.length - 1];
+          if (parent && parent.type === 'array' && parent.arrayIndex !== undefined) {
+            parent.arrayIndex++;
+          }
+        }
+      } else if (scopeStack.length > 0 && scopeStack[scopeStack.length - 1].type === 'array') {
+        // Primitive element in array
+        const top = scopeStack[scopeStack.length - 1];
+        const currentPath = getKeyPathString();
+        if (currentPath === normalizedTarget) {
+          return i + 1;
+        }
+        if (lineStr.endsWith(',')) {
+          if (top.arrayIndex !== undefined) top.arrayIndex++;
+        }
+      }
+    }
+  }
+
+  // Fallback: search by last key in path if exact path search didn't return
+  const pathParts = path.split('.').flatMap(p => p.split('[').map(s => s.replace(']', ''))).filter(Boolean);
+  if (pathParts.length > 0) {
+    const lastKey = pathParts[pathParts.length - 1];
+    for (let i = 0; i < lines.length; i++) {
+      const lineStr = lines[i];
+      if (lineStr.includes(`"${lastKey}"`) || lineStr.includes(`'${lastKey}'`)) {
+        return i + 1;
+      }
     }
   }
 
   return 1;
 }
+

@@ -42,6 +42,16 @@ export default function JSONSearchBar({
           type="text"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (e.shiftKey) onPrevMatch();
+              else onNextMatch();
+            } else if (e.key === 'Escape') {
+              e.preventDefault();
+              onClose();
+            }
+          }}
           placeholder="Find in editor..."
           className="pl-8 pr-7 py-1 text-xs sm:text-sm font-semibold bg-secondary/30 border border-border/70 rounded-xl text-foreground focus:outline-none focus:border-primary w-[160px] sm:w-[200px]"
         />

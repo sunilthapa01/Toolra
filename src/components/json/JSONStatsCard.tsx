@@ -56,26 +56,37 @@ export default function JSONStatsCard({ jsonText, isOpen, onToggle }: JSONStatsC
 
       {/* Body */}
       {isOpen && (
-        <div className="p-4 bg-card grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 font-mono-calc">
-          {statItems.map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={idx}
-                className="p-3 rounded-xl border-2 border-border/60 bg-secondary/15 flex flex-col items-center justify-center text-center space-y-1 hover:border-primary/50 transition-colors"
-              >
-                <Icon className={`h-5 w-5 ${item.color}`} />
-                <span className="text-lg font-black text-foreground leading-tight">
-                  {item.value.toLocaleString()}
-                </span>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  {item.label}
-                </span>
-              </div>
-            );
-          })}
+        <div className="bg-card">
+          {!stats.isValid && (
+            <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-xs font-extrabold text-amber-600 dark:text-amber-400 flex items-center justify-center gap-2">
+              <Icons.AlertCircle className="h-4 w-4 shrink-0 animate-pulse" />
+              <span>Structure metrics unavailable until JSON becomes valid.</span>
+            </div>
+          )}
+          <div className="p-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 font-mono-calc">
+            {statItems.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={idx}
+                  className={`p-3 rounded-xl border-2 border-border/60 bg-secondary/15 flex flex-col items-center justify-center text-center space-y-1 hover:border-primary/50 transition-colors ${
+                    !stats.isValid ? 'opacity-40 select-none' : ''
+                  }`}
+                >
+                  <Icon className={`h-5 w-5 ${item.color}`} />
+                  <span className="text-lg font-black text-foreground leading-tight">
+                    {stats.isValid ? item.value.toLocaleString() : '—'}
+                  </span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    {item.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
   );
 }
+
