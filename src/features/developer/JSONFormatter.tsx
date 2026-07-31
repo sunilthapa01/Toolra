@@ -1,35 +1,34 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useToast } from '@/components/ToastProvider';
 import { useTheme } from '@/components/ThemeProvider';
 import * as Icons from '@/components/Icons';
-import { motion, AnimatePresence } from 'framer-motion';
 import { validateJSON, autoFixJSON, ValidationError } from '@/utils/jsonValidator';
 import MonacoEditor from '@/components/MonacoEditor';
+import JSONTreeExplorer from '@/components/json/JSONTreeExplorer';
+import JSONProblemsPanel from '@/components/json/JSONProblemsPanel';
+import JSONCommandPalette, { CommandItem } from '@/components/json/JSONCommandPalette';
+import JSONShortcutsModal from '@/components/json/JSONShortcutsModal';
+import JSONStatsCard from '@/components/json/JSONStatsCard';
+import JSONSearchBar from '@/components/json/JSONSearchBar';
 
-// Sample JSON loaded instantly
+// Default Sample JSON
 const SAMPLE_JSON = `{
   "project": "Toolora JSON Formatter & Validator",
-  "version": "1.0.0",
-  "description": "Fast, premium, and 100% offline JSON utility.",
-  "privacy": {
-    "serverUploads": false,
-    "localProcessing": true,
-    "secure": true
-  },
+  "version": "2.0.0",
+  "description": "Fast, professional, IDE-grade developer JSON workspace.",
   "features": [
-    "Beautify with customizable spacing",
-    "Deep validation with line-specific errors",
-    "Duplicate keys auditing",
-    "Instant minification",
-    "Keyboard shortcuts support",
-    "File upload and download"
+    "Monaco Code Editor with real-time diagnostics",
+    "Interactive collapsible JSON Tree Explorer",
+    "VS Code style Command Palette (Ctrl+Shift+P)",
+    "Top-docked Problems panel with error stepping (F8)",
+    "Live structural statistics and auto-save session"
   ],
-  "stats": {
-    "speedMs": 0.85,
-    "rating": 5,
-    "activeUsers": 25000
+  "performance": {
+    "largeFileThresholdMB": 2,
+    "instantParserMs": 0.42,
+    "rating": 5
   }
 }`;
 
@@ -46,30 +45,93 @@ export default function JSONFormatter() {
   const [isValidated, setIsValidated] = useState(false);
   const [isSuccessAnimated, setIsSuccessAnimated] = useState(false);
 
-  // Status Bar states
-  const [cursorPos, setCursorPos] = useState({ line: 1, column: 1 });
-  const [isProblemsExpanded, setIsProblemsExpanded] = useState(false);
+  // UI View States
+  const [activeRightTab, setActiveRightTab] = useState<'output' | 'tree'>('output');
+  const [isProblemsExpanded, setIsProblemsExpanded] = useState(true);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
+  const [isStatsOpen, setIsStatsOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
-  // Monaco and Editor instances
+  // Search Bar Overlay States
+  const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchMatchCase, setSearchMatchCase] = useState(false);
+  const [searchIsRegex, setSearchIsRegex] = useState(false);
+
+  // Drag & Drop & Large File States
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isLargeFile, setIsLargeFile] = useState(false);
+
+  // Monaco and Cursor instances
+  const [cursorPos, setCursorPos] = useState({ line: 1, column: 1 });
   const [inputEditor, setInputEditor] = useState<any>(null);
   const [monacoInstance, setMonacoInstance] = useState<any>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync scroll references and actions inside refs to avoid stale closures in Monaco commands
+  // Sync refs to avoid stale closures
   const handleFormatRef = useRef<any>(null);
   const handleMinifyRef = useRef<any>(null);
+  const handleAutoFixRef = useRef<any>(null);
 
-  // Analytics Helper
+  // Analytics Tracker
   const trackEvent = (eventName: string, metadata: any = {}) => {
     console.log(`[Analytics] ${eventName}`, {
       ...metadata,
       timestamp: new Date().toISOString(),
-      platform: 'Browser'
     });
   };
 
-  // Perform Beautify/Formatting
+  // Restore Session on Mount
+  useEffect(() => {
+    try {
+      const savedInput = localStorage.getItem('toolora_json_input');
+      const savedIndent = localStorage.getItem('toolora_json_indent');
+      const savedWrap = localStorage.getItem('toolora_json_wrap');
+
+      if (savedInput !== null) {
+        setInputJSON(savedInput);
+        if (savedInput.trim()) {
+          const valRes = validateJSON(savedInput);
+          setErrors(valRes);
+          setIsValidated(true);
+          if (valRes.some(e => e.severity === 'error')) {
+            setIsProblemsExpanded(true);
+          }
+          if (!valRes.some(e => e.severity === 'error')) {
+            try {
+              const parsed = JSON.parse(savedInput);
+              setOutputJSON(JSON.stringify(parsed, null, 2));
+            } catch {}
+          }
+        }
+      } else {
+        setInputJSON(SAMPLE_JSON);
+        handleFormat(SAMPLE_JSON);
+      }
+
+      if (savedIndent) setIndentSize(JSON.parse(savedIndent));
+      if (savedWrap) setWrapLines(JSON.parse(savedWrap));
+    } catch {
+      setInputJSON(SAMPLE_JSON);
+      handleFormat(SAMPLE_JSON);
+    }
+  }, []);
+
+  // Save Session on State Change
+  useEffect(() => {
+    try {
+      localStorage.setItem('toolora_json_input', inputJSON);
+      localStorage.setItem('toolora_json_indent', JSON.stringify(indentSize));
+      localStorage.setItem('toolora_json_wrap', JSON.stringify(wrapLines));
+    } catch {}
+
+    const byteSize = new Blob([inputJSON]).size;
+    setIsLargeFile(byteSize > 2 * 1024 * 1024);
+  }, [inputJSON, indentSize, wrapLines]);
+
+  // Perform Beautify / Formatting
   const handleFormat = (rawText = inputJSON) => {
     const trimmed = rawText.trim();
     if (!trimmed) {
@@ -86,9 +148,9 @@ export default function JSONFormatter() {
     setIsValidated(true);
 
     if (hasErrors) {
-      showToast('JSON validation failed. Fix errors shown in Problems panel.');
+      showToast('JSON has syntax errors. Diagnostics displayed in Problems panel above.');
       setIsProblemsExpanded(true);
-      trackEvent('ValidateButton', { status: 'failure', errorsCount: validationResult.length });
+      trackEvent('Format', { status: 'failure', errorsCount: validationResult.length });
       return;
     }
 
@@ -98,41 +160,38 @@ export default function JSONFormatter() {
       const formatted = JSON.stringify(parsed, null, spacer);
       setOutputJSON(formatted);
 
-      // Trigger formatting success animations
       setIsSuccessAnimated(true);
       setTimeout(() => setIsSuccessAnimated(false), 1500);
 
       showToast('JSON formatted successfully.');
-      trackEvent('FormatButton', { status: 'success', indent: indentSize });
+      trackEvent('Format', { status: 'success', indent: indentSize });
     } catch (e: any) {
       setErrors([{
         line: 1,
         column: 1,
-        message: e.message || 'Invalid JSON syntax.',
+        message: e.message || 'Syntax error during JSON format.',
         severity: 'error',
-        explanation: 'The built-in parser failed to parse the JSON string.',
-        suggestion: 'Check the syntax for stray characters or unclosed elements.'
+        explanation: 'Built-in parser failed to structure raw JSON.',
+        suggestion: 'Verify quotes and closing brackets.'
       }]);
-      showToast('Unexpected parser error.');
       setIsProblemsExpanded(true);
     }
   };
 
-  // Perform Validation only
+  // Perform Validation Only
   const handleValidate = () => {
-    const validationResult = validateJSON(inputJSON);
-    setErrors(validationResult);
+    const valRes = validateJSON(inputJSON);
+    setErrors(valRes);
     setIsValidated(true);
 
-    const hasErrors = validationResult.some(err => err.severity === 'error');
+    const hasErrors = valRes.some(err => err.severity === 'error');
     if (hasErrors) {
-      showToast(`Validation failed: ${validationResult.filter(e => e.severity === 'error').length} error(s) found.`);
+      showToast(`Validation failed: ${valRes.filter(e => e.severity === 'error').length} error(s) detected.`);
       setIsProblemsExpanded(true);
-      trackEvent('ValidateButton', { status: 'failure', errorsCount: validationResult.length });
     } else {
-      showToast('Validation successful! JSON is valid.');
-      trackEvent('ValidateButton', { status: 'success' });
+      showToast('Validation passed! JSON is valid syntax.');
     }
+    trackEvent('Validate', { hasErrors, count: valRes.length });
   };
 
   // Perform Minification
@@ -143,15 +202,12 @@ export default function JSONFormatter() {
       return;
     }
 
-    const validationResult = validateJSON(inputJSON);
-    const hasErrors = validationResult.some(err => err.severity === 'error');
-
-    setErrors(validationResult);
-    setIsValidated(true);
-
-    if (hasErrors) {
-      showToast('Validation failed. Fix errors before minifying.');
+    const valRes = validateJSON(inputJSON);
+    if (valRes.some(e => e.severity === 'error')) {
+      setErrors(valRes);
+      setIsValidated(true);
       setIsProblemsExpanded(true);
+      showToast('Validation failed. Fix errors in Problems panel before minifying.');
       return;
     }
 
@@ -163,10 +219,10 @@ export default function JSONFormatter() {
       setIsSuccessAnimated(true);
       setTimeout(() => setIsSuccessAnimated(false), 1500);
 
-      showToast('JSON minified successfully.');
-      trackEvent('MinifyButton', { status: 'success' });
-    } catch (e: any) {
-      showToast('Unexpected minification parser error.');
+      showToast('JSON minified to single line.');
+      trackEvent('Minify', { status: 'success' });
+    } catch {
+      showToast('Parser error during minification.');
     }
   };
 
@@ -179,35 +235,52 @@ export default function JSONFormatter() {
     }
 
     const res = autoFixJSON(inputJSON);
+    setInputJSON(res.fixed);
     if (res.success) {
-      setInputJSON(res.fixed);
       handleFormat(res.fixed);
-      showToast('JSON successfully auto-fixed and formatted!');
-      trackEvent('AutoFixButton', { status: 'success' });
+      showToast('JSON auto-fixed and formatted!');
+      trackEvent('AutoFix', { status: 'success' });
     } else {
-      setInputJSON(res.fixed);
-      const validationResult = validateJSON(res.fixed);
-      setErrors(validationResult);
+      const valRes = validateJSON(res.fixed);
+      setErrors(valRes);
       setIsValidated(true);
       setIsProblemsExpanded(true);
-      showToast('JSON partially fixed. Some issues require manual resolution.');
-      trackEvent('AutoFixButton', { status: 'partial', error: res.error });
+      showToast('JSON partially fixed. Check remaining issues in Problems panel.');
+      trackEvent('AutoFix', { status: 'partial' });
     }
   };
 
-  // Update refs for Monaco commands
+  // Sync refs
   useEffect(() => {
     handleFormatRef.current = handleFormat;
     handleMinifyRef.current = handleMinify;
+    handleAutoFixRef.current = handleAutoFix;
   });
 
-  // Setup sample JSON initially
-  useEffect(() => {
-    setInputJSON(SAMPLE_JSON);
-    handleFormat(SAMPLE_JSON);
-  }, []);
+  // Jump to specific error line inside Monaco Editor
+  const jumpToProblem = (err: ValidationError) => {
+    if (!inputEditor || !err.line) return;
+    inputEditor.revealPositionInCenter({ lineNumber: err.line, column: err.column || 1 });
+    inputEditor.setPosition({ lineNumber: err.line, column: err.column || 1 });
+    inputEditor.focus();
+  };
 
-  // Sync validation markers in Monaco Editor when errors change
+  // Cycle next / prev problem
+  const handleNextProblem = () => {
+    if (errors.length === 0) return;
+    const nextIdx = (currentProblemIndex + 1) % errors.length;
+    setCurrentProblemIndex(nextIdx);
+    jumpToProblem(errors[nextIdx]);
+  };
+
+  const handlePrevProblem = () => {
+    if (errors.length === 0) return;
+    const prevIdx = (currentProblemIndex - 1 + errors.length) % errors.length;
+    setCurrentProblemIndex(prevIdx);
+    jumpToProblem(errors[prevIdx]);
+  };
+
+  // Sync validation error markers in Monaco
   useEffect(() => {
     if (!inputEditor || !monacoInstance) return;
     const model = inputEditor.getModel();
@@ -220,7 +293,7 @@ export default function JSONFormatter() {
         startColumn: err.column || 1,
         endLineNumber: err.line || 1,
         endColumn: (err.column || 1) + len,
-        message: `${err.message}\n\nExplanation: ${err.explanation || ''}\nSuggestion: ${err.suggestion || ''}`,
+        message: `${err.message}\n\nReason: ${err.reason || err.explanation || ''}\nSuggested Fix: ${err.suggestion || ''}`,
         severity: err.severity === 'error' ? monacoInstance.MarkerSeverity.Error : monacoInstance.MarkerSeverity.Warning
       };
     });
@@ -228,23 +301,142 @@ export default function JSONFormatter() {
     monacoInstance.editor.setModelMarkers(model, 'json-validation', markers);
   }, [errors, inputEditor, monacoInstance]);
 
-  // Handle live typing/change
-  const handleInputChange = (newValue: string) => {
-    setInputJSON(newValue);
-    if (isValidated) {
-      setErrors(validateJSON(newValue));
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+
+      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+
+      if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        e.preventDefault();
+        setIsShortcutsOpen(true);
+      }
+
+      if (e.key === 'F8') {
+        e.preventDefault();
+        if (e.shiftKey) handlePrevProblem();
+        else handleNextProblem();
+      }
+
+      if (e.altKey && e.key === 'ArrowDown') {
+        e.preventDefault();
+        handleNextProblem();
+      }
+      if (e.altKey && e.key === 'ArrowUp') {
+        e.preventDefault();
+        handlePrevProblem();
+      }
+
+      if (isCtrlOrCmd && e.key === 'Enter') {
+        e.preventDefault();
+        handleFormat();
+      }
+
+      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        handleMinify();
+      }
+
+      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        handleAutoFix();
+      }
+
+      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        setActiveRightTab(prev => (prev === 'output' ? 'tree' : 'output'));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [errors, currentProblemIndex, inputJSON]);
+
+  // Setup Monaco Commands on mount
+  const handleInputEditorMount = (editor: any, monaco: any) => {
+    setInputEditor(editor);
+    setMonacoInstance(monaco);
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+      if (handleFormatRef.current) handleFormatRef.current();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyM, () => {
+      if (handleMinifyRef.current) handleMinifyRef.current();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => {
+      if (handleAutoFixRef.current) handleAutoFixRef.current();
+    });
+  };
+
+  // Drag & Drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => setIsDragOver(false);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        setInputJSON(text);
+        handleFormat(text);
+        showToast(`Dropped "${file.name}" into workspace.`);
+      };
+      reader.readAsText(file);
     }
   };
 
-  // Copy to Clipboard helper
-  const handleCopy = (text: string, source: 'input' | 'output') => {
-    if (!text) {
-      showToast('No JSON to copy.');
+  // File Upload
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      setInputJSON(text);
+      handleFormat(text);
+      showToast(`Loaded file "${file.name}".`);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  // Clear Workspace
+  const handleClear = () => {
+    setInputJSON('');
+    setOutputJSON('');
+    setErrors([]);
+    setIsValidated(false);
+    showToast('Workspace cleared.');
+  };
+
+  // Load Sample
+  const handleLoadSample = () => {
+    setInputJSON(SAMPLE_JSON);
+    handleFormat(SAMPLE_JSON);
+    showToast('Sample JSON loaded.');
+  };
+
+  // Copy helper
+  const handleCopy = (text: string, label: string) => {
+    if (!text.trim()) {
+      showToast('Nothing to copy.');
       return;
     }
     navigator.clipboard.writeText(text);
-    showToast(`Copied ${source} JSON to clipboard.`);
-    trackEvent('CopyButton', { source });
+    showToast(`Copied ${label} to clipboard.`);
   };
 
   // Download Output JSON
@@ -259,423 +451,283 @@ export default function JSONFormatter() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `toolora-formatted-${Date.now().toString().slice(-4)}.json`;
+    a.download = `toolora-json-${Date.now().toString().slice(-4)}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast('JSON file downloaded successfully.');
-    trackEvent('Download');
+    showToast('Downloaded JSON file.');
   };
 
-  // Upload JSON File
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      setInputJSON(text);
-      setErrors([]);
-      setIsValidated(false);
-      setOutputJSON('');
-      showToast(`Uploaded "${file.name}" successfully.`);
-      trackEvent('Upload', { filename: file.name, size: file.size });
-      
-      // Autoformat newly uploaded JSON
-      handleFormat(text);
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  };
-
-  // Clear Editor
-  const handleClear = () => {
-    setInputJSON('');
-    setOutputJSON('');
-    setErrors([]);
-    setIsValidated(false);
-    showToast('Editor cleared.');
-    trackEvent('ClearEditor');
-  };
-
-  // Load sample JSON
-  const handleLoadSample = () => {
-    setInputJSON(SAMPLE_JSON);
-    setErrors([]);
-    setIsValidated(false);
-    handleFormat(SAMPLE_JSON);
-    showToast('Sample JSON loaded.');
-    trackEvent('SampleJSONLoaded');
-  };
-
-  // Global Keyboard Shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
-      
-      // Format: Ctrl/Cmd + Enter
-      if (isCtrlOrCmd && e.key === 'Enter') {
-        e.preventDefault();
-        handleFormat();
-      }
-
-      // Minify: Ctrl/Cmd + Shift + M
-      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'm') {
-        e.preventDefault();
-        handleMinify();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputJSON, indentSize]);
-
-  // Jump to specific error line inside Monaco Editor
-  const jumpToProblem = (lineNum: number, columnNum: number) => {
-    if (!inputEditor) return;
-    inputEditor.revealPositionInCenter({ lineNumber: lineNum, column: columnNum });
-    inputEditor.setPosition({ lineNumber: lineNum, column: columnNum });
-    inputEditor.focus();
-  };
-
-  // Setup Monaco Commands on mount
-  const handleInputEditorMount = (editor: any, monaco: any) => {
-    setInputEditor(editor);
-    setMonacoInstance(monaco);
-
-    // Register shortcuts in Monaco
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      if (handleFormatRef.current) handleFormatRef.current();
-    });
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyM, () => {
-      if (handleMinifyRef.current) handleMinifyRef.current();
-    });
-  };
-
-  // File size formatter
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+  // Command Palette Items Mapping
+  const commandItems: CommandItem[] = useMemo(() => [
+    { id: 'format', title: 'Format / Beautify JSON', category: 'Format', shortcut: 'Ctrl+Enter', description: 'Beautify JSON payload with custom indentation', icon: 'Zap', action: () => handleFormat() },
+    { id: 'validate', title: 'Validate Syntax Diagnostics', category: 'Action', description: 'Run deep syntax validation & check for errors', icon: 'Shield', action: handleValidate },
+    { id: 'minify', title: 'Minify to Single Line', category: 'Format', shortcut: 'Ctrl+Shift+M', description: 'Remove all whitespace and minify JSON into single line', icon: 'Terminal', action: handleMinify },
+    { id: 'autofix', title: 'Auto-Fix Syntax Errors', category: 'Action', shortcut: 'Ctrl+Shift+F', description: 'Automatically fix unquoted keys, single quotes, & trailing commas', icon: 'Sparkles', action: handleAutoFix },
+    { id: 'tree_view', title: 'Switch to JSON Tree Explorer', category: 'View', shortcut: 'Ctrl+Shift+E', description: 'View interactive collapsible JSON node tree', icon: 'Layers', action: () => setActiveRightTab('tree') },
+    { id: 'output_view', title: 'Switch to Formatted Code View', category: 'View', description: 'View formatted JSON code in Monaco Editor', icon: 'Code', action: () => setActiveRightTab('output') },
+    { id: 'stats', title: 'Toggle Structural Analytics', category: 'View', description: 'Show live count of Objects, Arrays, Keys, & Types', icon: 'BarChart2', action: () => setIsStatsOpen(!isStatsOpen) },
+    { id: 'problems', title: 'Toggle Problems Panel', category: 'View', description: 'Toggle top error diagnostics panel', icon: 'AlertCircle', action: () => setIsProblemsExpanded(!isProblemsExpanded) },
+    { id: 'copy', title: 'Copy Formatted Output', category: 'Action', shortcut: 'Ctrl+Shift+C', description: 'Copy output JSON string to clipboard', icon: 'Copy', action: () => handleCopy(outputJSON || inputJSON, 'Output') },
+    { id: 'download', title: 'Download JSON File', category: 'Action', description: 'Download output as a .json file', icon: 'Download', action: handleDownload },
+    { id: 'sample', title: 'Load Sample JSON Payload', category: 'Action', description: 'Load a default sample JSON string', icon: 'Files', action: handleLoadSample },
+    { id: 'clear', title: 'Clear Workspace Editor', category: 'Action', description: 'Reset input & output editors', icon: 'X', action: handleClear },
+    { id: 'shortcuts', title: 'Keyboard Shortcuts Cheatsheet', category: 'View', shortcut: '?', description: 'View full list of keyboard shortcuts', icon: 'Code', action: () => setIsShortcutsOpen(true) },
+  ], [inputJSON, outputJSON, isStatsOpen, isProblemsExpanded]);
 
   return (
-    <div className="space-y-6">
-      {/* 1. Structured Grouped Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-3 rounded-2xl bg-secondary/15 border border-border/80 shadow-premium-sm">
-        {/* Left: Input & Processing groups */}
-        <div className="flex flex-wrap items-center gap-6">
-          {/* Group 1: Input */}
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className="space-y-5 relative min-h-screen pb-12 select-none"
+    >
+      {/* Visual Drag & Drop Overlay */}
+      {isDragOver && (
+        <div className="fixed inset-0 z-50 bg-primary/20 backdrop-blur-md border-4 border-dashed border-primary flex flex-col items-center justify-center gap-3 animate-fade-in">
+          <Icons.Download className="h-14 w-14 text-primary rotate-180 animate-bounce" />
+          <h3 className="text-2xl font-black font-outfit text-foreground">Drop JSON File Here</h3>
+          <p className="text-sm font-semibold text-foreground">Supports .json and .txt files for instant formatting</p>
+        </div>
+      )}
+
+      {/* 1. Main Action Toolbar (High Font Visibility & High Contrast Buttons) */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-secondary/25 border-2 border-border shadow-premium-sm">
+        {/* Left Side: Input & Action Buttons */}
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+          {/* Group: Input Actions */}
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase text-muted tracking-wider">Input:</span>
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={handleLoadSample}
-                title="Load Sample JSON"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-semibold hover:bg-secondary/40 transition-all text-foreground"
-              >
-                <Icons.Files className="h-3.5 w-3.5 text-primary" />
-                <span>Sample</span>
-              </button>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                title="Upload JSON File"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-semibold hover:bg-secondary/40 transition-all text-foreground"
-              >
-                <Icons.Download className="h-3.5 w-3.5 rotate-180 text-primary" />
-                <span>Upload</span>
-              </button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                accept=".json,.txt"
-                className="hidden"
-              />
-            </div>
+            <span className="text-xs font-black uppercase text-foreground/80 tracking-wider hidden sm:inline">INPUT:</span>
+            <button
+              onClick={handleLoadSample}
+              className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2 shadow-xs"
+            >
+              <Icons.Files className="h-4 w-4 text-primary" />
+              <span>Sample JSON</span>
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2 shadow-xs"
+            >
+              <Icons.Download className="h-4 w-4 rotate-180 text-primary" />
+              <span>Upload File</span>
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".json,.txt"
+              className="hidden"
+            />
           </div>
 
-          <div className="hidden sm:block h-6 w-px bg-border/80" />
+          <div className="h-6 w-px bg-border/80 hidden sm:block" />
 
-          {/* Group 2: Processing */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase text-muted tracking-wider">Process:</span>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                onClick={() => handleFormat()}
-                title="Format/Beautify JSON (Ctrl+Enter)"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:bg-primary/95 transition-all shadow-premium-sm"
-              >
-                <Icons.Zap className="h-3.5 w-3.5" />
-                <span>Format</span>
-              </button>
-              <button
-                onClick={handleValidate}
-                title="Validate JSON Syntax"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-semibold hover:bg-secondary/40 transition-all text-foreground"
-              >
-                <Icons.Shield className="h-3.5 w-3.5 text-primary" />
-                <span>Validate</span>
-              </button>
-              <button
-                onClick={handleMinify}
-                title="Minify JSON to single line (Ctrl+Shift+M)"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-semibold hover:bg-secondary/40 transition-all text-foreground"
-              >
-                <Icons.Terminal className="h-3.5 w-3.5 text-primary" />
-                <span>Minify</span>
-              </button>
-              <button
-                onClick={handleAutoFix}
-                title="Auto-repair single quotes, unquoted keys, trailing commas, missing closing brackets"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-bold hover:bg-secondary/40 transition-all text-foreground"
-              >
-                <Icons.Sparkles className="h-3.5 w-3.5 text-primary" />
-                <span>Auto Fix</span>
-              </button>
-              {errors.length > 0 && (
-                <button
-                  onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
-                  title="Toggle Problems Panel"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-destructive/10 border border-destructive/20 text-destructive rounded-xl text-xs font-bold hover:bg-destructive/20 transition-all"
-                >
-                  <Icons.AlertCircle className="h-3.5 w-3.5" />
-                  <span>Problems ({errors.length})</span>
-                </button>
-              )}
-            </div>
+          {/* Group: Primary Processing Actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => handleFormat()}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs sm:text-sm font-extrabold hover:bg-primary/95 transition-all shadow-premium-sm flex items-center gap-2"
+            >
+              <Icons.Zap className="h-4.5 w-4.5" />
+              <span>Format</span>
+            </button>
+            <button
+              onClick={handleValidate}
+              className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2 shadow-xs"
+            >
+              <Icons.Shield className="h-4 w-4 text-primary" />
+              <span>Validate</span>
+            </button>
+            <button
+              onClick={handleMinify}
+              className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2 shadow-xs"
+            >
+              <Icons.Terminal className="h-4 w-4 text-primary" />
+              <span>Minify</span>
+            </button>
+            <button
+              onClick={handleAutoFix}
+              className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-extrabold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2 shadow-xs"
+            >
+              <Icons.Sparkles className="h-4 w-4 text-primary" />
+              <span>Auto Fix</span>
+            </button>
           </div>
         </div>
 
-        {/* Right: Output group */}
-        <div className="flex items-center gap-6">
-          <div className="hidden md:block h-6 w-px bg-border/80" />
+        {/* Right Side: Command Palette & Utilities */}
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setIsCommandPaletteOpen(true)}
+            title="Open Command Palette (Ctrl+Shift+P)"
+            className="px-4 py-2 bg-primary/15 border-2 border-primary/40 rounded-xl text-xs sm:text-sm font-extrabold hover:bg-primary/25 transition-all text-primary flex items-center gap-2 shadow-xs"
+          >
+            <Icons.Search className="h-4.5 w-4.5" />
+            <span>Commands</span>
+            <kbd className="px-1.5 py-0.5 text-xs bg-primary/20 rounded font-mono-calc font-extrabold text-primary hidden md:inline">Ctrl+Shift+P</kbd>
+          </button>
 
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase text-muted tracking-wider">Output:</span>
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => handleCopy(outputJSON || inputJSON, outputJSON ? 'output' : 'input')}
-                title="Copy output to Clipboard"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-semibold hover:bg-secondary/40 transition-all text-foreground"
-              >
-                <Icons.Copy className="h-3.5 w-3.5 text-primary" />
-                <span>Copy</span>
-              </button>
-              <button
-                onClick={handleDownload}
-                title="Download formatted file"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-xl text-xs font-semibold hover:bg-secondary/40 transition-all text-foreground"
-              >
-                <Icons.Download className="h-3.5 w-3.5 text-primary" />
-                <span>Download</span>
-              </button>
-              <button
-                onClick={handleClear}
-                title="Reset Editors"
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-destructive/20 text-destructive hover:bg-destructive/5 rounded-xl text-xs font-semibold transition-all"
-              >
-                <Icons.X className="h-3.5 w-3.5" />
-                <span>Clear</span>
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={() => setIsShortcutsOpen(true)}
+            title="Keyboard Shortcuts Cheatsheet (?)"
+            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5"
+          >
+            <Icons.Code className="h-4 w-4 text-primary" />
+            <span className="hidden lg:inline">Shortcuts (?)</span>
+          </button>
+
+          <div className="h-6 w-px bg-border/80" />
+
+          <button
+            onClick={() => handleCopy(outputJSON || inputJSON, 'Output')}
+            className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2"
+          >
+            <Icons.Copy className="h-4 w-4 text-primary" />
+            <span className="hidden sm:inline">Copy</span>
+          </button>
+          <button
+            onClick={handleDownload}
+            className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2"
+          >
+            <Icons.Download className="h-4 w-4 text-primary" />
+            <span className="hidden sm:inline">Download</span>
+          </button>
+          <button
+            onClick={handleClear}
+            className="p-2 border-2 border-destructive/30 text-destructive hover:bg-destructive/15 rounded-xl transition-all font-bold"
+            title="Clear Workspace"
+          >
+            <Icons.X className="h-4.5 w-4.5" />
+          </button>
         </div>
       </div>
 
-      {/* 3. Settings & Shortcuts row */}
-      <div className="flex flex-wrap items-center justify-between gap-4 text-xs p-1 bg-secondary/5 rounded-xl">
+      {/* 2. Options Toolbar & Quick Analytics Toggle */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-secondary/15 border-2 border-border/70 rounded-2xl">
         <div className="flex flex-wrap items-center gap-5">
-          {/* Indentation Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase text-muted tracking-wider">Spacing:</span>
-            <div className="inline-flex rounded-xl bg-card border border-border p-1 gap-0.5">
+          {/* Spacing selector */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black uppercase text-foreground/80 tracking-wider">Indent:</span>
+            <div className="inline-flex rounded-xl bg-card border-2 border-border p-1 gap-1">
               {([2, 4, 'tab'] as const).map((size) => (
                 <button
                   key={size}
-                  onClick={() => {
-                    setIndentSize(size);
-                    trackEvent('IndentSizeChange', { size });
-                  }}
-                  className={`px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-lg transition-all ${
+                  onClick={() => setIndentSize(size)}
+                  className={`px-3 py-1 text-xs font-extrabold uppercase rounded-lg transition-all ${
                     indentSize === size
-                      ? 'bg-primary text-primary-foreground font-black'
-                      : 'text-muted hover:text-foreground hover:bg-secondary/20'
+                      ? 'bg-primary text-primary-foreground font-black shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'
                   }`}
                 >
-                  {size === 'tab' ? 'Tab' : `${size} Space`}
+                  {size === 'tab' ? 'Tab' : `${size} Spaces`}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Word Wrap Toggle */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase text-muted tracking-wider">Line Wrap:</span>
+          {/* Line Wrap Toggle */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black uppercase text-foreground/80 tracking-wider">Line Wrap:</span>
             <button
-              onClick={() => {
-                setWrapLines(!wrapLines);
-                trackEvent('LineWrapToggle', { wrap: !wrapLines });
-              }}
-              className={`px-2.5 py-1 border rounded-xl text-[10px] font-bold uppercase transition-all ${
-                wrapLines
-                  ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-border bg-card text-muted hover:text-foreground'
+              onClick={() => setWrapLines(!wrapLines)}
+              className={`px-3 py-1.5 border-2 rounded-xl text-xs font-extrabold uppercase transition-all ${
+                wrapLines ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-foreground/70 hover:text-foreground'
               }`}
             >
               {wrapLines ? 'Enabled' : 'Disabled'}
             </button>
           </div>
+
+          {/* Analytics Toggle */}
+          <button
+            onClick={() => setIsStatsOpen(!isStatsOpen)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase border-2 transition-all flex items-center gap-2 ${
+              isStatsOpen ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-card border-border text-foreground/80 hover:text-foreground'
+            }`}
+          >
+            <Icons.BarChart2 className="h-4 w-4" />
+            <span>Structural Analytics</span>
+          </button>
         </div>
 
-        {/* Quick shortcuts info */}
-        <div className="hidden md:flex items-center gap-4 text-[10px] text-muted/80 font-medium">
-          <span className="flex items-center gap-1">
-            <kbd className="bg-card border border-border px-1.5 py-0.5 rounded shadow-sm text-foreground">Ctrl</kbd>+
-            <kbd className="bg-card border border-border px-1.5 py-0.5 rounded shadow-sm text-foreground">Enter</kbd>
-            <span className="text-muted/65 ml-1">Format</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <kbd className="bg-card border border-border px-1.5 py-0.5 rounded shadow-sm text-foreground">Ctrl</kbd>+
-            <kbd className="bg-card border border-border px-1.5 py-0.5 rounded shadow-sm text-foreground">Shift</kbd>+
-            <kbd className="bg-card border border-border px-1.5 py-0.5 rounded shadow-sm text-foreground">M</kbd>
-            <span className="text-muted/65 ml-1">Minify</span>
+        {/* Large File & Warning indicators */}
+        <div className="flex items-center gap-4 text-xs font-bold text-foreground">
+          {isLargeFile && (
+            <span className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-2 border-amber-500/30 px-3 py-1 rounded-xl font-black flex items-center gap-1.5">
+              <Icons.AlertCircle className="h-4 w-4" />
+              <span>Large File Mode (&gt;2MB)</span>
+            </span>
+          )}
+          <span className="hidden md:inline font-mono-calc text-muted-foreground">
+            ✓ Session Auto-Saved
           </span>
         </div>
       </div>
 
-      {/* 4. Collapsible Problems Panel (Upper Area) */}
-      <div className="border border-border/80 rounded-2xl overflow-hidden bg-card shadow-premium-sm transition-all duration-300">
-        {/* Panel Header */}
-        <button
-          onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
-          className="w-full flex items-center justify-between px-5 py-3 border-b border-border/60 hover:bg-secondary/20 transition-colors text-left"
-        >
-          <div className="flex items-center gap-2">
-            <span className={`h-4.5 w-4.5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-              errors.length === 0 
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                : errors.some(e => e.severity === 'error')
-                ? 'bg-destructive/10 text-destructive'
-                : 'bg-amber-500/10 text-amber-500'
-            }`}>
-              {errors.length}
-            </span>
-            <span className="text-xs font-bold uppercase tracking-wider font-outfit text-foreground flex items-center gap-1.5">
-              Problems
+      {/* 3. Structural Analytics Card */}
+      {isStatsOpen && (
+        <JSONStatsCard
+          jsonText={inputJSON}
+          isOpen={isStatsOpen}
+          onToggle={() => setIsStatsOpen(!isStatsOpen)}
+        />
+      )}
+
+      {/* 4. Top Docked Problems & Diagnostics Panel (HIGH VISIBILITY LOCATION AT THE TOP) */}
+      <JSONProblemsPanel
+        errors={errors}
+        isOpen={isProblemsExpanded}
+        onToggle={() => setIsProblemsExpanded(!isProblemsExpanded)}
+        onSelectError={jumpToProblem}
+        onNextError={handleNextProblem}
+        onPrevError={handlePrevProblem}
+        currentIndex={currentProblemIndex}
+      />
+
+      {/* 5. Main Split Workspace Editors */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Left Side: Input Monaco Editor */}
+        <div className="flex flex-col space-y-2 relative">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-black uppercase text-foreground tracking-widest flex items-center gap-2">
+              JSON Input Editor
               {errors.length > 0 && (
-                <span className="text-[10px] text-muted font-normal lowercase">
-                  ({errors.filter(e => e.severity === 'error').length} error{errors.filter(e => e.severity === 'error').length === 1 ? '' : 's'}, {errors.filter(e => e.severity === 'warning').length} warning{errors.filter(e => e.severity === 'warning').length === 1 ? '' : 's'})
+                <span className="text-destructive font-black bg-destructive/10 px-2 py-0.5 rounded-lg border border-destructive/20 text-xs">
+                  ({errors.length} Issues)
                 </span>
               )}
             </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-muted font-medium hidden sm:inline">
-              {isProblemsExpanded ? 'Hide' : 'Show'}
-            </span>
-            <Icons.ChevronDown className={`h-4 w-4 text-muted transition-transform duration-300 ${isProblemsExpanded ? '' : 'rotate-180'}`} />
-          </div>
-        </button>
-
-        {/* Panel Content (Errors List) */}
-        <AnimatePresence initial={false}>
-          {isProblemsExpanded && (
-            <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: 'auto' }}
-              exit={{ height: 0 }}
-              className="overflow-hidden"
+            <button
+              onClick={() => setIsSearchBarOpen(!isSearchBarOpen)}
+              className="text-xs font-extrabold text-foreground hover:text-primary transition-colors flex items-center gap-1.5 bg-secondary/30 px-2.5 py-1 rounded-lg border border-border/60"
             >
-              <div className="p-3 divide-y divide-border/40 max-h-[250px] overflow-y-auto font-mono-calc">
-                {errors.length === 0 ? (
-                  <div className="p-4 text-xs text-muted text-center italic select-none">
-                    No problems have been detected in the workspace.
-                  </div>
-                ) : (
-                  errors.map((err, i) => (
-                    <div
-                      key={i}
-                      onClick={() => err.line && jumpToProblem(err.line, err.column)}
-                      className="py-3 px-2 first:pt-1 last:pb-1 flex items-start gap-3.5 cursor-pointer hover:bg-secondary/35 rounded-xl transition-all"
-                    >
-                      {/* Indicator Badge */}
-                      <span
-                        className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider mt-0.5 shrink-0 ${
-                          err.severity === 'error'
-                            ? 'bg-destructive/10 text-destructive border border-destructive/20'
-                            : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                        }`}
-                      >
-                        {err.severity}
-                      </span>
-
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <div className="flex items-baseline justify-between gap-4">
-                          <p className="text-xs font-semibold text-foreground leading-normal break-words">
-                            {err.message}
-                          </p>
-                          {err.line && err.column && (
-                            <span className="text-[10px] text-muted shrink-0">
-                              Line {err.line}, Col {err.column}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {err.explanation && (
-                          <p className="text-[11px] text-muted leading-relaxed">
-                            <span className="font-bold text-foreground/75">Why:</span> {err.explanation}
-                          </p>
-                        )}
-                        {err.suggestion && (
-                          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 leading-relaxed font-semibold">
-                            <span className="font-bold text-foreground/75">Fix:</span> {err.suggestion}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* 5. Side-by-Side or Stacked Editors */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Left Side: Input Editor */}
-        <div className="flex flex-col space-y-1.5">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-[10px] font-black uppercase text-muted tracking-widest">JSON Input</span>
-            <div className="flex items-center gap-3">
-              {errors.length > 0 && (
-                <button
-                  onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
-                  className="text-[10px] font-bold text-destructive hover:underline uppercase tracking-wider flex items-center gap-1"
-                >
-                  <Icons.AlertCircle className="h-3 w-3" />
-                  {errors.length} Issue{errors.length === 1 ? '' : 's'}
-                </button>
-              )}
-              <button
-                onClick={handleValidate}
-                className="text-[10px] font-bold text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
-              >
-                <Icons.Shield className="h-3 w-3" />
-                Validate Only
-              </button>
-            </div>
+              <Icons.Search className="h-3.5 w-3.5" />
+              <span>Find (Ctrl+F)</span>
+            </button>
           </div>
-          <div className="h-[550px] relative border border-border/80 rounded-2xl overflow-hidden shadow-premium-sm">
+
+          <div className="h-[580px] relative border-2 border-border rounded-2xl overflow-hidden shadow-premium-sm bg-card">
+            <JSONSearchBar
+              isOpen={isSearchBarOpen}
+              onClose={() => setIsSearchBarOpen(false)}
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              matchCase={searchMatchCase}
+              onMatchCaseChange={setSearchMatchCase}
+              isRegex={searchIsRegex}
+              onIsRegexChange={setSearchIsRegex}
+              onNextMatch={() => {}}
+              onPrevMatch={() => {}}
+            />
             <MonacoEditor
               value={inputJSON}
-              onChange={handleInputChange}
+              onChange={(val) => {
+                setInputJSON(val);
+                if (isValidated) setErrors(validateJSON(val));
+              }}
               language="json"
               theme={theme}
               options={{ wordWrap: wrapLines ? 'on' : 'off' }}
@@ -685,80 +737,118 @@ export default function JSONFormatter() {
           </div>
         </div>
 
-        {/* Right Side: Formatted Output */}
-        <div className="flex flex-col space-y-1.5">
+        {/* Right Side: Formatted Output / JSON Tree Explorer */}
+        <div className="flex flex-col space-y-2">
           <div className="flex items-center justify-between px-1">
-            <span className="text-[10px] font-black uppercase text-muted tracking-widest flex items-center gap-2">
-              Formatted Output
-              {isSuccessAnimated && (
-                <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase animate-fade-in-out">
-                  Formatted
-                </span>
-              )}
-            </span>
-            <button
-              onClick={() => handleCopy(outputJSON, 'output')}
-              disabled={!outputJSON}
-              className="text-[10px] font-bold text-primary hover:underline disabled:opacity-50 flex items-center gap-1"
-            >
-              <Icons.Copy className="h-3 w-3" />
-              Copy Output
-            </button>
+            {/* View Mode Tabs (Large High Visibility Font & Badges) */}
+            <div className="flex items-center gap-1.5 bg-secondary/30 p-1 rounded-xl border-2 border-border">
+              <button
+                onClick={() => setActiveRightTab('output')}
+                className={`px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold uppercase transition-all flex items-center gap-2 ${
+                  activeRightTab === 'output'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-foreground/80 hover:text-foreground'
+                }`}
+              >
+                <Icons.Code className="h-4 w-4" />
+                <span>Formatted Code</span>
+              </button>
+              <button
+                onClick={() => setActiveRightTab('tree')}
+                className={`px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold uppercase transition-all flex items-center gap-2 ${
+                  activeRightTab === 'tree'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-foreground/80 hover:text-foreground'
+                }`}
+              >
+                <Icons.Layers className="h-4 w-4" />
+                <span>Tree Explorer</span>
+              </button>
+            </div>
+
+            {activeRightTab === 'output' && (
+              <button
+                onClick={() => handleCopy(outputJSON, 'Output')}
+                disabled={!outputJSON}
+                className="text-xs font-extrabold text-primary hover:underline disabled:opacity-50 flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/30"
+              >
+                <Icons.Copy className="h-3.5 w-3.5" />
+                <span>Copy Output</span>
+              </button>
+            )}
           </div>
-          <div className="h-[550px] relative border border-border/80 rounded-2xl overflow-hidden shadow-premium-sm">
-            <MonacoEditor
-              value={outputJSON}
-              readOnly={true}
-              language="json"
-              theme={theme}
-              options={{ wordWrap: wrapLines ? 'on' : 'off' }}
-            />
+
+          <div className="h-[580px] relative border-2 border-border rounded-2xl overflow-hidden shadow-premium-sm bg-card">
+            {activeRightTab === 'output' ? (
+              <MonacoEditor
+                value={outputJSON}
+                readOnly={true}
+                language="json"
+                theme={theme}
+                options={{ wordWrap: wrapLines ? 'on' : 'off' }}
+              />
+            ) : (
+              <JSONTreeExplorer
+                jsonString={inputJSON}
+                onSelectNodePath={(path, line) => {
+                  if (inputEditor) {
+                    inputEditor.revealPositionInCenter({ lineNumber: line, column: 1 });
+                    inputEditor.setPosition({ lineNumber: line, column: 1 });
+                    inputEditor.focus();
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
 
-      {/* 6. VS Code Status Bar */}
-      <div className="flex flex-wrap items-center justify-between bg-card border border-border/80 rounded-2xl px-4 py-2 text-[11px] font-mono-calc text-muted shadow-premium-sm">
-        {/* Left side: Validity status */}
+      {/* 6. Bottom Status Bar */}
+      <div className="flex flex-wrap items-center justify-between bg-card border-2 border-border/80 rounded-2xl px-5 py-3 text-xs sm:text-sm font-mono-calc font-bold text-foreground shadow-premium-sm">
+        {/* Status Indicator */}
         <button
           onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity text-left cursor-pointer"
-          title="Click to toggle Problems panel"
+          className="flex items-center gap-2.5 hover:opacity-80 transition-opacity cursor-pointer"
         >
           {!inputJSON.trim() ? (
-            <span className="flex items-center gap-1.5 text-muted-foreground/60">
-              <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
-              <span>JSON: Empty</span>
+            <span className="flex items-center gap-2 text-muted-foreground font-semibold">
+              <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" />
+              <span>Empty Workspace</span>
             </span>
           ) : errors.length === 0 ? (
-            <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>JSON: Valid</span>
-            </span>
-          ) : errors.some(e => e.severity === 'error') ? (
-            <span className="flex items-center gap-1.5 text-destructive font-bold">
-              <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-              <span>JSON: Invalid ({errors.filter(e => e.severity === 'error').length} errors)</span>
+            <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-extrabold">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>✓ Valid JSON Payload</span>
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500 font-bold">
-              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-              <span>JSON: Warnings ({errors.filter(e => e.severity === 'warning').length} warnings)</span>
+            <span className="flex items-center gap-2 text-destructive font-black">
+              <span className="h-2.5 w-2.5 rounded-full bg-destructive animate-pulse" />
+              <span>❌ {errors.filter(e => e.severity === 'error').length} Syntax Errors</span>
             </span>
           )}
         </button>
 
-        {/* Right side: cursor, lines, size, spacing */}
-        <div className="flex items-center gap-4">
-          <span>Ln {cursorPos.line}, Col {cursorPos.column}</span>
-          <span className="h-3.5 w-px bg-border" />
+        {/* Cursor & File Stats */}
+        <div className="flex items-center gap-5 text-xs font-bold text-foreground">
+          <span>Line {cursorPos.line}, Col {cursorPos.column}</span>
+          <span className="h-4 w-px bg-border" />
           <span>{inputJSON.split('\n').length} lines</span>
-          <span className="h-3.5 w-px bg-border" />
-          <span>{formatFileSize(new Blob([inputJSON]).size)}</span>
-          <span className="h-3.5 w-px bg-border" />
+          <span className="h-4 w-px bg-border" />
           <span>Spaces: {indentSize === 'tab' ? 'Tab' : indentSize}</span>
         </div>
       </div>
+
+      {/* Command Palette & Shortcuts Modals */}
+      <JSONCommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        commands={commandItems}
+      />
+
+      <JSONShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
+      />
     </div>
   );
 }

@@ -7,6 +7,9 @@ export interface ValidationError {
   endIdx?: number;
   explanation?: string;
   suggestion?: string;
+  expected?: string;
+  received?: string;
+  reason?: string;
 }
 
 interface Token {
@@ -456,12 +459,15 @@ class Parser {
           this.errors.push({
             line: separatorToken.line,
             column: separatorToken.col,
-            message: `Missing comma between object members.`,
+            message: `Missing comma between object members`,
             severity: 'error',
             startIdx: separatorToken.start,
             endIdx: separatorToken.end,
+            expected: `", "`,
+            received: `"${separatorToken.value}"`,
+            reason: `JSON requires commas between properties.`,
             explanation: `Multiple elements in a JSON object must be separated by commas (,).`,
-            suggestion: `Insert a comma (,) before the next key-value pair.`
+            suggestion: `Add a comma after this property.`
           });
         } else {
           this.errors.push({
