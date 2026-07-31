@@ -36,8 +36,8 @@ export default function Footer() {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {/* Horizontal crossbar of the T: Purple Accent */}
-                  <rect x="3" y="5" width="18" height="4.5" rx="2.25" fill="var(--primary)" />
+                  {/* Horizontal crossbar of the T: Crimson Red */}
+                  <rect x="3" y="5" width="18" height="4.5" rx="2.25" fill="#EF4444" />
                   
                   {/* Vertical stem of the T: currentColor */}
                   <rect x="10" y="9.5" width="4" height="10.5" rx="2" fill="currentColor" />
@@ -47,8 +47,8 @@ export default function Footer() {
                   <rect x="12" y="14.5" width="2" height="1" fill="var(--card)" />
                   <rect x="12" y="17.5" width="2" height="1" fill="var(--card)" />
                   
-                  {/* Accent dot */}
-                  <circle cx="18" cy="14.5" r="1.5" fill="var(--primary)" />
+                  {/* Gold Accent dot */}
+                  <circle cx="18" cy="14.5" r="1.5" fill="#FACC15" />
                 </svg>
               </div>
               <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
