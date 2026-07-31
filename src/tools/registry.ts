@@ -17,6 +17,21 @@ import { markdownPreviewContent, markdownPreviewFaqs } from './content/markdown-
 
 
 export const toolsRegistry: Record<string, ToolDefinition> = {
+  'json-formatter': {
+    slug: 'json-formatter',
+    title: 'JSON Formatter & Validator',
+    description: 'Prettify, parse, validate, and minify your JSON data locally. Clean syntax highlighting with auto-formatting.',
+    category: 'developer',
+    categoryName: 'Developer',
+    capabilities: ['Prettify & Parse', 'Minify JSON', 'Syntax Check'],
+    keywords: ['json parser', 'json format', 'validate json', 'json lint', 'json beautify', 'json minify'],
+    faqs: jsonFormatterFaqs,
+    content: jsonFormatterContent,
+    component: dynamic(() => import('@/features/developer/JSONFormatter'), {
+      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading JSON Formatter...'),
+      ssr: false
+    })
+  },
   'gst-calculator': {
     slug: 'gst-calculator',
     title: 'GST Calculator',
@@ -198,21 +213,6 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     content: pdfSplitContent,
     component: dynamic(() => import('@/features/pdf/PDFSplit'), {
       loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading PDF Page Splitter...'),
-      ssr: false
-    })
-  },
-  'json-formatter': {
-    slug: 'json-formatter',
-    title: 'JSON Formatter & Validator',
-    description: 'Prettify, parse, validate, and minify your JSON data locally. Clean syntax highlighting with auto-formatting.',
-    category: 'developer',
-    categoryName: 'Developer',
-    capabilities: ['Prettify & Parse', 'Minify JSON', 'Syntax Check'],
-    keywords: ['json parser', 'json format', 'validate json', 'json lint', 'json beautify', 'json minify'],
-    faqs: jsonFormatterFaqs,
-    content: jsonFormatterContent,
-    component: dynamic(() => import('@/features/developer/JSONFormatter'), {
-      loading: () => React.createElement('div', { className: 'h-64 flex items-center justify-center text-muted' }, 'Loading JSON Formatter...'),
       ssr: false
     })
   },
