@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
-import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
 import { useContact } from './ContactProvider';
 import * as Icons from './Icons';
-import CommandPalette from './CommandPalette';
 import { usePageTransition } from './TransitionProvider';
 import { AnimatedNavLink } from './AnimationAtoms';
 
@@ -37,7 +35,7 @@ function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarP
     }
   }, [searchQuery, searchParams]);
 
-  // Global hotkey listeners for Ctrl+K, Cmd+K, and '/'
+  // Global hotkey listeners for Ctrl+K, Cmd+K, and '/' to focus single Navbar search input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -86,7 +84,6 @@ function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarP
 
   return (
     <header className="sticky top-0 w-full border-b border-border bg-card/90 backdrop-blur-md transition-colors duration-150 z-50">
-      <CommandPalette />
 
       <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo & Sidebar Toggle */}
@@ -110,16 +107,6 @@ function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarP
             }}
             className="flex items-center gap-2.5 group cursor-pointer select-none"
           >
-            <div className="relative h-9 w-9 shrink-0 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform duration-200">
-              <Image
-                src="/toolora_refined_logo_no_bg.png"
-                alt="Toolora Logo"
-                width={36}
-                height={36}
-                className="object-contain w-full h-full drop-shadow-xs"
-                priority
-              />
-            </div>
             <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
               Toolora
             </span>

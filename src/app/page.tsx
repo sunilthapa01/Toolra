@@ -32,7 +32,6 @@ function HomeContent() {
   const [subscribing, setSubscribing] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
 
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const toolsList = useMemo(() => Object.values(toolsRegistry), []);
 
   useEffect(() => {
@@ -67,31 +66,6 @@ function HomeContent() {
     });
     return counts;
   }, [toolsList]);
-
-  // Focus search bar on keyboard shortcut (Ctrl+K, Cmd+K, or '/')
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-        setIsFocused(true);
-      } else if (e.key === '/' && document.activeElement !== searchInputRef.current) {
-        const tag = document.activeElement?.tagName;
-        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
-          e.preventDefault();
-          searchInputRef.current?.focus();
-          setIsFocused(true);
-        }
-      } else if (e.key === 'Escape') {
-        if (document.activeElement === searchInputRef.current) {
-          searchInputRef.current?.blur();
-          setIsFocused(false);
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   // Filter tools based on search query & selected workspace
   const filteredTools = useMemo(() => {
@@ -209,7 +183,13 @@ function HomeContent() {
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
-                      {activeTool.categoryName} Workspace
+                      {['finance', 'text', 'business', 'everyday'].includes(activeTool.category)
+                        ? 'Everyday'
+                        : activeTool.category === 'pdf'
+                        ? 'PDF'
+                        : activeTool.category === 'developer'
+                        ? 'Developer'
+                        : activeTool.categoryName} Workspace
                     </span>
                     <span className="text-xs text-muted">•</span>
                     <span className="text-xs text-muted font-medium">Instant Local Engine</span>
@@ -369,23 +349,34 @@ function HomeContent() {
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="text-center py-16 rounded-2xl border border-dashed border-border bg-card/50 max-w-md mx-auto space-y-3">
-                  <Icons.AlertCircle className="h-8 w-8 text-muted mx-auto" />
-                  <h3 className="text-sm font-bold font-outfit text-foreground">No tools found</h3>
-                  <p className="text-xs text-muted">
-                    No tools matched "{searchQuery}". Reset filters to see all available tools.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSelectedCategory('developer');
-                      setSelectedToolSlug(null);
-                      window.history.replaceState(null, '', '/');
-                    }}
-                    className="text-xs font-bold text-primary hover:underline uppercase tracking-wider pt-2 cursor-pointer"
-                  >
-                    Reset Filters
-                  </button>
+                <div className="w-full max-w-2xl mx-auto my-8 p-8 sm:p-12 rounded-3xl border border-border/80 bg-card/90 backdrop-blur-md shadow-premium-lg flex flex-col items-center justify-center text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary border border-border text-primary shadow-xs">
+                    <Icons.Search className="h-8 w-8 text-primary opacity-90" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-outfit text-xl sm:text-2xl font-black tracking-tight text-foreground">
+                      No matching tools found
+                    </h3>
+                    <p className="text-sm sm:text-base text-muted max-w-lg leading-relaxed font-normal">
+                      We couldn't find any utilities matching <span className="font-bold text-foreground">"{searchQuery}"</span> in the current view.
+                    </p>
+                  </div>
+
+                  <div className="pt-2 flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedCategory('developer');
+                        setSelectedToolSlug(null);
+                        window.history.replaceState(null, '', '/');
+                      }}
+                      className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs sm:text-sm uppercase tracking-wider hover:bg-primary/90 active:scale-95 transition-all shadow-premium-md flex items-center gap-2 cursor-pointer"
+                    >
+                      <Icons.X className="h-4 w-4" />
+                      <span>Reset Search & Filters</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useContact } from './ContactProvider';
 import { useToast } from './ToastProvider';
 import { FOOTER_SECTIONS, NavigationItem } from '@/config/navigation';
@@ -29,15 +28,6 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5 group mb-4">
-              <div className="relative h-9 w-9 shrink-0 flex items-center justify-center">
-                <Image
-                  src="/toolora_refined_logo_no_bg.png"
-                  alt="Toolora Logo"
-                  width={36}
-                  height={36}
-                  className="object-contain w-full h-full"
-                />
-              </div>
               <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
                 Toolora
               </span>
