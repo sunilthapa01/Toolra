@@ -238,57 +238,15 @@ export function TextReveal({ text, className = '' }: TextRevealProps) {
 // 6. PageEntranceWrapper
 // ==========================================
 export function PageEntranceWrapper({ children }: { children: React.ReactNode }) {
-  const { state, shouldReduceMotion } = usePageTransition();
-
-  if (shouldReduceMotion) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: state === 'exiting' ? 0 : 1 }}
-        transition={{ duration: 0.15 }}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-
-  // Smooth entrance: opacity + slide up + blur filter clear
-  // Smooth exit: opacity + slide up + blur filter blur
-  const variants = {
-    idle: {
-      opacity: 1,
-      y: 0,
-      filter: 'blur(0px)',
-      transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
-    },
-    exiting: {
-      opacity: 0,
-      y: -12,
-      filter: 'blur(4px)',
-      transition: { duration: 0.25, ease: [0.7, 0, 0.84, 0] },
-    },
-    loading: {
-      opacity: 0,
-      y: 12,
-      filter: 'blur(4px)',
-    },
-    entering: {
-      opacity: 1,
-      y: 0,
-      filter: 'blur(0px)',
-      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
-
   return (
     <motion.div
-      initial="loading"
-      animate={state}
-      variants={variants}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className="w-full"
-      style={{ transform: state === 'idle' ? 'none' : undefined }}
     >
       {children}
     </motion.div>
   );
 }
+

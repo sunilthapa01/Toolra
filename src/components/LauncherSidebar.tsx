@@ -9,8 +9,8 @@ import { ToolIcon } from './ToolIcon';
 import { usePageTransition } from './TransitionProvider';
 
 interface LauncherSidebarProps {
-  selectedCategory: ToolCategory | 'all';
-  onSelectCategory: (category: ToolCategory | 'all') => void;
+  selectedCategory: string;
+  onSelectCategory: (category: string) => void;
   categoryCounts: Record<string, number>;
   isOpen?: boolean;
   currentSlug?: string;
@@ -25,17 +25,36 @@ export default function LauncherSidebar({
 }: LauncherSidebarProps) {
   const { navigate } = usePageTransition();
 
-  const categories: { id: ToolCategory | 'all'; label: string; icon: React.ComponentType<any> }[] = [
-    { id: 'all', label: 'All Tools', icon: Icons.Sparkles },
-    { id: 'developer', label: 'Developer', icon: Icons.Code },
-    { id: 'pdf', label: 'PDF', icon: Icons.FileText },
-    { id: 'finance', label: 'Finance', icon: Icons.Calculator },
-    { id: 'text', label: 'Text', icon: Icons.Type },
-    { id: 'business', label: 'Business', icon: Icons.Briefcase },
+  const workspaces = [
+    { id: 'developer', label: 'Developer Workspace', icon: Icons.Code },
+    { id: 'pdf', label: 'PDF Workspace', icon: Icons.FileText },
+    { id: 'everyday', label: 'Everyday Workspace', icon: Icons.Home },
   ];
 
   const currentTool = currentSlug ? toolsRegistry[currentSlug] : null;
   const isToolActive = Boolean(currentSlug);
+
+  const getWorkspaceCount = (id: string) => {
+    if (id === 'developer') return categoryCounts['developer'] || 0;
+    if (id === 'pdf') return categoryCounts['pdf'] || 0;
+    if (id === 'everyday') {
+      return (
+        (categoryCounts['finance'] || 0) +
+        (categoryCounts['text'] || 0) +
+        (categoryCounts['business'] || 0) +
+        (categoryCounts['everyday'] || 0)
+      );
+    }
+    return 0;
+  };
+
+  const isWorkspaceSelected = (id: string) => {
+    if (selectedCategory === id) return true;
+    if (id === 'everyday' && ['finance', 'text', 'business', 'everyday'].includes(selectedCategory)) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <AnimatePresence initial={false}>
@@ -79,43 +98,40 @@ export default function LauncherSidebar({
                   </div>
 
                   <button
-                    onClick={() => navigate('/')}
-                    className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-card border border-border rounded-xl text-[11px] font-bold text-foreground hover:bg-secondary/40 transition-all"
+                    onClick={() => onSelectCategory(currentTool.category)}
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-card border border-border rounded-xl text-[11px] font-bold text-foreground hover:bg-secondary/40 transition-all cursor-pointer"
                   >
                     <Icons.ChevronLeft className="h-3.5 w-3.5 text-primary" />
-                    <span>Back to All Tools</span>
+                    <span>Back to Workspace Grid</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* CATEGORIES SECTION (Disabled cleanly when inside an open tool) */}
+            {/* WORKSPACES SECTION */}
             <div className="space-y-1.5">
               <div className="text-[10px] font-extrabold uppercase tracking-widest text-muted px-3 py-1 flex items-center justify-between">
-                <span>Categories</span>
+                <span>Workspaces</span>
                 {isToolActive && (
                   <span className="text-[9px] font-semibold text-muted/70 uppercase">Disabled</span>
                 )}
               </div>
 
-              {categories.map((cat) => {
-                const Icon = cat.icon;
-                const isSelected = selectedCategory === cat.id && !isToolActive;
-                const count =
-                  cat.id === 'all'
-                    ? Object.values(categoryCounts).reduce((a, b) => a + b, 0)
-                    : categoryCounts[cat.id] || 0;
+              {workspaces.map((ws) => {
+                const Icon = ws.icon;
+                const selected = isWorkspaceSelected(ws.id) && !isToolActive;
+                const count = getWorkspaceCount(ws.id);
 
                 if (isToolActive) {
                   return (
                     <div
-                      key={cat.id}
-                      title="Category navigation is disabled while a tool is open"
+                      key={ws.id}
+                      title="Workspace navigation is disabled while a tool is open"
                       className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm opacity-40 cursor-not-allowed select-none bg-secondary/10 text-muted"
                     >
                       <div className="flex items-center gap-3">
                         <Icon className="h-4 w-4 shrink-0 text-muted/70" />
-                        <span className="text-xs font-outfit tracking-wide">{cat.label}</span>
+                        <span className="text-xs font-outfit tracking-wide">{ws.label}</span>
                       </div>
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-secondary/20 text-muted/70 flex items-center gap-1">
                         <Icons.Lock className="h-2.5 w-2.5" />
@@ -127,21 +143,21 @@ export default function LauncherSidebar({
 
                 return (
                   <button
-                    key={cat.id}
-                    onClick={() => onSelectCategory(cat.id)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 text-sm ${
-                      isSelected
+                    key={ws.id}
+                    onClick={() => onSelectCategory(ws.id)}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 text-sm cursor-pointer ${
+                      selected
                         ? 'bg-primary text-primary-foreground shadow-xs font-bold'
                         : 'text-foreground hover:bg-card hover:text-foreground'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`h-4 w-4 shrink-0 ${isSelected ? 'text-primary-foreground' : 'text-muted'}`} />
-                      <span className="text-xs font-outfit tracking-wide">{cat.label}</span>
+                      <Icon className={`h-4 w-4 shrink-0 ${selected ? 'text-primary-foreground' : 'text-muted'}`} />
+                      <span className="text-xs font-outfit tracking-wide">{ws.label}</span>
                     </div>
                     <span
                       className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                        isSelected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-card text-muted'
+                        selected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-card text-muted'
                       }`}
                     >
                       {count}
@@ -156,3 +172,4 @@ export default function LauncherSidebar({
     </AnimatePresence>
   );
 }
+

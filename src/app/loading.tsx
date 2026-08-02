@@ -1,7 +1,7 @@
 'use client';
 
-import PremiumLoader from '@/components/PremiumLoader';
-
 export default function Loading() {
-  return <PremiumLoader />;
+  // Intentionally empty — eliminates full-screen loader blocking
+  return null;
 }
+

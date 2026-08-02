@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
 import { useContact } from './ContactProvider';
 import * as Icons from './Icons';
@@ -10,27 +11,77 @@ import { AnimatedNavLink } from './AnimationAtoms';
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (q: string) => void;
 }
 
-export default function Navbar({ onToggleSidebar }: NavbarProps) {
+function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const { openContactModal } = useContact();
   const { navigate } = usePageTransition();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [localQuery, setLocalQuery] = useState(searchQuery || searchParams.get('q') || '');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (searchQuery !== undefined) {
+      setLocalQuery(searchQuery);
+    } else {
+      const q = searchParams.get('q');
+      if (q !== null) setLocalQuery(q);
+    }
+  }, [searchQuery, searchParams]);
+
+  // Global hotkey listeners for Ctrl+K, Cmd+K, and '/'
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      } else if (e.key === '/' && document.activeElement !== searchInputRef.current) {
+        const tag = document.activeElement?.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+          e.preventDefault();
+          searchInputRef.current?.focus();
+        }
+      } else if (e.key === 'Escape') {
+        if (document.activeElement === searchInputRef.current) {
+          searchInputRef.current?.blur();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleQueryChange = (val: string) => {
+    setLocalQuery(val);
+    if (onSearchChange) {
+      onSearchChange(val);
+    }
+    if (pathname === '/') {
+      const params = new URLSearchParams(window.location.search);
+      if (val.trim()) {
+        params.set('q', val);
+      } else {
+        params.delete('q');
+      }
+      const newUrl = params.toString() ? `/?${params.toString()}` : '/';
+      window.history.replaceState(null, '', newUrl);
+    } else {
+      if (val.trim()) {
+        router.push(`/?q=${encodeURIComponent(val)}`);
+      }
+    }
+  };
 
   const categories = [
     { name: 'Contact', href: '#' },
   ];
-
-  const triggerSearch = () => {
-    const event = new KeyboardEvent('keydown', {
-      key: 'k',
-      ctrlKey: true,
-      bubbles: true,
-      cancelable: true
-    });
-    window.dispatchEvent(event);
-  };
 
   return (
     <header className="sticky top-0 w-full border-b border-border bg-card/90 backdrop-blur-md transition-colors duration-150 z-50">
@@ -87,20 +138,31 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
           </a>
         </div>
 
-        {/* Clear Search Field Bar */}
-        <div className="flex-1 max-w-xs sm:max-w-sm mx-4 hidden md:block">
-          <button
-            onClick={triggerSearch}
-            className="w-full flex items-center justify-between bg-secondary hover:bg-secondary/80 px-4 py-2 text-xs text-muted transition-all cursor-pointer outline-none border border-border rounded-xl hover:border-foreground/40"
-          >
-            <div className="flex items-center gap-2">
-              <Icons.Search className="h-3.5 w-3.5 text-muted" />
-              <span className="font-medium">Search utilities...</span>
-            </div>
-            <span className="inline-flex items-center gap-0.5 border border-border bg-card px-1.5 py-0.5 text-[9px] font-bold text-foreground rounded">
+        {/* Persistent Centralized Navbar Search Input */}
+        <div className="flex-1 max-w-xs sm:max-w-md mx-4 hidden md:block">
+          <div className="relative flex items-center bg-secondary border border-border rounded-xl px-3 py-1.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+            <Icons.Search className="h-4 w-4 text-muted shrink-0 mr-2" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={localQuery}
+              onChange={(e) => handleQueryChange(e.target.value)}
+              placeholder="Search tools, commands or keywords..."
+              className="w-full border-0 bg-transparent py-1 text-xs sm:text-sm text-foreground placeholder:text-muted focus:ring-0 outline-none font-medium font-inter"
+            />
+            {localQuery ? (
+              <button
+                onClick={() => handleQueryChange('')}
+                className="p-1 text-muted hover:text-foreground shrink-0 mr-1"
+                aria-label="Clear search"
+              >
+                <Icons.X className="h-3.5 w-3.5" />
+              </button>
+            ) : null}
+            <span className="inline-flex items-center gap-0.5 border border-border bg-card px-1.5 py-0.5 text-[9px] font-bold text-foreground rounded shrink-0 select-none">
               Ctrl K
             </span>
-          </button>
+          </div>
         </div>
 
         {/* Navigation Action list */}
@@ -144,15 +206,6 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             )}
           </button>
 
-          {/* Search Trigger for Mobile */}
-          <button
-            onClick={triggerSearch}
-            className="flex h-9 w-9 items-center justify-center border border-border bg-card text-foreground md:hidden hover:bg-secondary transition-colors rounded-xl"
-            aria-label="Search Palette"
-          >
-            <Icons.Search className="h-4.5 w-4.5" />
-          </button>
-
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -168,9 +221,19 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
         </div>
       </div>
 
-      {/* Mobile sitemap directory */}
+      {/* Mobile search & sitemap directory */}
       {mobileMenuOpen && (
         <div className="sm:hidden border-b border-border bg-card px-4 py-4 space-y-3 shadow-premium-md">
+          <div className="relative flex items-center bg-secondary border border-border rounded-xl px-3 py-2">
+            <Icons.Search className="h-4 w-4 text-muted shrink-0 mr-2" />
+            <input
+              type="text"
+              value={localQuery}
+              onChange={(e) => handleQueryChange(e.target.value)}
+              placeholder="Search tools..."
+              className="w-full border-0 bg-transparent py-0.5 text-xs text-foreground placeholder:text-muted focus:ring-0 outline-none font-medium font-inter"
+            />
+          </div>
           {categories.map((cat) => {
             if (cat.name === 'Contact') {
               return (
@@ -204,5 +267,13 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
         </div>
       )}
     </header>
+  );
+}
+
+export default function Navbar(props: NavbarProps) {
+  return (
+    <Suspense fallback={null}>
+      <NavbarContent {...props} />
+    </Suspense>
   );
 }

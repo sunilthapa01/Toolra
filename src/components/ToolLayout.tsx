@@ -36,17 +36,9 @@ export default function ToolLayout({
 }: ToolLayoutProps) {
   const [activeSection, setActiveSection] = useState('hero');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { navigate } = usePageTransition();
 
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [slug]);
 
   const breadcrumbSteps = [
     { name: categoryName, href: `/#${category}` },
@@ -176,8 +168,9 @@ export default function ToolLayout({
 
             {/* Primary Hero Workspace (Tool / Calculator / Editor) */}
             <div id="hero" className="w-full rounded-2xl border border-border bg-card p-4 sm:p-6 md:p-8 shadow-sm transition-all min-h-[450px]">
-              {loading ? <SkeletonLoader /> : children}
+              {children}
             </div>
+
 
             {/* Educational Content & Compact TOC Layout (If available) */}
             {hasEducationalContent && (
