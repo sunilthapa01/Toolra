@@ -149,7 +149,6 @@ export default function ToolLayout({
           }}
           categoryCounts={categoryCounts}
           isOpen={sidebarOpen}
-          currentSlug={slug}
         />
 
         {/* Fluid 80-90% Viewport Workspace Container */}

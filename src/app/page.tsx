@@ -196,7 +196,6 @@ function HomeContent() {
           onSelectCategory={handleSelectWorkspace}
           categoryCounts={categoryCounts}
           isOpen={sidebarOpen}
-          currentSlug={selectedToolSlug || undefined}
         />
 
         {/* MAIN LAUNCHER CONTENT */}
