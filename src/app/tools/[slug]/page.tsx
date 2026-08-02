@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { toolsRegistry } from '@/tools/registry';
-import ToolLayout from '@/components/ToolLayout';
-import ComingSoonToolPage from '@/components/ComingSoonToolPage';
 
 interface Props {
   params: { slug: string };
@@ -52,38 +50,5 @@ export default function ToolPage({ params }: Props) {
     notFound();
   }
 
-  // Handle coming-soon preview tools gracefully
-  if (!tool.component) {
-    return (
-      <ToolLayout
-        slug={tool.slug}
-        title={tool.title}
-        description={tool.description}
-        category={tool.category}
-        categoryName={tool.categoryName}
-        faqs={tool.faqs}
-        seoContent={tool.seoContent}
-        content={tool.content}
-      >
-        <ComingSoonToolPage tool={tool} />
-      </ToolLayout>
-    );
-  }
-
-  const ToolComponent = tool.component;
-
-  return (
-    <ToolLayout
-      slug={tool.slug}
-      title={tool.title}
-      description={tool.description}
-      category={tool.category}
-      categoryName={tool.categoryName}
-      faqs={tool.faqs}
-      seoContent={tool.seoContent}
-      content={tool.content}
-    >
-      <ToolComponent />
-    </ToolLayout>
-  );
+  redirect(`/?category=${tool.category}&tool=${tool.slug}`);
 }

@@ -202,56 +202,26 @@ function HomeContent() {
         {/* MAIN LAUNCHER CONTENT */}
         <section className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 min-w-0 transition-all duration-200 overflow-y-auto">
           
-          {/* WORKSPACE FILTER CHIPS */}
-          <div className="flex flex-wrap items-center justify-between border-b border-border pb-4 gap-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted mr-2 select-none">
-                Workspace:
-              </span>
-              {WORKSPACES.map((ws) => {
-                const Icon = ws.icon;
-                const isSelected =
-                  selectedCategory === ws.id ||
-                  (ws.id === 'everyday' && ['finance', 'text', 'business', 'everyday'].includes(selectedCategory));
-                return (
-                  <button
-                    key={ws.id}
-                    onClick={() => handleSelectWorkspace(ws.id)}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold font-outfit transition-all duration-150 border cursor-pointer ${
-                      isSelected
-                        ? 'border-primary bg-primary text-primary-foreground shadow-xs'
-                        : 'border-border bg-card text-foreground hover:border-foreground/50 hover:bg-secondary'
-                    }`}
-                  >
-                    <Icon className={`h-3.5 w-3.5 ${isSelected ? 'text-primary-foreground' : 'text-muted'}`} />
-                    <span>{ws.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {activeTool && (
-              <button
-                onClick={handleCloseTool}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-secondary text-xs font-bold text-foreground transition-all cursor-pointer"
-              >
-                <Icons.ChevronLeft className="h-4 w-4 text-primary" />
-                <span>Back to Tools Grid</span>
-              </button>
-            )}
-          </div>
-
           {/* ACTIVE INLINE TOOL WORKSPACE OR TOOLS GRID */}
           {activeTool && ActiveToolComponent ? (
             <div className="space-y-8 animate-in fade-in duration-200">
               {/* Tool Title & Meta */}
               <div className="space-y-2 border-b border-border/60 pb-5">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
-                    {activeTool.categoryName} Workspace
-                  </span>
-                  <span className="text-xs text-muted">•</span>
-                  <span className="text-xs text-muted font-medium">Instant Local Engine</span>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                      {activeTool.categoryName} Workspace
+                    </span>
+                    <span className="text-xs text-muted">•</span>
+                    <span className="text-xs text-muted font-medium">Instant Local Engine</span>
+                  </div>
+                  <button
+                    onClick={handleCloseTool}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-secondary text-xs font-bold text-foreground transition-all cursor-pointer shrink-0"
+                  >
+                    <Icons.ChevronLeft className="h-4 w-4 text-primary" />
+                    <span>Back to Tools Grid</span>
+                  </button>
                 </div>
 
                 <h1 className="font-outfit text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
