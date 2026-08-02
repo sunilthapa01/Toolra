@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useContact } from './ContactProvider';
 import { useToast } from './ToastProvider';
 import { FOOTER_SECTIONS, NavigationItem } from '@/config/navigation';
@@ -28,28 +29,14 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5 group mb-4">
-              <div className="flex h-9 w-9 items-center justify-center select-none shrink-0">
-                <svg
-                  width="100%"
-                  height="100%"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {/* Horizontal crossbar of the T: Crimson Red */}
-                  <rect x="3" y="5" width="18" height="4.5" rx="2.25" fill="#EF4444" />
-                  
-                  {/* Vertical stem of the T: currentColor */}
-                  <rect x="10" y="9.5" width="4" height="10.5" rx="2" fill="currentColor" />
-                  
-                  {/* Ruler ticks: filled with var(--card) to act as cutouts */}
-                  <rect x="12" y="11.5" width="2" height="1" fill="var(--card)" />
-                  <rect x="12" y="14.5" width="2" height="1" fill="var(--card)" />
-                  <rect x="12" y="17.5" width="2" height="1" fill="var(--card)" />
-                  
-                  {/* Gold Accent dot */}
-                  <circle cx="18" cy="14.5" r="1.5" fill="#FACC15" />
-                </svg>
+              <div className="relative h-9 w-9 shrink-0 flex items-center justify-center">
+                <Image
+                  src="/toolora_refined_logo_no_bg.png"
+                  alt="Toolora Logo"
+                  width={36}
+                  height={36}
+                  className="object-contain w-full h-full"
+                />
               </div>
               <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
                 Toolora
