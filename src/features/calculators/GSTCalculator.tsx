@@ -97,7 +97,7 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
 
   const shareCalculation = () => {
     const link = typeof window !== 'undefined'
-      ? `${window.location.origin}/tools/gst-calculator?amount=${amount}&rate=${gstRate}&inc=${values.isInclusive}&inter=${values.isInterstate}`
+      ? `${window.location.origin}/gst?amount=${amount}&rate=${gstRate}&inc=${values.isInclusive}&inter=${values.isInterstate}`
       : '';
     navigator.clipboard.writeText(link);
     setShared(true);

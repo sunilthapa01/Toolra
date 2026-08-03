@@ -25,12 +25,12 @@ export const FOOTER_SECTIONS: NavigationSection[] = [
   {
     title: 'Tools',
     links: [
-      { title: 'GST Calculator', href: '/tools/gst-calculator', implemented: true },
-      { title: 'EMI Calculator', href: '/tools/emi-calculator', implemented: true },
-      { title: 'SIP Calculator', href: '/tools/sip-calculator', implemented: true },
-      { title: 'Reverse GST', href: '/tools/reverse-gst-calculator', implemented: true },
-      { title: 'PDF Merger', href: '/tools/pdf-merge-combine', implemented: true },
-      { title: 'PDF Splitter', href: '/tools/pdf-split', implemented: true },
+      { title: 'GST Calculator', href: '/gst', implemented: true },
+      { title: 'EMI Calculator', href: '/emi', implemented: true },
+      { title: 'SIP Calculator', href: '/sip', implemented: true },
+      { title: 'Reverse GST', href: '/reverse-gst', implemented: true },
+      { title: 'PDF Merger', href: '/pdf-merge', implemented: true },
+      { title: 'PDF Splitter', href: '/pdf-split', implemented: true },
     ],
   },
   {

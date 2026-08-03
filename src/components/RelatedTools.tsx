@@ -2,7 +2,7 @@
 
 import React from 'react';
 import * as Icons from './Icons';
-import { toolsRegistry } from '@/tools/registry';
+import { toolsRegistry, getToolCanonicalPath } from '@/tools/registry';
 import { usePageTransition } from './TransitionProvider';
 import { motion } from 'framer-motion';
 
@@ -43,13 +43,15 @@ export default function RelatedTools({ currentSlug, category }: RelatedToolsProp
                          tool.category === 'text' ? Icons.Type :
                          Icons.Briefcase;
 
+            const canonicalPath = getToolCanonicalPath(tool);
+
             return (
               <motion.a
                 key={tool.slug}
-                href={`/tools/${tool.slug}`}
+                href={canonicalPath}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate(`/tools/${tool.slug}`, true);
+                  navigate(canonicalPath, true);
                 }}
                 whileHover={{ y: -4, scale: 1.015 }}
                 whileTap={{ scale: 0.98 }}

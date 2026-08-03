@@ -1,13 +1,26 @@
 import { Metadata } from 'next';
 import { notFound, redirect, RedirectType } from 'next/navigation';
 import { toolsRegistry, getToolBySlugOrAlias, getToolCanonicalPath } from '@/tools/registry';
+import { HomeContent } from '@/app/page';
+import React, { Suspense } from 'react';
 
 interface Props {
   params: { slug: string };
   searchParams?: Record<string, string | string[] | undefined>;
 }
 
-// Generate SEO Metadata dynamically pointing to canonical short URL
+export async function generateStaticParams() {
+  const paramsSet = new Set<string>();
+  Object.values(toolsRegistry).forEach((tool) => {
+    paramsSet.add(tool.slug);
+    if (tool.shortUrl) paramsSet.add(tool.shortUrl);
+    if (tool.aliases) {
+      tool.aliases.forEach((alias) => paramsSet.add(alias));
+    }
+  });
+  return Array.from(paramsSet).map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tool = getToolBySlugOrAlias(params.slug);
   if (!tool) return {};
@@ -38,25 +51,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Pre-render static pages for legacy tool routes at build time
-export async function generateStaticParams() {
-  return Object.keys(toolsRegistry).map((slug) => ({
-    slug,
-  }));
-}
-
-export default function LegacyToolPage({ params, searchParams }: Props) {
+export default function DynamicToolPage({ params, searchParams }: Props) {
   const tool = getToolBySlugOrAlias(params.slug);
-  
+
   if (!tool) {
     notFound();
   }
 
-  const canonicalPath = getToolCanonicalPath(tool);
-  const queryString = searchParams && Object.keys(searchParams).length > 0
-    ? '?' + new URLSearchParams(searchParams as Record<string, string>).toString()
-    : '';
+  // If accessed slug is an alias or legacy slug, 301 redirect to primary canonical short URL
+  const canonicalShortUrl = tool.shortUrl || tool.slug;
+  if (params.slug !== canonicalShortUrl) {
+    const queryString = searchParams && Object.keys(searchParams).length > 0
+      ? '?' + new URLSearchParams(searchParams as Record<string, string>).toString()
+      : '';
+    redirect(`/${canonicalShortUrl}${queryString}`, RedirectType.replace);
+  }
 
-  // 301 Permanent Redirect legacy /tools/:slug path to canonical short URL
-  redirect(`${canonicalPath}${queryString}`, RedirectType.replace);
+  return (
+    <Suspense fallback={null}>
+      <HomeContent initialToolSlug={tool.slug} />
+    </Suspense>
+  );
 }

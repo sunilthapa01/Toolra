@@ -14,11 +14,11 @@ import { base64EncoderDecoderContent, base64EncoderDecoderFaqs } from './content
 import { hashGeneratorContent, hashGeneratorFaqs } from './content/hash-generator';
 import { markdownPreviewContent, markdownPreviewFaqs } from './content/markdown-preview';
 
-
-
 export const toolsRegistry: Record<string, ToolDefinition> = {
   'json-formatter': {
     slug: 'json-formatter',
+    shortUrl: 'json',
+    aliases: ['json-formatter', 'json-parser', 'json-validator'],
     title: 'JSON Formatter & Validator',
     description: 'Prettify, parse, validate, and minify your JSON data locally. Clean syntax highlighting with auto-formatting.',
     category: 'developer',
@@ -34,6 +34,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'gst-calculator': {
     slug: 'gst-calculator',
+    shortUrl: 'gst',
+    aliases: ['gst-calculator'],
     title: 'GST Calculator',
     description: 'Calculate Goods and Services Tax (GST) for transactions. Supports GST Exclusive and Inclusive calculations with complete CGST, SGST, and IGST breakdowns.',
     category: 'finance',
@@ -57,6 +59,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'reverse-gst-calculator': {
     slug: 'reverse-gst-calculator',
+    shortUrl: 'reverse-gst',
+    aliases: ['reverse-gst-calculator'],
     title: 'Reverse GST Calculator',
     description: 'Extract the base tax amount and original price from a GST inclusive total price quickly and accurately.',
     category: 'finance',
@@ -72,6 +76,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'emi-calculator': {
     slug: 'emi-calculator',
+    shortUrl: 'emi',
+    aliases: ['emi-calculator'],
     title: 'EMI Calculator',
     description: 'Calculate monthly home, car, or personal loan repayments with full amortization charts and interest breakdowns.',
     category: 'finance',
@@ -87,6 +93,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'loan-calculator': {
     slug: 'loan-calculator',
+    shortUrl: 'loan',
+    aliases: ['loan-calculator'],
     title: 'Loan Calculator',
     description: 'Calculate monthly payments, total interest, and amortization schedule instantly with our free online calculator. Compare loans or simulate extra prepayments.',
     category: 'finance',
@@ -116,6 +124,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'income-tax-calculator-india': {
     slug: 'income-tax-calculator-india',
+    shortUrl: 'income-tax',
+    aliases: ['income-tax-calculator-india', 'tax'],
     title: 'Income Tax Calculator India',
     description: 'Calculate and compare your income tax liability under both the Old and New Tax Regimes for the latest Financial Year (FY 2024-25, FY 2025-26, and FY 2026-27). Estimate deductions, calculate HRA exemptions, and export your summary.',
     category: 'finance',
@@ -143,6 +153,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'sip-calculator': {
     slug: 'sip-calculator',
+    shortUrl: 'sip',
+    aliases: ['sip-calculator'],
     title: 'SIP Calculator',
     description: 'Calculate the future value of your monthly Systemic Investment Plan (SIP) or one-time Lumpsum mutual funds.',
     category: 'finance',
@@ -158,6 +170,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'gst-split-calculator': {
     slug: 'gst-split-calculator',
+    shortUrl: 'gst-split',
+    aliases: ['gst-split-calculator'],
     title: 'GST Split Calculator',
     description: 'Split bills and shared transaction invoices between partners, isolating tax portions and raw pricing splits.',
     category: 'finance',
@@ -169,6 +183,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'pdf-merge-combine': {
     slug: 'pdf-merge-combine',
+    shortUrl: 'pdf-merge',
+    aliases: ['pdf-merge-combine', 'merge-pdf', 'combine-pdf'],
     title: 'PDF Merge & Combine',
     description: 'Merge multiple PDF files into one document online for free. Fast, secure, privacy-first PDF merger that works entirely in your browser.',
     category: 'pdf',
@@ -196,6 +212,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'pdf-split': {
     slug: 'pdf-split',
+    shortUrl: 'pdf-split',
+    aliases: ['split-pdf'],
     title: 'PDF Page Splitter',
     description: 'Extract specific pages or split pages of a PDF document into separate files instantly in your browser.',
     category: 'pdf',
@@ -218,6 +236,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'base64-encoder-decoder': {
     slug: 'base64-encoder-decoder',
+    shortUrl: 'base64',
+    aliases: ['base64-encoder-decoder', 'base64-encode', 'base64-decode'],
     title: 'Base64 Encoder & Decoder',
     description: 'Encode text strings into Base64 format or decode Base64 back into readable text locally and securely.',
     category: 'developer',
@@ -242,6 +262,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'hash-generator': {
     slug: 'hash-generator',
+    shortUrl: 'hash',
+    aliases: ['hash-generator', 'md5', 'sha256'],
     title: 'Hash Generator',
     seoTitle: 'Hash Generator – Generate MD5, SHA-256, SHA-512 Hash Online | Toolora',
     description: 'Generate MD5, SHA-1, SHA-256, SHA-384 and SHA-512 hashes instantly. Secure, free and browser-based.',
@@ -268,6 +290,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'markdown-preview': {
     slug: 'markdown-preview',
+    shortUrl: 'markdown',
+    aliases: ['markdown-preview', 'md'],
     title: 'Markdown Preview',
     seoTitle: 'Markdown Preview Editor Online | Toolora',
     description: 'Write Markdown and preview it instantly in real time. Full screen editor, copy parsed HTML, copy markdown, export code, and upload files locally.',
@@ -293,6 +317,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'word-counter': {
     slug: 'word-counter',
+    shortUrl: 'word-counter',
+    aliases: [],
     title: 'Word Counter',
     description: 'Count words, characters, sentences, paragraphs, and reading times for any text input instantly.',
     category: 'text',
@@ -304,6 +330,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'case-converter': {
     slug: 'case-converter',
+    shortUrl: 'case-converter',
+    aliases: [],
     title: 'Case Converter Suite',
     description: 'Convert text between UPPERCASE, lowercase, camelCase, snake_case, titleCase, and sentence case easily.',
     category: 'text',
@@ -315,6 +343,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'gst-invoice-generator': {
     slug: 'gst-invoice-generator',
+    shortUrl: 'gst-invoice',
+    aliases: ['gst-invoice-generator'],
     title: 'GST Invoice Maker',
     description: 'Create standard, GST-compliant PDF invoice receipts for clients and downloads them directly.',
     category: 'business',
@@ -326,6 +356,8 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
   },
   'invoice-generator': {
     slug: 'invoice-generator',
+    shortUrl: 'invoice',
+    aliases: ['invoice-generator'],
     title: 'Standard Invoice Generator',
     description: 'Generate professional business invoices and simple receipts for general clients and billing records.',
     category: 'business',
@@ -336,3 +368,27 @@ export const toolsRegistry: Record<string, ToolDefinition> = {
     comingSoon: true
   }
 };
+
+// Fast lookup map from any shortUrl, slug, or alias -> tool key in toolsRegistry
+export const aliasToSlugMap: Record<string, string> = {};
+
+Object.values(toolsRegistry).forEach((tool) => {
+  aliasToSlugMap[tool.slug] = tool.slug;
+  if (tool.shortUrl) {
+    aliasToSlugMap[tool.shortUrl] = tool.slug;
+  }
+  if (tool.aliases) {
+    tool.aliases.forEach((alias) => {
+      aliasToSlugMap[alias] = tool.slug;
+    });
+  }
+});
+
+export function getToolBySlugOrAlias(param: string): ToolDefinition | undefined {
+  const slug = aliasToSlugMap[param];
+  return slug ? toolsRegistry[slug] : undefined;
+}
+
+export function getToolCanonicalPath(tool: ToolDefinition): string {
+  return `/${tool.shortUrl || tool.slug}`;
+}

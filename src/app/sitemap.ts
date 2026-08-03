@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
-import { toolsRegistry } from '@/tools/registry';
+import { toolsRegistry, getToolCanonicalPath } from '@/tools/registry';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://toolora.prologuelearn.com';
+  const baseUrl = 'https://toolora.com';
 
   const routes = [
     {
@@ -13,11 +13,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const toolRoutes = Object.keys(toolsRegistry).map((slug) => ({
-    url: `${baseUrl}/tools/${slug}`,
+  const toolRoutes = Object.values(toolsRegistry).map((tool) => ({
+    url: `${baseUrl}${getToolCanonicalPath(tool)}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
-    priority: 0.8,
+    priority: 0.9,
   }));
 
   return [...routes, ...toolRoutes];

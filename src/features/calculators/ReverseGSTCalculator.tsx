@@ -131,7 +131,7 @@ Calculated locally on Toolora.com`;
 
   const shareCalculation = () => {
     const link = typeof window !== 'undefined'
-      ? `${window.location.origin}/tools/reverse-gst-calculator?amount=${totalAmount}&rate=${gstRate}&inter=${values.isInterstate}`
+      ? `${window.location.origin}/reverse-gst?amount=${totalAmount}&rate=${gstRate}&inter=${values.isInterstate}`
       : '';
     navigator.clipboard.writeText(link);
     setShared(true);

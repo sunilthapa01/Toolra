@@ -1594,31 +1594,31 @@ export default function PDFMergeCombine() {
               <h4 className="font-outfit text-xs font-black text-foreground uppercase tracking-wider">Internal Links</h4>
               <ul className="space-y-2.5 text-xs font-bold uppercase tracking-wider text-muted">
                 <li>
-                  <a href="/tools/pdf-split" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/pdf-split" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>PDF Splitter</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-primary/10 bg-primary/5 text-primary ml-auto">Soon</span>
                   </a>
                 </li>
                 <li>
-                  <a href="/tools/pdf-compress" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/pdf-compress" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>PDF Compressor</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-primary/10 bg-primary/5 text-primary ml-auto">Soon</span>
                   </a>
                 </li>
                 <li>
-                  <a href="/tools/pdf-rotate" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/pdf-rotate" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>PDF Rotator</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-primary/10 bg-primary/5 text-primary ml-auto">Soon</span>
                   </a>
                 </li>
                 <li>
-                  <a href="/tools/pdf-to-jpg" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/pdf-to-jpg" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>PDF to JPG</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-primary/10 bg-primary/5 text-primary ml-auto">Soon</span>
                   </a>
                 </li>
                 <li>
-                  <a href="/tools/jpg-to-pdf" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/jpg-to-pdf" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>JPG to PDF</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-primary/10 bg-primary/5 text-primary ml-auto">Soon</span>
                   </a>

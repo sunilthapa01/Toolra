@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { toolsRegistry } from '@/tools/registry';
+import { toolsRegistry, getToolCanonicalPath } from '@/tools/registry';
 import { ToolCategory } from '@/tools/types';
 import * as Icons from './Icons';
 import { usePageTransition } from './TransitionProvider';
@@ -49,8 +49,10 @@ export default function ToolsGrid() {
 
   const handleToolSelect = (slug: string) => {
     setClickedSlug(slug);
+    const tool = toolsRegistry[slug];
+    const canonicalPath = tool ? getToolCanonicalPath(tool) : `/${slug}`;
     setTimeout(() => {
-      navigate(`/tools/${slug}`, true);
+      navigate(canonicalPath, true);
       setClickedSlug(null);
     }, 200);
   };

@@ -458,7 +458,7 @@ Calculated locally on Toolora.com`;
 
   const shareCalculation = () => {
     if (typeof window !== 'undefined') {
-      const url = `${window.location.origin}/tools/loan-calculator?amount=${amount}&rate=${rate}&tenure=${tenure}&currency=${currency}&type=${loanType}`;
+      const url = `${window.location.origin}/loan?amount=${amount}&rate=${rate}&tenure=${tenure}&currency=${currency}&type=${loanType}`;
       navigator.clipboard.writeText(url);
       setShared(true);
       setTimeout(() => setShared(false), 2000);

@@ -111,7 +111,7 @@ export default function ToolLayout({
       applicationCategory: 'UtilityApplication',
       operatingSystem: 'All',
       browserRequirements: 'Requires JavaScript. Requires HTML5.',
-      url: `https://toolora.com/tools/${slug}`,
+      url: `https://toolora.com/${toolsRegistry[slug]?.shortUrl || slug}`,
       description: description,
     };
   }, [title, slug, description]);

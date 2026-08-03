@@ -188,7 +188,7 @@ Calculated locally on Toolora.com`;
 
   const shareCalculation = () => {
     const link = typeof window !== 'undefined'
-      ? `${window.location.origin}/tools/sip-calculator?mode=${values.mode}&amount=${investment}&rate=${annualRate}&tenure=${tenureYears}&step=${stepUpRate}`
+      ? `${window.location.origin}/sip?mode=${values.mode}&amount=${investment}&rate=${annualRate}&tenure=${tenureYears}&step=${stepUpRate}`
       : '';
     navigator.clipboard.writeText(link);
     setShared(true);

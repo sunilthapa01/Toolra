@@ -186,7 +186,7 @@ Calculated locally on Toolora.com`;
 
   const shareCalculation = () => {
     const link = typeof window !== 'undefined'
-      ? `${window.location.origin}/tools/emi-calculator?amount=${principal}&rate=${annualRate}&tenure=${rawTenure}&years=${values.isYears}`
+      ? `${window.location.origin}/emi?amount=${principal}&rate=${annualRate}&tenure=${rawTenure}&years=${values.isYears}`
       : '';
     navigator.clipboard.writeText(link);
     setShared(true);

@@ -478,7 +478,7 @@ Calculated securely at: Toolora.com`;
 
   const shareResult = () => {
     const shareLink = typeof window !== 'undefined'
-      ? `${window.location.origin}/tools/income-tax-calculator-india?salary=${salary}&fy=${financialYear}&regime=${taxRegime}`
+      ? `${window.location.origin}/income-tax?salary=${salary}&fy=${financialYear}&regime=${taxRegime}`
       : '';
     navigator.clipboard.writeText(shareLink);
     setShared(true);

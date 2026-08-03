@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import LauncherSidebar from '@/components/LauncherSidebar';
 import * as Icons from '@/components/Icons';
-import { toolsRegistry } from '@/tools/registry';
+import { toolsRegistry, getToolCanonicalPath, getToolBySlugOrAlias } from '@/tools/registry';
 import { ToolDefinition } from '@/tools/types';
 import { ToolIcon } from '@/components/ToolIcon';
 
@@ -16,14 +16,20 @@ const WORKSPACES: { id: string; label: string; icon: React.ComponentType<any> }[
   { id: 'everyday', label: 'Everyday Workspace', icon: Icons.Home },
 ];
 
-function HomeContent() {
+interface HomeContentProps {
+  initialToolSlug?: string;
+}
+
+export function HomeContent({ initialToolSlug }: HomeContentProps) {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
 
+  const initialTool = initialToolSlug ? toolsRegistry[initialToolSlug] : null;
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [selectedCategory, setSelectedCategory] = useState<string>('developer');
-  const [selectedToolSlug, setSelectedToolSlug] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialTool?.category || 'developer');
+  const [selectedToolSlug, setSelectedToolSlug] = useState<string | null>(initialToolSlug || null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -44,8 +50,12 @@ function HomeContent() {
       setSelectedCategory(cat);
     }
     const toolParam = searchParams.get('tool');
-    if (toolParam && toolsRegistry[toolParam]) {
-      setSelectedToolSlug(toolParam);
+    if (toolParam) {
+      const foundTool = getToolBySlugOrAlias(toolParam);
+      if (foundTool) {
+        setSelectedToolSlug(foundTool.slug);
+        setSelectedCategory(foundTool.category);
+      }
     }
   }, [searchParams]);
 
@@ -100,11 +110,7 @@ function HomeContent() {
   const handleSelectWorkspace = (catId: string) => {
     setSelectedCategory(catId);
     setSelectedToolSlug(null);
-    const params = new URLSearchParams(window.location.search);
-    params.set('category', catId);
-    params.delete('tool');
-    const newUrl = params.toString() ? `/?${params.toString()}` : '/';
-    window.history.pushState(null, '', newUrl);
+    window.history.pushState(null, '', '/');
   };
 
   const handleToolSelect = (tool: ToolDefinition) => {
@@ -114,21 +120,18 @@ function HomeContent() {
       setSubscribed(false);
     } else {
       setSelectedToolSlug(tool.slug);
-      const params = new URLSearchParams(window.location.search);
-      params.set('category', tool.category);
-      params.set('tool', tool.slug);
-      const newUrl = `/?${params.toString()}`;
-      window.history.pushState(null, '', newUrl);
+      setSelectedCategory(tool.category);
+      const canonicalPath = getToolCanonicalPath(tool);
+      const currentQuery = window.location.search;
+      const targetUrl = currentQuery ? `${canonicalPath}${currentQuery}` : canonicalPath;
+      window.history.pushState(null, '', targetUrl);
     }
     setIsFocused(false);
   };
 
   const handleCloseTool = () => {
     setSelectedToolSlug(null);
-    const params = new URLSearchParams(window.location.search);
-    params.delete('tool');
-    const newUrl = params.toString() ? `/?${params.toString()}` : '/';
-    window.history.pushState(null, '', newUrl);
+    window.history.pushState(null, '', '/');
   };
 
   const activeTool = selectedToolSlug ? toolsRegistry[selectedToolSlug] : null;

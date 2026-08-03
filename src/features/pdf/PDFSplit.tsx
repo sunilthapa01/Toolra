@@ -1200,19 +1200,19 @@ export default function PDFSplit() {
               <h4 className="font-outfit text-xs font-black text-foreground uppercase tracking-wider">Internal Links</h4>
               <ul className="space-y-2.5 text-xs font-bold uppercase tracking-wider text-muted">
                 <li>
-                  <a href="/tools/pdf-merge-combine" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/pdf-merge" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>PDF Merge & Combine</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-emerald-500/10 bg-emerald-500/5 text-emerald-500 ml-auto">Active</span>
                   </a>
                 </li>
                 <li>
-                  <a href="/tools/pdf-compress" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/pdf-compress" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>PDF Compressor</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-primary/10 bg-primary/5 text-primary ml-auto">Soon</span>
                   </a>
                 </li>
                 <li>
-                  <a href="/tools/pdf-rotate" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <a href="/pdf-rotate" className="hover:text-primary transition-colors flex items-center gap-1.5">
                     <span>PDF Rotator</span>
                     <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-primary/10 bg-primary/5 text-primary ml-auto">Soon</span>
                   </a>
