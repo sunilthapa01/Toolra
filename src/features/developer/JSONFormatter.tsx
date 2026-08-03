@@ -12,6 +12,8 @@ import JSONCommandPalette, { CommandItem } from '@/components/json/JSONCommandPa
 import JSONShortcutsModal from '@/components/json/JSONShortcutsModal';
 import JSONStatsCard from '@/components/json/JSONStatsCard';
 import JSONSearchBar from '@/components/json/JSONSearchBar';
+import { getDraft, saveDraft } from '@/lib/storage/indexedDB';
+
 
 // Default Sample JSON
 const SAMPLE_JSON = `{
@@ -90,40 +92,42 @@ export default function JSONFormatter() {
 
   // Restore Session on Mount
   useEffect(() => {
-    try {
-      const savedInput = localStorage.getItem('toolora_json_input');
-      const savedIndent = localStorage.getItem('toolora_json_indent');
-      const savedWrap = localStorage.getItem('toolora_json_wrap');
-      const savedTab = localStorage.getItem('toolora_json_tab');
+    getDraft('json-formatter').then((idbSaved) => {
+      try {
+        const savedInput = idbSaved || localStorage.getItem('toolora_json_input');
+        const savedIndent = localStorage.getItem('toolora_json_indent');
+        const savedWrap = localStorage.getItem('toolora_json_wrap');
+        const savedTab = localStorage.getItem('toolora_json_tab');
 
-      if (savedInput !== null) {
-        setInputJSON(savedInput);
-        if (savedInput.trim()) {
-          const valRes = validateJSON(savedInput);
-          setErrors(valRes);
-          setIsValidated(true);
-          if (valRes.some(e => e.severity === 'error')) {
-            setIsProblemsExpanded(true);
+        if (savedInput !== null && savedInput !== undefined) {
+          setInputJSON(savedInput);
+          if (savedInput.trim()) {
+            const valRes = validateJSON(savedInput);
+            setErrors(valRes);
+            setIsValidated(true);
+            if (valRes.some(e => e.severity === 'error')) {
+              setIsProblemsExpanded(true);
+            }
+            if (!valRes.some(e => e.severity === 'error')) {
+              try {
+                const parsed = JSON.parse(savedInput);
+                setOutputJSON(JSON.stringify(parsed, null, 2));
+              } catch {}
+            }
           }
-          if (!valRes.some(e => e.severity === 'error')) {
-            try {
-              const parsed = JSON.parse(savedInput);
-              setOutputJSON(JSON.stringify(parsed, null, 2));
-            } catch {}
-          }
+        } else {
+          setInputJSON(SAMPLE_JSON);
+          handleFormat(SAMPLE_JSON);
         }
-      } else {
+
+        if (savedIndent) setIndentSize(JSON.parse(savedIndent));
+        if (savedWrap) setWrapLines(JSON.parse(savedWrap));
+        if (savedTab) setActiveRightTab(JSON.parse(savedTab));
+      } catch {
         setInputJSON(SAMPLE_JSON);
         handleFormat(SAMPLE_JSON);
       }
-
-      if (savedIndent) setIndentSize(JSON.parse(savedIndent));
-      if (savedWrap) setWrapLines(JSON.parse(savedWrap));
-      if (savedTab) setActiveRightTab(JSON.parse(savedTab));
-    } catch {
-      setInputJSON(SAMPLE_JSON);
-      handleFormat(SAMPLE_JSON);
-    }
+    });
   }, []);
 
   // Save Session on State Change
@@ -133,11 +137,13 @@ export default function JSONFormatter() {
       localStorage.setItem('toolora_json_indent', JSON.stringify(indentSize));
       localStorage.setItem('toolora_json_wrap', JSON.stringify(wrapLines));
       localStorage.setItem('toolora_json_tab', JSON.stringify(activeRightTab));
+      saveDraft('json-formatter', inputJSON);
     } catch {}
 
     const byteSize = new Blob([inputJSON]).size;
     setIsLargeFile(byteSize > 2 * 1024 * 1024);
   }, [inputJSON, indentSize, wrapLines, activeRightTab]);
+
 
   // Check Clipboard for Valid JSON Suggestion
   const checkClipboardForJSON = async () => {

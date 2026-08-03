@@ -1,0 +1,63 @@
+{
+  "id": "/",
+  "name": "Toolora – Developer Productivity Suite",
+  "short_name": "Toolora",
+  "description": "Offline-first developer tools: JSON formatter, Markdown editor, Base64 encoder, Hash generator, JWT decoder, and calculators.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "categories": ["developer", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "JSON Formatter",
+      "short_name": "JSON",
+      "description": "Format and validate JSON instantly",
+      "url": "/json",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Markdown Workspace",
+      "short_name": "Markdown",
+      "description": "Write and preview Markdown documents",
+      "url": "/markdown",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Base64 Encoder",
+      "short_name": "Base64",
+      "description": "Encode and decode Base64 strings",
+      "url": "/base64",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Hash Generator",
+      "short_name": "Hash",
+      "description": "Generate MD5, SHA-256, SHA-512 checksums",
+      "url": "/hash",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

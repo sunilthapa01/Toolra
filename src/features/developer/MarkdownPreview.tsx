@@ -17,6 +17,8 @@ import MarkdownDiagnosticsBadge from '@/components/markdown/MarkdownDiagnosticsB
 import { calculateMarkdownStats, MarkdownStats } from '@/utils/markdownAnalytics';
 import { analyzeMarkdownDiagnostics, DiagnosticIssue } from '@/utils/markdownDiagnostics';
 import { renderMarkdownToHtml } from '@/utils/markdownParser';
+import { getDraft, saveDraft } from '@/lib/storage/indexedDB';
+
 
 const STORAGE_KEY = 'toolora_markdown_studio_content_v2';
 
@@ -161,16 +163,18 @@ export default function MarkdownPreview() {
 
   // Initial Content Load & Auto Save Restores
   useEffect(() => {
-    const savedContent = localStorage.getItem(STORAGE_KEY);
-    if (savedContent && savedContent.trim().length > 0) {
-      setInputMarkdown(savedContent);
-      setHistory([savedContent]);
-      setHistoryIndex(0);
-    } else {
-      setInputMarkdown(SAMPLE_MARKDOWN);
-      setHistory([SAMPLE_MARKDOWN]);
-      setHistoryIndex(0);
-    }
+    getDraft('markdown-preview').then((idbSaved) => {
+      const savedContent = idbSaved || localStorage.getItem(STORAGE_KEY);
+      if (savedContent && savedContent.trim().length > 0) {
+        setInputMarkdown(savedContent);
+        setHistory([savedContent]);
+        setHistoryIndex(0);
+      } else {
+        setInputMarkdown(SAMPLE_MARKDOWN);
+        setHistory([SAMPLE_MARKDOWN]);
+        setHistoryIndex(0);
+      }
+    });
   }, []);
 
   // Update HTML, Stats, Diagnostics & Auto Save synchronously on input Markdown change
@@ -194,13 +198,15 @@ export default function MarkdownPreview() {
       setTotalMatches(0);
     }
 
-    // 3. Auto Save to localStorage
+    // 3. Auto Save to localStorage and IndexedDB
     if (inputMarkdown.trim().length > 0) {
       localStorage.setItem(STORAGE_KEY, inputMarkdown);
+      saveDraft('markdown-preview', inputMarkdown);
       setIsAutoSaved(true);
       const timer = setTimeout(() => setIsAutoSaved(false), 2500);
       return () => clearTimeout(timer);
     }
+
 
     // 4. Record history stack for undo/redo if not triggered by undo/redo button
     if (!isUndoRedoAction.current) {

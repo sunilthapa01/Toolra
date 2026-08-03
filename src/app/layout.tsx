@@ -9,6 +9,8 @@ import ScrollToTop from '@/components/ScrollToTop';
 import MobileNoticePopup from '@/components/MobileNoticePopup';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/next';
+import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
+import { OfflineBanner } from '@/components/pwa/OfflineBanner';
 
 export const metadata: Metadata = {
   title: {
@@ -17,6 +19,16 @@ export const metadata: Metadata = {
   },
   description: 'The internet\'s premium toolbox containing high-performance, private-by-default tools for everyone.',
   metadataBase: new URL('https://toolora.com'),
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Toolora',
+  },
+  icons: {
+    icon: '/icons/icon-192x192.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
@@ -33,6 +45,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="theme-color" content="#0f172a" />
         {/* Simple non-blocking inline script to enforce saved theme instantly during early loading */}
         <script
           dangerouslySetInnerHTML={{
@@ -54,11 +68,13 @@ export default function RootLayout({
           <TransitionProvider>
             <ContactProvider>
               <ToastProvider>
+                <OfflineBanner />
                 <ScrollToTop />
                 <MobileNoticePopup />
                 <PageEntranceWrapper>
                   {children}
                 </PageEntranceWrapper>
+                <ServiceWorkerRegister />
               </ToastProvider>
             </ContactProvider>
           </TransitionProvider>
@@ -69,8 +85,9 @@ export default function RootLayout({
               gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
             />
           )}
-   <Analytics />
+        <Analytics />
       </body>
     </html>
   );
 }
+

@@ -910,6 +910,24 @@ export const Home = ({ size = 20, className, ...props }: IconProps) => (
   </svg>
 );
 
+export const WifiOff = ({ size = 20, className, ...props }: IconProps) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <line x1="2" x2="22" y1="2" y2="22"/>
+    <path d="M8.5 8.5A6 6 0 0 1 12 8c2.05 0 3.88.83 5.2 2.13"/>
+    <path d="M12 12a2.5 2.5 0 0 1 1.77.73"/>
+    <line x1="12" x2="12.01" y1="16" y2="16"/>
+  </svg>
+);
+
+export const DownloadApp = ({ size = 20, className, ...props }: IconProps) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+    <path d="M12 6v6"/>
+    <path d="m9 9 3 3 3-3"/>
+  </svg>
+);
+
+
 
 
 
