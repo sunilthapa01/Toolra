@@ -7,7 +7,7 @@ import { useContact } from './ContactProvider';
 import * as Icons from './Icons';
 import { usePageTransition } from './TransitionProvider';
 import { AnimatedNavLink } from './AnimationAtoms';
-import { InstallPWAButton } from '@/components/pwa/InstallPWAButton';
+
 
 
 interface NavbarProps {
@@ -168,9 +168,6 @@ function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarP
               );
             })}
           </nav>
-
-          {/* PWA Install Button */}
-          <InstallPWAButton />
 
           {/* Theme Switcher Toggle Button */}
           <button

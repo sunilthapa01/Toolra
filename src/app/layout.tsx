@@ -10,7 +10,6 @@ import MobileNoticePopup from '@/components/MobileNoticePopup';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/next';
 import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
-import { OfflineBanner } from '@/components/pwa/OfflineBanner';
 
 export const metadata: Metadata = {
   title: {
@@ -68,7 +67,6 @@ export default function RootLayout({
           <TransitionProvider>
             <ContactProvider>
               <ToastProvider>
-                <OfflineBanner />
                 <ScrollToTop />
                 <MobileNoticePopup />
                 <PageEntranceWrapper>
