@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useToast } from '@/components/ToastProvider';
 import { useTheme } from '@/components/ThemeProvider';
 import * as Icons from '@/components/Icons';
@@ -113,20 +114,25 @@ export default function MarkdownPreview() {
   const { theme } = useTheme();
 
   // Core Document State
-  const [inputMarkdown, setInputMarkdown] = useState('');
-  const [previewHtml, setPreviewHtml] = useState('');
+  const [inputMarkdown, setInputMarkdown] = useState(SAMPLE_MARKDOWN);
+  const [previewHtml, setPreviewHtml] = useState(() => renderMarkdownToHtml(SAMPLE_MARKDOWN, '', 0));
   const [isAutoSaved, setIsAutoSaved] = useState(false);
 
   // Undo / Redo History Stack
-  const [history, setHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [history, setHistory] = useState<string[]>([SAMPLE_MARKDOWN]);
+  const [historyIndex, setHistoryIndex] = useState(0);
   const isUndoRedoAction = useRef(false);
 
   // Layout & View Options
   const [layoutMode, setLayoutMode] = useState<'split' | 'editor' | 'preview'>('split');
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [wrapLines, setWrapLines] = useState(true);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Search State
   const [showSearch, setShowSearch] = useState(false);
@@ -375,9 +381,9 @@ export default function MarkdownPreview() {
               e.preventDefault();
               handleExportMarkdown();
               break;
-            case 'Z': // Redo
+            case 'Z': // Toggle Fullscreen
               e.preventDefault();
-              handleRedo();
+              setIsFullScreen(prev => !prev);
               break;
           }
         }
@@ -585,8 +591,14 @@ export default function MarkdownPreview() {
     showToast('Loaded sample Markdown template.');
   };
 
-  return (
-    <div className={isFullScreen ? "fixed inset-0 z-50 bg-background flex flex-col p-5 md:p-6 overflow-hidden" : "space-y-4 w-full relative"}>
+  const content = (
+    <div
+      className={`space-y-4 transition-all duration-300 ${
+        isFullScreen
+          ? 'fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-background p-4 sm:p-6 overflow-y-auto flex flex-col justify-between h-screen w-full font-outfit'
+          : 'relative min-h-screen pb-12'
+      }`}
+    >
       {/* Full Screen Top Control Bar */}
       {isFullScreen && (
         <div className="flex items-center justify-between pb-3.5 border-b border-border/80 shrink-0">
@@ -898,4 +910,10 @@ export default function MarkdownPreview() {
       />
     </div>
   );
+
+  if (isFullScreen && isMounted && typeof document !== 'undefined') {
+    return createPortal(content, document.body);
+  }
+
+  return content;
 }

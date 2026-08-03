@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useToast } from '@/components/ToastProvider';
 import * as Icons from '@/components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,6 +67,14 @@ const isLikelyBase64 = (str: string): boolean => {
 
 export default function Base64EncoderDecoder() {
   const { showToast } = useToast();
+
+  // Fullscreen State & Hydration
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Core Editor States
   const [inputText, setInputText] = useState('');
@@ -374,6 +383,17 @@ export default function Base64EncoderDecoder() {
         handleSwap();
       }
 
+      // Toggle Fullscreen: Ctrl + Shift + Z
+      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        setIsFullscreen((prev) => !prev);
+      }
+
+      // Exit Fullscreen: Esc
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+
       // Clear: Ctrl + K
       if (isCtrlOrCmd && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -383,7 +403,7 @@ export default function Base64EncoderDecoder() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inputText, mode, handleConvert]);
+  }, [inputText, mode, handleConvert, isFullscreen]);
 
   // Autofocus text input on mount
   useEffect(() => {
@@ -423,8 +443,14 @@ export default function Base64EncoderDecoder() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  return (
-    <div className="space-y-6">
+  const content = (
+    <div
+      className={`space-y-6 transition-all duration-300 ${
+        isFullscreen
+          ? 'fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-background p-4 sm:p-6 overflow-y-auto flex flex-col justify-between h-screen w-full font-outfit'
+          : 'relative min-h-screen pb-12'
+      }`}
+    >
       {/* 1. Header with primary mode toggles */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-border/50">
         <div className="space-y-1">
@@ -543,6 +569,24 @@ export default function Base64EncoderDecoder() {
           >
             <Icons.Copy className="h-4 w-4" />
             Copy Result
+          </button>
+
+          <button
+            onClick={() => setIsFullscreen((prev) => !prev)}
+            title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Fullscreen Workspace (Ctrl+Shift+Z)'}
+            className="inline-flex h-9 px-3 items-center justify-center gap-1.5 rounded-xl border border-border bg-card text-muted hover:text-foreground hover:bg-secondary transition-all shadow-premium-sm text-[10px] font-bold uppercase tracking-wider"
+          >
+            {isFullscreen ? (
+              <>
+                <Icons.Minimize2 className="h-4 w-4 text-primary" />
+                Exit Fullscreen
+              </>
+            ) : (
+              <>
+                <Icons.Maximize2 className="h-4 w-4 text-primary" />
+                Fullscreen
+              </>
+            )}
           </button>
 
           <button
@@ -840,4 +884,10 @@ export default function Base64EncoderDecoder() {
       </AnimatePresence>
     </div>
   );
+
+  if (isFullscreen && isMounted && typeof document !== 'undefined') {
+    return createPortal(content, document.body);
+  }
+
+  return content;
 }

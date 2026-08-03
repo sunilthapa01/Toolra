@@ -138,6 +138,17 @@ export default function MonacoEditor({
       editorRef.current = editor;
       setIsLoaded(true);
 
+      // Force layout pass after DOM paint
+      requestAnimationFrame(() => {
+        editor.layout();
+      });
+      setTimeout(() => {
+        if (editorRef.current) editorRef.current.layout();
+      }, 100);
+      setTimeout(() => {
+        if (editorRef.current) editorRef.current.layout();
+      }, 300);
+
       if (onEditorMount) {
         onEditorMount(editor, monaco);
       }
@@ -179,8 +190,21 @@ export default function MonacoEditor({
       isUpdatingRef.current = true;
       editorRef.current.setValue(value || '');
       isUpdatingRef.current = false;
+      editorRef.current.layout();
     }
   }, [value]);
+
+  // ResizeObserver to ensure Monaco Editor resizes dynamically with parent container
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver(() => {
+      if (editorRef.current) {
+        editorRef.current.layout();
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isLoaded]);
 
   // Sync theme changes
   useEffect(() => {
@@ -195,6 +219,7 @@ export default function MonacoEditor({
       wordWrap: options.wordWrap || 'off',
       readOnly: readOnly
     });
+    editorRef.current.layout();
   }, [options.wordWrap, readOnly]);
 
   return (
