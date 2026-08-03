@@ -53,6 +53,10 @@ export default function JSONFormatter() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
+  // Clipboard Detection & Auto-Paste Suggestion States
+  const [suggestedClipboardJSON, setSuggestedClipboardJSON] = useState<string | null>(null);
+  const [isSuggestionDismissed, setIsSuggestionDismissed] = useState(false);
+
   // Search Bar Overlay States
   const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,6 +78,7 @@ export default function JSONFormatter() {
   const handleFormatRef = useRef<any>(null);
   const handleMinifyRef = useRef<any>(null);
   const handleAutoFixRef = useRef<any>(null);
+  const handlePasteAndFormatRef = useRef<any>(null);
 
   // Analytics Tracker
   const trackEvent = (eventName: string, metadata: any = {}) => {
@@ -89,6 +94,7 @@ export default function JSONFormatter() {
       const savedInput = localStorage.getItem('toolora_json_input');
       const savedIndent = localStorage.getItem('toolora_json_indent');
       const savedWrap = localStorage.getItem('toolora_json_wrap');
+      const savedTab = localStorage.getItem('toolora_json_tab');
 
       if (savedInput !== null) {
         setInputJSON(savedInput);
@@ -113,6 +119,7 @@ export default function JSONFormatter() {
 
       if (savedIndent) setIndentSize(JSON.parse(savedIndent));
       if (savedWrap) setWrapLines(JSON.parse(savedWrap));
+      if (savedTab) setActiveRightTab(JSON.parse(savedTab));
     } catch {
       setInputJSON(SAMPLE_JSON);
       handleFormat(SAMPLE_JSON);
@@ -125,11 +132,89 @@ export default function JSONFormatter() {
       localStorage.setItem('toolora_json_input', inputJSON);
       localStorage.setItem('toolora_json_indent', JSON.stringify(indentSize));
       localStorage.setItem('toolora_json_wrap', JSON.stringify(wrapLines));
+      localStorage.setItem('toolora_json_tab', JSON.stringify(activeRightTab));
     } catch {}
 
     const byteSize = new Blob([inputJSON]).size;
     setIsLargeFile(byteSize > 2 * 1024 * 1024);
-  }, [inputJSON, indentSize, wrapLines]);
+  }, [inputJSON, indentSize, wrapLines, activeRightTab]);
+
+  // Check Clipboard for Valid JSON Suggestion
+  const checkClipboardForJSON = async () => {
+    if (isSuggestionDismissed) return;
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.readText) {
+        const clipText = await navigator.clipboard.readText();
+        const trimmed = (clipText || '').trim();
+        if (trimmed && trimmed.length > 0 && trimmed.length < 500000) {
+          const valRes = validateJSON(trimmed);
+          const hasError = valRes.some(e => e.severity === 'error');
+          if (!hasError && trimmed !== inputJSON.trim()) {
+            setSuggestedClipboardJSON(trimmed);
+            return;
+          }
+        }
+      }
+      setSuggestedClipboardJSON(null);
+    } catch {
+      setSuggestedClipboardJSON(null);
+    }
+  };
+
+  // Run Clipboard Check on Mount and Window Focus
+  useEffect(() => {
+    checkClipboardForJSON();
+    const handleFocus = () => checkClipboardForJSON();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [inputJSON, isSuggestionDismissed]);
+
+  // One-Click Paste & Format from Clipboard
+  const handlePasteAndFormat = async (clipTextOverride?: string) => {
+    try {
+      let rawText = clipTextOverride;
+      if (!rawText) {
+        if (typeof navigator === 'undefined' || !navigator.clipboard || !navigator.clipboard.readText) {
+          showToast('Clipboard access unavailable. Press Ctrl+V inside the editor to paste manually.');
+          return;
+        }
+        rawText = await navigator.clipboard.readText();
+      }
+
+      const trimmed = (rawText || '').trim();
+      if (!trimmed) {
+        showToast('Clipboard is empty.');
+        return;
+      }
+
+      setInputJSON(trimmed);
+      setSuggestedClipboardJSON(null);
+      setIsSuggestionDismissed(true);
+
+      const valRes = validateJSON(trimmed);
+      const hasErrors = valRes.some(err => err.severity === 'error');
+      setErrors(valRes);
+      setIsValidated(true);
+
+      if (hasErrors) {
+        setOutputJSON('');
+        setIsProblemsExpanded(true);
+        showToast('Pasted JSON from clipboard, but syntax errors were detected. Inspect Problems panel.');
+        trackEvent('PasteAndFormat', { status: 'failure', errorsCount: valRes.length });
+      } else {
+        const parsed = JSON.parse(trimmed);
+        const spacer = indentSize === 'tab' ? '\t' : indentSize;
+        const formatted = JSON.stringify(parsed, null, spacer);
+        setOutputJSON(formatted);
+        setIsSuccessAnimated(true);
+        setTimeout(() => setIsSuccessAnimated(false), 1500);
+        showToast('Pasted & formatted JSON from clipboard in 1 click!');
+        trackEvent('PasteAndFormat', { status: 'success' });
+      }
+    } catch {
+      showToast('Clipboard access denied. Press Ctrl+V inside the editor to paste.');
+    }
+  };
 
   // Perform Beautify / Formatting
   const handleFormat = (rawText = inputJSON) => {
@@ -257,6 +342,7 @@ export default function JSONFormatter() {
     handleFormatRef.current = handleFormat;
     handleMinifyRef.current = handleMinify;
     handleAutoFixRef.current = handleAutoFix;
+    handlePasteAndFormatRef.current = handlePasteAndFormat;
   });
 
   // Jump to specific error line inside Monaco Editor
@@ -392,6 +478,26 @@ export default function JSONFormatter() {
         setIsCommandPaletteOpen(prev => !prev);
       }
 
+      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        handlePasteAndFormat();
+      }
+
+      if (e.altKey && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        handlePasteAndFormat();
+      }
+
+      if (isCtrlOrCmd && e.shiftKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        handleCopy(outputJSON || inputJSON, 'Output');
+      }
+
+      if ((e.altKey && e.key.toLowerCase() === 'c') || (isCtrlOrCmd && e.altKey && e.key.toLowerCase() === 'c')) {
+        e.preventDefault();
+        handleClear();
+      }
+
       if (isCtrlOrCmd && !e.shiftKey && e.key.toLowerCase() === 'f' && !isEditingInput) {
         e.preventDefault();
         setIsSearchBarOpen(prev => !prev);
@@ -440,7 +546,7 @@ export default function JSONFormatter() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [errors, currentProblemIndex, inputJSON]);
+  }, [errors, currentProblemIndex, inputJSON, outputJSON]);
 
   // Setup Monaco Commands on mount
   const handleInputEditorMount = (editor: any, monaco: any) => {
@@ -458,6 +564,9 @@ export default function JSONFormatter() {
     });
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => {
       if (handleAutoFixRef.current) handleAutoFixRef.current();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyV, () => {
+      if (handlePasteAndFormatRef.current) handlePasteAndFormatRef.current();
     });
   };
 
@@ -564,6 +673,7 @@ export default function JSONFormatter() {
 
   // Command Palette Items Mapping
   const commandItems: CommandItem[] = useMemo(() => [
+    { id: 'paste_format', title: 'Paste & Format from Clipboard', category: 'Action', shortcut: 'Ctrl+Shift+V', description: 'Read clipboard, validate, and format JSON in 1 click', icon: 'Clipboard', action: () => handlePasteAndFormat() },
     { id: 'find', title: 'Find & Search in Editor', category: 'Edit', shortcut: 'Ctrl+F', description: 'Open search overlay to find text matches in editor', icon: 'Search', action: () => setIsSearchBarOpen(true) },
     { id: 'format', title: 'Format / Beautify JSON', category: 'Format', shortcut: 'Ctrl+Enter', description: 'Beautify JSON payload with custom indentation', icon: 'Zap', action: () => handleFormat() },
     { id: 'validate', title: 'Validate Syntax Diagnostics', category: 'Action', description: 'Run deep syntax validation & check for errors', icon: 'Shield', action: handleValidate },
@@ -576,7 +686,7 @@ export default function JSONFormatter() {
     { id: 'copy', title: 'Copy Formatted Output', category: 'Action', shortcut: 'Ctrl+Shift+C', description: 'Copy output JSON string to clipboard', icon: 'Copy', action: () => handleCopy(outputJSON || inputJSON, 'Output') },
     { id: 'download', title: 'Download JSON File', category: 'Action', description: 'Download output as a .json file', icon: 'Download', action: handleDownload },
     { id: 'sample', title: 'Load Sample JSON Payload', category: 'Action', description: 'Load a default sample JSON string', icon: 'Files', action: handleLoadSample },
-    { id: 'clear', title: 'Clear Workspace Editor', category: 'Action', description: 'Reset input & output editors', icon: 'X', action: handleClear },
+    { id: 'clear', title: 'Clear Workspace Editor', category: 'Action', shortcut: 'Alt+C', description: 'Reset input & output editors', icon: 'X', action: handleClear },
     { id: 'shortcuts', title: 'Keyboard Shortcuts Cheatsheet', category: 'View', shortcut: '?', description: 'View full list of keyboard shortcuts', icon: 'Code', action: () => setIsShortcutsOpen(true) },
   ], [inputJSON, outputJSON, isStatsOpen, isProblemsExpanded]);
 
@@ -603,6 +713,15 @@ export default function JSONFormatter() {
           {/* Group: Input Actions */}
           <div className="flex items-center gap-2">
             <span className="text-xs font-black uppercase text-foreground/80 tracking-wider hidden sm:inline">INPUT:</span>
+            <button
+              onClick={() => handlePasteAndFormat()}
+              title="Paste JSON from Clipboard & Format Instantly (Ctrl+Shift+V)"
+              className="px-3.5 py-2 bg-primary text-primary-foreground rounded-xl text-xs sm:text-sm font-extrabold hover:bg-primary/90 transition-all flex items-center gap-2 shadow-premium-sm"
+            >
+              <Icons.Clipboard className="h-4 w-4" />
+              <span>Paste & Format</span>
+              <kbd className="px-1.5 py-0.5 text-[10px] bg-primary-foreground/20 rounded font-mono-calc font-extrabold text-primary-foreground hidden md:inline">Ctrl+Shift+V</kbd>
+            </button>
             <button
               onClick={handleLoadSample}
               className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-2 shadow-xs"
@@ -707,6 +826,41 @@ export default function JSONFormatter() {
           </button>
         </div>
       </div>
+
+      {/* Non-Intrusive Auto-Paste Suggestion Banner */}
+      {suggestedClipboardJSON && !isSuggestionDismissed && (
+        <div className="flex flex-wrap items-center justify-between gap-4 p-3.5 rounded-2xl bg-primary/10 border-2 border-primary/40 text-foreground animate-fade-in shadow-premium-sm font-outfit">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/20 rounded-xl text-primary shrink-0">
+              <Icons.Sparkles className="h-5 w-5 animate-pulse text-primary" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm font-black text-foreground">
+                Valid JSON detected in your clipboard!
+              </p>
+              <p className="text-xs text-muted-foreground font-medium hidden sm:block">
+                Would you like to paste, validate, and format it in 1 click?
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => handlePasteAndFormat(suggestedClipboardJSON)}
+              className="px-3.5 py-1.5 bg-primary text-primary-foreground text-xs sm:text-sm font-black rounded-xl hover:bg-primary/95 transition-all flex items-center gap-1.5 shadow-xs"
+            >
+              <Icons.Zap className="h-4 w-4" />
+              <span>Paste & Format</span>
+            </button>
+            <button
+              onClick={() => setIsSuggestionDismissed(true)}
+              className="p-1.5 hover:bg-secondary/60 rounded-xl text-muted-foreground hover:text-foreground transition-all"
+              title="Dismiss suggestion"
+            >
+              <Icons.X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 2. Options Toolbar & Quick Analytics Toggle */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-secondary/15 border-2 border-border/70 rounded-2xl">

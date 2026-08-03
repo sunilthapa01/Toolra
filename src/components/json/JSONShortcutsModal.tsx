@@ -44,10 +44,12 @@ export default function JSONShortcutsModal({ isOpen, onClose }: JSONShortcutsMod
     {
       category: 'Formatting & Actions',
       items: [
+        { key: 'Ctrl + Shift + V / Alt + V', description: 'Paste JSON from clipboard & format instantly' },
         { key: 'Ctrl + Enter', description: 'Beautify / Format JSON with current spacing' },
         { key: 'Ctrl + Shift + M', description: 'Minify JSON string to single line' },
         { key: 'Ctrl + Shift + F', description: 'Auto-Fix common syntax errors (unquoted keys, single quotes)' },
         { key: 'Ctrl + Shift + C', description: 'Copy formatted JSON output to clipboard' },
+        { key: 'Alt + C', description: 'Clear workspace editor' },
       ],
     },
     {
