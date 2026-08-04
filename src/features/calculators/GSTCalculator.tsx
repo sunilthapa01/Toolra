@@ -160,7 +160,7 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
           <div className="flex bg-card border border-border p-1 rounded-2xl relative shadow-premium-sm">
             <button
               onClick={() => handleChange('isInclusive', false)}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 !values.isInclusive ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
@@ -168,11 +168,11 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
             </button>
             <button
               onClick={() => handleChange('isInclusive', true)}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 values.isInclusive ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
-              Price Already Includes GST
+              Price Includes GST
             </button>
           </div>
         </div>
@@ -182,15 +182,15 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
           <span className="text-[10px] font-black uppercase tracking-widest text-muted block">
             {values.isInclusive ? "Total Price (Already Includes GST)" : "Original Amount (Before GST)"}
           </span>
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-premium-md focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500/60 transition-all">
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-premium-md focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:border-emerald-500/60 transition-all">
             <div className="flex items-center">
-              <span className="text-3xl font-semibold text-muted select-none mr-2">₹</span>
+              <span className="text-2xl sm:text-3xl font-semibold text-muted select-none mr-2">₹</span>
               <input
                 type="number"
                 name="amount"
                 value={values.amount}
                 onChange={handleInputChange}
-                className="block w-full border-0 bg-transparent p-0 text-3xl font-mono-calc font-extrabold text-foreground focus:ring-0 outline-none placeholder:text-muted/20"
+                className="block w-full border-0 bg-transparent p-0 text-2xl sm:text-3xl font-mono-calc font-extrabold text-foreground focus:ring-0 outline-none placeholder:text-muted/20"
                 placeholder="0.00"
               />
             </div>
@@ -210,7 +210,7 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
               {gstRate}%
             </span>
           </div>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
             {standardRates.map((rate) => {
               const isSelected = values.customRate === '' && values.gstRate === rate;
               return (
@@ -236,7 +236,7 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
                 name="customRate"
                 value={values.customRate}
                 onChange={handleInputChange}
-                className="block w-full border-0 bg-transparent px-1 py-2 text-xs text-foreground focus:ring-0 outline-none text-center placeholder:text-muted/40 font-bold"
+                className="block w-full border-0 bg-transparent px-1 py-2 text-[10px] sm:text-xs text-foreground focus:ring-0 outline-none text-center placeholder:text-muted/40 font-bold"
                 placeholder="Custom"
               />
             </div>
@@ -252,19 +252,19 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
           <div className="flex bg-card border border-border p-1 rounded-2xl relative shadow-premium-sm">
             <button
               onClick={() => handleChange('isInterstate', false)}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 !values.isInterstate ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
-              Same State (Local Sale)
+              Same State (Local)
             </button>
             <button
               onClick={() => handleChange('isInterstate', true)}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 values.isInterstate ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
-              Different State (Out of State)
+              Out of State (IGST)
             </button>
           </div>
           <p className="text-[10px] text-muted/60 leading-normal">
@@ -300,7 +300,7 @@ Total Amount (Gross): ${formatCurrency(totalAmount)}`;
             <AnimatedIndianAmount
               value={totalAmount}
               label="Final Price (Total Amount)"
-              sizeClass="text-3xl sm:text-4xl md:text-5xl font-extrabold"
+              sizeClass="text-2xl sm:text-3xl md:text-4xl font-extrabold"
               exactSizeClass="text-xs"
             />
             <p className="text-[11px] text-muted/80 leading-normal pt-1">

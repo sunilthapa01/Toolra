@@ -9,6 +9,7 @@ interface LauncherSidebarProps {
   onSelectCategory: (category: string) => void;
   categoryCounts: Record<string, number>;
   isOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export default function LauncherSidebar({
@@ -16,6 +17,7 @@ export default function LauncherSidebar({
   onSelectCategory,
   categoryCounts,
   isOpen = true,
+  onCloseMobile,
 }: LauncherSidebarProps) {
   const workspaces = [
     { id: 'developer', label: 'Developer Workspace', icon: Icons.Code },
@@ -48,52 +50,78 @@ export default function LauncherSidebar({
   return (
     <AnimatePresence initial={false}>
       {isOpen && (
-        <motion.aside
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 270, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 32 }}
-          className="shrink-0 border-r border-border bg-[var(--sidebar-bg)] select-none font-inter overflow-hidden z-20 transition-colors duration-200"
-        >
-          <div className="w-[270px] p-4 sm:p-5 space-y-5 overflow-y-auto max-h-screen scrollbar-thin">
-            {/* WORKSPACES SECTION */}
-            <div className="space-y-1.5">
-              <div className="text-[10px] font-extrabold uppercase tracking-widest text-muted px-3 py-1">
-                <span>Workspaces</span>
-              </div>
+        <>
+          {/* Mobile Overlay Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onCloseMobile}
+            className="md:hidden fixed inset-0 z-40 bg-background/70 backdrop-blur-xs"
+          />
 
-              {workspaces.map((ws) => {
-                const Icon = ws.icon;
-                const selected = isWorkspaceSelected(ws.id);
-                const count = getWorkspaceCount(ws.id);
+          <motion.aside
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '-100%', opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+            className="fixed md:relative top-16 md:top-0 left-0 bottom-0 z-50 md:z-20 w-[270px] shrink-0 border-r border-border bg-[var(--sidebar-bg)] select-none font-inter overflow-hidden transition-colors duration-200 shadow-xl md:shadow-none"
+          >
+            <div className="w-[270px] p-4 sm:p-5 space-y-5 overflow-y-auto max-h-[calc(100vh-4rem)] scrollbar-thin">
+              {/* WORKSPACES SECTION */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-3 py-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted">
+                    Workspaces
+                  </span>
+                  {onCloseMobile && (
+                    <button
+                      onClick={onCloseMobile}
+                      className="md:hidden p-1.5 text-muted hover:text-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+                      aria-label="Close sidebar"
+                      title="Close sidebar"
+                    >
+                      <Icons.X className="h-4.5 w-4.5" />
+                    </button>
+                  )}
+                </div>
 
-                return (
-                  <button
-                    key={ws.id}
-                    onClick={() => onSelectCategory(ws.id)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold transition-all duration-150 text-sm cursor-pointer ${
-                      selected
-                        ? 'bg-primary text-primary-foreground shadow-xs font-bold'
-                        : 'text-foreground hover:bg-card hover:text-foreground'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon className={`h-4 w-4 shrink-0 ${selected ? 'text-primary-foreground' : 'text-muted'}`} />
-                      <span className="text-xs font-outfit tracking-wide">{ws.label}</span>
-                    </div>
-                    <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                        selected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-card text-muted'
+                {workspaces.map((ws) => {
+                  const Icon = ws.icon;
+                  const selected = isWorkspaceSelected(ws.id);
+                  const count = getWorkspaceCount(ws.id);
+
+                  return (
+                    <button
+                      key={ws.id}
+                      onClick={() => {
+                        onSelectCategory(ws.id);
+                        if (onCloseMobile) onCloseMobile();
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl font-semibold transition-all duration-150 text-sm cursor-pointer touch-target ${
+                        selected
+                          ? 'bg-primary text-primary-foreground shadow-xs font-bold'
+                          : 'text-foreground hover:bg-card hover:text-foreground'
                       }`}
                     >
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
+                      <div className="flex items-center gap-3">
+                        <Icon className={`h-4.5 w-4.5 shrink-0 ${selected ? 'text-primary-foreground' : 'text-muted'}`} />
+                        <span className="text-xs font-outfit tracking-wide">{ws.label}</span>
+                      </div>
+                      <span
+                        className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                          selected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-card text-muted'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </motion.aside>
+          </motion.aside>
+        </>
       )}
     </AnimatePresence>
   );

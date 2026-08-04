@@ -14,9 +14,10 @@ interface NavbarProps {
   onToggleSidebar?: () => void;
   searchQuery?: string;
   onSearchChange?: (q: string) => void;
+  onLogoClick?: () => void;
 }
 
-function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarProps) {
+function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange, onLogoClick }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const { openContactModal } = useContact();
   const { navigate } = usePageTransition();
@@ -105,26 +106,29 @@ function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarP
             href="/"
             onClick={(e) => {
               e.preventDefault();
+              if (onLogoClick) {
+                onLogoClick();
+              }
               navigate('/');
             }}
             className="flex items-center gap-2.5 group cursor-pointer select-none"
           >
-            <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase">
+            <span className="font-outfit text-lg font-black tracking-tight text-foreground uppercase hover:opacity-80 transition-opacity">
               Toolora
             </span>
           </a>
         </div>
 
         {/* Persistent Centralized Navbar Search Input */}
-        <div className="flex-1 max-w-xs sm:max-w-md mx-4 hidden md:block">
-          <div className="relative flex items-center bg-secondary border border-border rounded-xl px-3 py-1.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-            <Icons.Search className="h-4 w-4 text-muted shrink-0 mr-2" />
+        <div className="flex-1 max-w-[160px] xs:max-w-[200px] sm:max-w-xs md:max-w-md mx-2 sm:mx-4">
+          <div className="relative flex items-center bg-secondary border border-border rounded-xl px-2.5 sm:px-3 py-1 sm:py-1.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+            <Icons.Search className="h-4 w-4 text-muted shrink-0 mr-1.5 sm:mr-2" />
             <input
               ref={searchInputRef}
               type="text"
               value={localQuery}
               onChange={(e) => handleQueryChange(e.target.value)}
-              placeholder="Search tools, commands or keywords..."
+              placeholder="Search tools..."
               className="w-full border-0 bg-transparent py-1 text-xs sm:text-sm text-foreground placeholder:text-muted focus:ring-0 outline-none font-medium font-inter"
             />
             {localQuery ? (
@@ -136,7 +140,7 @@ function NavbarContent({ onToggleSidebar, searchQuery, onSearchChange }: NavbarP
                 <Icons.X className="h-3.5 w-3.5" />
               </button>
             ) : null}
-            <span className="inline-flex items-center gap-0.5 border border-border bg-card px-1.5 py-0.5 text-[9px] font-bold text-foreground rounded shrink-0 select-none">
+            <span className="hidden lg:inline-flex items-center gap-0.5 border border-border bg-card px-1.5 py-0.5 text-[9px] font-bold text-foreground rounded shrink-0 select-none">
               Ctrl K
             </span>
           </div>

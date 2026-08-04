@@ -536,65 +536,65 @@ Calculated locally on Toolora.com`;
       </div>
 
       {/* Segmented Dashboard Tabs */}
-      <div className="flex border-b border-border bg-secondary/15 p-1.5 rounded-2xl w-full overflow-x-auto scrollbar-none no-print">
-        <div className="flex gap-1.5 w-full min-w-[580px]">
+      <div className="flex border-b border-border bg-secondary/15 p-1 rounded-2xl w-full overflow-x-auto no-scrollbar no-print">
+        <div className="flex gap-1 min-w-full sm:min-w-[580px]">
           <button
             onClick={() => setActiveTab('calculator')}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 sm:py-2.5 px-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 shrink-0 ${
               activeTab === 'calculator' ? 'bg-card text-foreground border border-border shadow-premium-sm' : 'text-muted hover:text-foreground'
             }`}
           >
-            <Icons.Calculator className="h-4 w-4" />
+            <Icons.Calculator className="h-3.5 w-3.5" />
             <span>Calculator</span>
           </button>
           <button
             onClick={() => setActiveTab('simulator')}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 sm:py-2.5 px-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 shrink-0 ${
               activeTab === 'simulator' ? 'bg-card text-foreground border border-border shadow-premium-sm' : 'text-muted hover:text-foreground'
             }`}
           >
-            <Icons.Zap className="h-4 w-4" />
+            <Icons.Zap className="h-3.5 w-3.5" />
             <span>Extra Payments</span>
           </button>
           <button
             onClick={() => setActiveTab('compare')}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 sm:py-2.5 px-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 shrink-0 ${
               activeTab === 'compare' ? 'bg-card text-foreground border border-border shadow-premium-sm' : 'text-muted hover:text-foreground'
             }`}
           >
-            <Icons.Files className="h-4 w-4" />
-            <span>Compare Loans</span>
+            <Icons.Files className="h-3.5 w-3.5" />
+            <span>Compare</span>
           </button>
           <button
             onClick={() => setActiveTab('refinance')}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 sm:py-2.5 px-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 shrink-0 ${
               activeTab === 'refinance' ? 'bg-card text-foreground border border-border shadow-premium-sm' : 'text-muted hover:text-foreground'
             }`}
           >
-            <Icons.RefreshCw className="h-4 w-4" />
-            <span>Refinancing</span>
+            <Icons.RefreshCw className="h-3.5 w-3.5" />
+            <span>Refi</span>
           </button>
           <button
             onClick={() => setActiveTab('articles')}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 sm:py-2.5 px-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 shrink-0 ${
               activeTab === 'articles' ? 'bg-card text-foreground border border-border shadow-premium-sm' : 'text-muted hover:text-foreground'
             }`}
           >
-            <Icons.FileText className="h-4 w-4" />
-            <span>Loan Guide</span>
+            <Icons.FileText className="h-3.5 w-3.5" />
+            <span>Guide</span>
           </button>
         </div>
       </div>
 
       {/* --- TAB 1: CORE CALCULATOR --- */}
       {activeTab === 'calculator' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
           {/* Sliders and Input Controls */}
-          <div className="lg:col-span-5 space-y-6 no-print">
+          <div className="lg:col-span-5 space-y-5 no-print">
             {/* Quick Loan Type Badges */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <span className="text-[10px] font-black uppercase tracking-widest text-muted block">Select Loan Category</span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
                 {[
                   { id: 'home', label: 'Home Mortgage', icon: '🏠' },
                   { id: 'car', label: 'Auto Loan', icon: '🚗' },
@@ -605,13 +605,13 @@ Calculated locally on Toolora.com`;
                   <button
                     key={type.id}
                     onClick={() => handleLoanTypeChange(type.id as any)}
-                    className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all ${
+                    className={`px-2.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-xl border transition-all shrink-0 ${
                       loanType === type.id
                         ? 'bg-primary/5 text-primary border-primary/40 shadow-premium-sm font-black'
                         : 'border-border/80 hover:bg-secondary/40 text-muted'
                     }`}
                   >
-                    <span className="mr-1.5">{type.icon}</span>
+                    <span className="mr-1">{type.icon}</span>
                     {type.label}
                   </button>
                 ))}
@@ -841,7 +841,7 @@ Calculated locally on Toolora.com`;
 
               <div className="py-2 space-y-1">
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted block">Monthly Payment (EMI)</span>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground font-mono-calc">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground font-mono-calc">
                   {formatCurrency(calculations.emi, currency)}
                 </div>
                 {extraPayment > 0 && (

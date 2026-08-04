@@ -251,19 +251,19 @@ Calculated locally on Toolora.com`;
           <div className="flex bg-card border border-border p-1 rounded-2xl relative shadow-premium-sm">
             <button
               onClick={() => handleChange('mode', 'sip')}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 values.mode === 'sip' ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
-              Invest Monthly (Regular SIP)
+              Monthly (SIP)
             </button>
             <button
               onClick={() => handleChange('mode', 'lumpsum')}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 values.mode === 'lumpsum' ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
-              Invest Once (Lumpsum)
+              One-Time (Lumpsum)
             </button>
           </div>
         </div>
@@ -301,6 +301,20 @@ Calculated locally on Toolora.com`;
                 className="block w-full pl-8 pr-4 py-3 text-xs font-bold border border-border bg-card rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
+            <div className="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
+              {[2500, 5000, 10000, 25000, 50000].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => handleChange('investment', val)}
+                  className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all shrink-0 touch-target ${
+                    investment === val ? 'bg-primary text-primary-foreground border-primary' : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  ₹{(val / 1000).toFixed(val % 1000 === 0 ? 0 : 1)}k
+                </button>
+              ))}
+            </div>
             <p className="text-[10px] text-muted/60 mt-1">
               Enter the amount of cash you want to invest.
             </p>
@@ -315,7 +329,7 @@ Calculated locally on Toolora.com`;
               {annualRate}% P.A.
             </span>
           </div>
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-premium-sm">
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-3 shadow-premium-sm">
             <input
               type="range"
               min="1"
@@ -339,6 +353,20 @@ Calculated locally on Toolora.com`;
                 %
               </span>
             </div>
+            <div className="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
+              {[8, 10, 12, 15, 18].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => handleChange('rate', val)}
+                  className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all shrink-0 touch-target ${
+                    annualRate === val ? 'bg-primary text-primary-foreground border-primary' : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  {val}%
+                </button>
+              ))}
+            </div>
             <p className="text-[10px] text-muted/60 mt-1">
               The average growth rate you expect from your investment per year.
             </p>
@@ -353,7 +381,7 @@ Calculated locally on Toolora.com`;
               {tenureYears} Years
             </span>
           </div>
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-premium-sm">
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-3 shadow-premium-sm">
             <input
               type="range"
               min="1"
@@ -372,6 +400,20 @@ Calculated locally on Toolora.com`;
                 onChange={handleInputChange}
                 className="block w-full px-3.5 py-3 text-xs font-bold border border-border bg-card rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
+            </div>
+            <div className="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
+              {[5, 10, 15, 20, 25, 30].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => handleChange('tenure', val)}
+                  className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all shrink-0 touch-target ${
+                    tenureYears === val ? 'bg-primary text-primary-foreground border-primary' : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  {val} Yrs
+                </button>
+              ))}
             </div>
             <p className="text-[10px] text-muted/60 mt-1">
               How many years you want to keep your money invested.
@@ -463,7 +505,7 @@ Calculated locally on Toolora.com`;
             <AnimatedIndianAmount
               value={futureValue}
               label="Total Estimated Future Wealth"
-              sizeClass="text-3xl sm:text-4xl md:text-5xl font-extrabold"
+              sizeClass="text-2xl sm:text-3xl md:text-4xl font-extrabold"
               exactSizeClass="text-xs"
             />
             <p className="text-[11px] text-muted/80 leading-normal pt-1">

@@ -624,3 +624,36 @@ mark.search-highlight-active {
 
 .hljs-function, .hljs-variable { color: #6f42c1; }
 .dark .hljs-function, .dark .hljs-variable { color: #d2a8ff; }
+
+/* Mobile Touch & Ergonomics Utilities */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.safe-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.safe-mb {
+  margin-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.touch-scroller {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

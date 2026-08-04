@@ -1064,20 +1064,20 @@ export default function PDFMergeCombine() {
 
                         {/* Top Right action deck */}
                         <div className="flex items-center gap-1.5 self-center shrink-0">
-                          {/* Move up / down buttons */}
-                          <div className="flex flex-col gap-1">
+                          {/* Move up / down buttons (Touch Sized) */}
+                          <div className="flex sm:flex-col gap-1">
                             <button
                               disabled={index === 0}
                               onClick={() => moveItem(index, 'up')}
-                              className="p-1 text-muted hover:text-foreground disabled:opacity-20 transition-all rounded-md hover:bg-secondary"
+                              className="p-2 sm:p-1.5 text-muted hover:text-foreground disabled:opacity-20 transition-all rounded-xl hover:bg-secondary border border-border/50 sm:border-transparent active:scale-95 touch-target"
                               title="Move Document Up"
                             >
-                              <Icons.ChevronDown className="h-4.5 w-4.5 rotate-180" />
+                              <Icons.ChevronUp className="h-4.5 w-4.5" />
                             </button>
                             <button
                               disabled={index === files.length - 1}
                               onClick={() => moveItem(index, 'down')}
-                              className="p-1 text-muted hover:text-foreground disabled:opacity-20 transition-all rounded-md hover:bg-secondary"
+                              className="p-2 sm:p-1.5 text-muted hover:text-foreground disabled:opacity-20 transition-all rounded-xl hover:bg-secondary border border-border/50 sm:border-transparent active:scale-95 touch-target"
                               title="Move Document Down"
                             >
                               <Icons.ChevronDown className="h-4.5 w-4.5" />
@@ -1090,7 +1090,7 @@ export default function PDFMergeCombine() {
                               onClick={() => {
                                 setFiles(prev => prev.map(f => f.id === fileObj.id ? { ...f, showPagePreviews: !f.showPagePreviews } : f));
                               }}
-                              className={`p-2 rounded-xl transition-all border ${
+                              className={`p-2.5 sm:p-2 rounded-xl transition-all border touch-target active:scale-95 ${
                                 fileObj.showPagePreviews 
                                   ? 'border-primary/20 bg-primary/5 text-primary' 
                                   : 'border-border/60 bg-card text-muted hover:text-foreground hover:bg-secondary'
@@ -1104,7 +1104,7 @@ export default function PDFMergeCombine() {
                           {/* Delete Document */}
                           <button
                             onClick={() => deleteFile(fileObj.id)}
-                            className="p-2 text-muted hover:text-red-500 rounded-xl hover:bg-red-500/5 border border-transparent hover:border-red-500/10 transition-colors"
+                            className="p-2.5 sm:p-2 text-muted hover:text-red-500 rounded-xl hover:bg-red-500/5 border border-transparent hover:border-red-500/10 transition-colors touch-target active:scale-95"
                             title="Delete File"
                           >
                             <Icons.X className="h-4 w-4" />

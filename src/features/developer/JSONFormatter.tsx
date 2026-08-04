@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ToastProvider';
 import { useTheme } from '@/components/ThemeProvider';
 import * as Icons from '@/components/Icons';
@@ -56,12 +57,14 @@ export default function JSONFormatter() {
 
   // UI View States
   const [activeRightTab, setActiveRightTab] = useState<'output' | 'tree'>('output');
+  const [mobileTab, setMobileTab] = useState<'input' | 'output' | 'tree'>('input');
   const [isProblemsExpanded, setIsProblemsExpanded] = useState(false);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   // Clipboard Detection & Auto-Paste Suggestion States
   const [suggestedClipboardJSON, setSuggestedClipboardJSON] = useState<string | null>(null);
@@ -303,6 +306,7 @@ export default function JSONFormatter() {
       const spacer = indentSize === 'tab' ? '\t' : indentSize;
       const formatted = JSON.stringify(parsed, null, spacer);
       setOutputJSON(formatted);
+      setMobileTab('output');
 
       setIsSuccessAnimated(true);
       setTimeout(() => setIsSuccessAnimated(false), 1500);
@@ -734,18 +738,44 @@ export default function JSONFormatter() {
         </div>
       )}
 
-      {/* 1. Main Action Toolbar (All Action Options Explicitly Visible) */}
-      <div className="p-3.5 rounded-2xl bg-secondary/20 border-2 border-border shadow-premium-sm space-y-2.5 font-outfit">
-        {/* Row 1: Primary Input Workflow Actions */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mr-1 hidden sm:inline">
-            Input:
-          </span>
+      {/* 1. Main Action Toolbar */}
+      {/* Mobile Primary Action Bar (< sm) */}
+      <div className="sm:hidden p-1.5 rounded-2xl bg-secondary/30 border border-border shadow-xs flex items-center justify-between gap-1.5 font-outfit">
+        <button
+          onClick={() => handlePasteAndFormat()}
+          title="Paste & Format from Clipboard"
+          className="flex-1 py-2 px-3 bg-primary text-primary-foreground rounded-xl text-xs font-black hover:bg-primary/95 transition-all flex items-center justify-center gap-1.5 shadow-premium-sm active:scale-95 shrink-0"
+        >
+          <Icons.Clipboard className="h-4 w-4" />
+          <span>Paste & Format</span>
+        </button>
 
+        <button
+          onClick={() => handleFormat()}
+          title="Format editor content"
+          className="py-2 px-3 bg-card border border-border rounded-xl text-xs font-bold hover:bg-secondary/60 transition-all text-foreground flex items-center justify-center gap-1 shrink-0"
+        >
+          <Icons.Zap className="h-3.5 w-3.5 text-primary" />
+          <span>Format</span>
+        </button>
+
+        <button
+          onClick={() => setIsMobileDrawerOpen(true)}
+          title="More Actions & Tools"
+          className="p-2 bg-card border border-border rounded-xl text-foreground hover:bg-secondary/60 transition-all shrink-0 active:scale-95"
+        >
+          <Icons.MoreHorizontal className="h-4 w-4 text-primary" />
+        </button>
+      </div>
+
+      {/* Desktop Main Action Toolbar (>= sm) */}
+      <div className="hidden sm:block p-3.5 rounded-2xl bg-secondary/20 border-2 border-border shadow-premium-sm space-y-2 font-outfit">
+        {/* Row 1: Primary Actions (Always accessible) */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
           <button
             onClick={() => handlePasteAndFormat()}
             title="Paste JSON from Clipboard & Format Instantly (Ctrl+Shift+V)"
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs sm:text-sm font-extrabold hover:bg-primary/90 transition-all flex items-center gap-2 shadow-premium-sm active:scale-95"
+            className="px-3.5 py-2 bg-primary text-primary-foreground rounded-xl text-xs sm:text-sm font-extrabold hover:bg-primary/90 transition-all flex items-center gap-1.5 shadow-premium-sm active:scale-95 shrink-0"
           >
             <Icons.Clipboard className="h-4 w-4" />
             <span>Paste & Format</span>
@@ -753,20 +783,49 @@ export default function JSONFormatter() {
           </button>
 
           <button
+            onClick={() => handleFormat()}
+            title="Format current editor content (Ctrl+Enter)"
+            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs shrink-0"
+          >
+            <Icons.Zap className="h-4 w-4 text-primary" />
+            <span>Format</span>
+          </button>
+
+          <button
+            onClick={handleMinify}
+            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs shrink-0"
+            title="Minify JSON (Ctrl+Shift+M)"
+          >
+            <Icons.Terminal className="h-4 w-4 text-primary" />
+            <span>Minify</span>
+          </button>
+
+          <button
+            onClick={handleClear}
+            className="p-2 border-2 border-destructive/30 text-destructive hover:bg-destructive/15 rounded-xl transition-all font-bold shrink-0"
+            title="Clear Workspace (Alt+C)"
+          >
+            <Icons.X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Row 2: Secondary Tools & Utilities (Horizontally Scrollable on Mobile) */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 border-t border-border/40 py-0.5">
+          <button
             onClick={handleLoadSample}
-            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs"
+            className="px-2.5 py-1.5 bg-card border border-border rounded-xl text-xs font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs shrink-0"
             title="Load sample JSON payload"
           >
-            <Icons.Files className="h-4 w-4 text-primary" />
+            <Icons.Files className="h-3.5 w-3.5 text-primary" />
             <span>Sample JSON</span>
           </button>
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs"
+            className="px-2.5 py-1.5 bg-card border border-border rounded-xl text-xs font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs shrink-0"
             title="Upload file (.json, .txt)"
           >
-            <Icons.Download className="h-4 w-4 rotate-180 text-primary" />
+            <Icons.Download className="h-3.5 w-3.5 rotate-180 text-primary" />
             <span>Upload File</span>
           </button>
           <input
@@ -778,120 +837,85 @@ export default function JSONFormatter() {
           />
 
           <button
-            onClick={() => handleFormat()}
-            title="Format current editor content (Ctrl+Enter)"
-            className="px-3.5 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs"
-          >
-            <Icons.Zap className="h-4 w-4 text-primary" />
-            <span>Format</span>
-          </button>
-
-          <button
             onClick={handleValidate}
-            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs"
+            className="px-2.5 py-1.5 bg-card border border-border rounded-xl text-xs font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs shrink-0"
             title="Run syntax diagnostics validation"
           >
-            <Icons.Shield className="h-4 w-4 text-primary" />
+            <Icons.Shield className="h-3.5 w-3.5 text-primary" />
             <span>Validate</span>
           </button>
 
           <button
-            onClick={handleMinify}
-            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs"
-            title="Minify JSON (Ctrl+Shift+M)"
+            onClick={handleAutoFix}
+            className="px-2.5 py-1.5 bg-card border border-border rounded-xl text-xs font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs shrink-0"
+            title="Auto-Fix common syntax errors (Ctrl+Shift+F)"
           >
-            <Icons.Terminal className="h-4 w-4 text-primary" />
-            <span>Minify</span>
+            <Icons.Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span>Auto Fix</span>
           </button>
 
           <button
-            onClick={handleAutoFix}
-            className="px-3 py-2 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shadow-xs"
-            title="Auto-Fix common syntax errors (Ctrl+Shift+F)"
+            onClick={() => setIsCommandPaletteOpen(true)}
+            title="Open Command Palette (Ctrl+Shift+P)"
+            className="px-2.5 py-1.5 bg-primary/10 border border-primary/30 rounded-xl text-xs font-bold hover:bg-primary/20 transition-all text-primary flex items-center gap-1.5 shadow-xs shrink-0"
           >
-            <Icons.Sparkles className="h-4 w-4 text-primary" />
-            <span>Auto Fix</span>
+            <Icons.Search className="h-3.5 w-3.5" />
+            <span>Commands</span>
           </button>
-        </div>
 
-        {/* Row 2: Utilities, Copy, Download, Fullscreen & Clear */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/40">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setIsCommandPaletteOpen(true)}
-              title="Open Command Palette (Ctrl+Shift+P)"
-              className="px-3 py-1.5 bg-primary/10 border border-primary/30 rounded-xl text-xs sm:text-sm font-bold hover:bg-primary/20 transition-all text-primary flex items-center gap-1.5 shadow-xs"
-            >
-              <Icons.Search className="h-4 w-4" />
-              <span>Commands</span>
-              <kbd className="px-1 py-0.5 text-[10px] bg-primary/20 rounded font-mono-calc font-extrabold text-primary hidden md:inline">Ctrl+Shift+P</kbd>
-            </button>
+          <button
+            onClick={() => setIsShortcutsOpen(true)}
+            title="Keyboard Shortcuts Cheatsheet (?)"
+            className="px-2.5 py-1.5 bg-card border border-border rounded-xl text-xs font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5 shrink-0"
+          >
+            <Icons.Code className="h-3.5 w-3.5 text-primary" />
+            <span>Shortcuts</span>
+          </button>
 
-            <button
-              onClick={() => setIsShortcutsOpen(true)}
-              title="Keyboard Shortcuts Cheatsheet (?)"
-              className="px-3 py-1.5 bg-card border-2 border-border rounded-xl text-xs sm:text-sm font-bold hover:bg-secondary/50 transition-all text-foreground flex items-center gap-1.5"
-            >
-              <Icons.Code className="h-4 w-4 text-primary" />
-              <span>Shortcuts (?)</span>
-            </button>
-          </div>
+          <button
+            onClick={() => handleCopy(outputJSON || inputJSON, 'Output')}
+            disabled={!outputJSON && !inputJSON}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 shrink-0 ${
+              outputJSON || inputJSON
+                ? 'bg-card border-border hover:bg-secondary/50 text-foreground shadow-xs'
+                : 'bg-secondary/20 border-border/40 text-muted-foreground opacity-50 cursor-not-allowed'
+            }`}
+            title="Copy Output (Ctrl+Shift+C)"
+          >
+            <Icons.Copy className="h-3.5 w-3.5 text-primary" />
+            <span>Copy</span>
+          </button>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => handleCopy(outputJSON || inputJSON, 'Output')}
-              disabled={!outputJSON && !inputJSON}
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center gap-1.5 ${
-                outputJSON || inputJSON
-                  ? 'bg-card border-border hover:bg-secondary/50 text-foreground shadow-xs'
-                  : 'bg-secondary/20 border-border/40 text-muted-foreground opacity-50 cursor-not-allowed'
-              }`}
-              title="Copy Output (Ctrl+Shift+C)"
-            >
-              <Icons.Copy className="h-4 w-4 text-primary" />
-              <span>Copy</span>
-            </button>
+          <button
+            onClick={handleDownload}
+            disabled={!outputJSON && !inputJSON}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 shrink-0 ${
+              outputJSON || inputJSON
+                ? 'bg-card border-border hover:bg-secondary/50 text-foreground shadow-xs'
+                : 'bg-secondary/20 border-border/40 text-muted-foreground opacity-50 cursor-not-allowed'
+            }`}
+            title="Download JSON file"
+          >
+            <Icons.Download className="h-3.5 w-3.5 text-primary" />
+            <span>Download</span>
+          </button>
 
-            <button
-              onClick={handleDownload}
-              disabled={!outputJSON && !inputJSON}
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center gap-1.5 ${
-                outputJSON || inputJSON
-                  ? 'bg-card border-border hover:bg-secondary/50 text-foreground shadow-xs'
-                  : 'bg-secondary/20 border-border/40 text-muted-foreground opacity-50 cursor-not-allowed'
-              }`}
-              title="Download JSON file"
-            >
-              <Icons.Download className="h-4 w-4 text-primary" />
-              <span>Download</span>
-            </button>
-
-            {/* Fullscreen Expand Toggle Button */}
-            <button
-              onClick={() => setIsFullscreen(prev => !prev)}
-              title={isFullscreen ? 'Exit Fullscreen Mode (Esc)' : 'Expand JSON Formatter to Full Screen (Ctrl+Shift+Z)'}
-              className={`px-3 py-1.5 border-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-1.5 shadow-xs ${
-                isFullscreen
-                  ? 'bg-primary text-primary-foreground border-primary shadow-premium-sm'
-                  : 'bg-card border-border hover:bg-secondary/50 text-foreground'
-              }`}
-            >
-              {isFullscreen ? (
-                <Icons.Minimize2 className="h-4 w-4" />
-              ) : (
-                <Icons.Maximize2 className="h-4 w-4 text-primary" />
-              )}
-              <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
-            </button>
-
-            <button
-              onClick={handleClear}
-              className="p-1.5 border-2 border-destructive/30 text-destructive hover:bg-destructive/15 rounded-xl transition-all font-bold"
-              title="Clear Workspace (Alt+C)"
-            >
-              <Icons.X className="h-4 w-4" />
-            </button>
-          </div>
+          <button
+            onClick={() => setIsFullscreen(prev => !prev)}
+            title={isFullscreen ? 'Exit Fullscreen Mode (Esc)' : 'Expand JSON Formatter to Full Screen (Ctrl+Shift+Z)'}
+            className={`px-2.5 py-1.5 border rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 shadow-xs shrink-0 ${
+              isFullscreen
+                ? 'bg-primary text-primary-foreground border-primary shadow-premium-sm'
+                : 'bg-card border-border hover:bg-secondary/50 text-foreground'
+            }`}
+          >
+            {isFullscreen ? (
+              <Icons.Minimize2 className="h-3.5 w-3.5" />
+            ) : (
+              <Icons.Maximize2 className="h-3.5 w-3.5 text-primary" />
+            )}
+            <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
+          </button>
         </div>
       </div>
 
@@ -950,17 +974,54 @@ export default function JSONFormatter() {
         currentIndex={currentProblemIndex}
       />
 
-      {/* 4. Main Split Workspace Editors */}
+      {/* 4. Mobile Segmented Tab Switcher (< lg) */}
+      <div className="lg:hidden flex items-center justify-between p-1 bg-secondary/30 rounded-xl border border-border/80 my-2">
+        <button
+          onClick={() => setMobileTab('input')}
+          className={`flex-1 py-2.5 rounded-lg text-xs font-black uppercase transition-all flex items-center justify-center gap-1.5 touch-target ${
+            mobileTab === 'input'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-foreground/80 hover:text-foreground'
+          }`}
+        >
+          <Icons.Code className="h-3.5 w-3.5" />
+          <span>Input</span>
+        </button>
+        <button
+          onClick={() => setMobileTab('output')}
+          className={`flex-1 py-2.5 rounded-lg text-xs font-black uppercase transition-all flex items-center justify-center gap-1.5 touch-target ${
+            mobileTab === 'output'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-foreground/80 hover:text-foreground'
+          }`}
+        >
+          <Icons.Zap className="h-3.5 w-3.5" />
+          <span>Formatted</span>
+        </button>
+        <button
+          onClick={() => setMobileTab('tree')}
+          className={`flex-1 py-2.5 rounded-lg text-xs font-black uppercase transition-all flex items-center justify-center gap-1.5 touch-target ${
+            mobileTab === 'tree'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-foreground/80 hover:text-foreground'
+          }`}
+        >
+          <Icons.Layers className="h-3.5 w-3.5" />
+          <span>Tree</span>
+        </button>
+      </div>
+
+      {/* 5. Main Split Workspace Editors */}
       <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 ${isFullscreen ? 'flex-1 my-1' : ''}`}>
         {/* Left Side: Input Monaco Editor */}
-        <div className="flex flex-col space-y-2 relative">
+        <div className={`flex flex-col space-y-2 relative ${mobileTab === 'input' ? 'block' : 'hidden lg:flex'}`}>
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black uppercase text-foreground tracking-widest">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-[10px] sm:text-xs font-black uppercase text-foreground tracking-wider sm:tracking-widest">
                 JSON Input Editor
               </span>
               {errors.length > 0 && (
-                <span className="text-destructive font-black bg-destructive/10 px-2 py-0.5 rounded-lg border border-destructive/20 text-[11px]">
+                <span className="text-destructive font-black bg-destructive/10 px-1.5 py-0.5 rounded-lg border border-destructive/20 text-[10px] sm:text-[11px]">
                   {errors.length} {errors.length === 1 ? 'Issue' : 'Issues'}
                 </span>
               )}
@@ -968,17 +1029,17 @@ export default function JSONFormatter() {
 
             <button
               onClick={() => setIsSearchBarOpen(!isSearchBarOpen)}
-              className="text-xs font-bold text-foreground/80 hover:text-primary transition-all flex items-center gap-1 bg-secondary/30 hover:bg-secondary/60 px-2.5 py-1 rounded-lg border border-border/60"
+              className="text-[10px] sm:text-xs font-bold text-foreground/80 hover:text-primary transition-all flex items-center gap-1 bg-secondary/30 hover:bg-secondary/60 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-border/60"
               title="Find in editor (Ctrl+F)"
             >
-              <Icons.Search className="h-3.5 w-3.5" />
-              <span>Find (Ctrl+F)</span>
+              <Icons.Search className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              <span>Find <span className="hidden sm:inline">(Ctrl+F)</span></span>
             </button>
           </div>
 
           <div
             className={`relative border-2 border-border rounded-2xl overflow-hidden shadow-premium-sm bg-card transition-all ${
-              isFullscreen ? 'h-[calc(100vh-280px)] min-h-[450px]' : 'h-[580px]'
+              isFullscreen ? 'h-[calc(100vh-280px)] min-h-[350px]' : 'h-[calc(100vh-190px)] sm:h-[480px] lg:h-[580px]'
             }`}
           >
             <JSONSearchBar
@@ -1011,57 +1072,66 @@ export default function JSONFormatter() {
         </div>
 
         {/* Right Side: Formatted Output / JSON Tree Explorer */}
-        <div className="flex flex-col space-y-2 relative">
-          <div className="flex items-center justify-between px-1">
+        <div className={`flex flex-col space-y-2 relative ${mobileTab === 'output' || mobileTab === 'tree' ? 'block' : 'hidden lg:flex'}`}>
+          <div className="flex items-center justify-between px-1 gap-1">
             {/* View Mode Switcher Tabs */}
-            <div className="flex items-center gap-1 bg-secondary/30 p-1 rounded-xl border border-border/70">
+            <div className="flex items-center gap-1 bg-secondary/30 p-0.5 sm:p-1 rounded-xl border border-border/70">
               <button
-                onClick={() => setActiveRightTab('output')}
-                className={`px-3 py-1 rounded-lg text-xs font-extrabold uppercase transition-all flex items-center gap-1.5 ${
-                  activeRightTab === 'output'
+                onClick={() => {
+                  setActiveRightTab('output');
+                  setMobileTab('output');
+                }}
+                className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-extrabold uppercase transition-all flex items-center gap-1 sm:gap-1.5 ${
+                  (activeRightTab === 'output' && mobileTab !== 'tree')
                     ? 'bg-primary text-primary-foreground shadow-xs'
                     : 'text-foreground/80 hover:text-foreground'
                 }`}
               >
-                <Icons.Code className="h-3.5 w-3.5" />
-                <span>Formatted Code</span>
+                <Icons.Code className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">Formatted Code</span>
+                <span className="sm:hidden">Formatted</span>
               </button>
               <button
-                onClick={() => setActiveRightTab('tree')}
-                className={`px-3 py-1 rounded-lg text-xs font-extrabold uppercase transition-all flex items-center gap-1.5 ${
-                  activeRightTab === 'tree'
+                onClick={() => {
+                  setActiveRightTab('tree');
+                  setMobileTab('tree');
+                }}
+                className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg text-[10px] sm:text-xs font-extrabold uppercase transition-all flex items-center gap-1 sm:gap-1.5 ${
+                  (activeRightTab === 'tree' || mobileTab === 'tree')
                     ? 'bg-primary text-primary-foreground shadow-xs'
                     : 'text-foreground/80 hover:text-foreground'
                 }`}
               >
-                <Icons.Layers className="h-3.5 w-3.5" />
-                <span>Tree Explorer</span>
+                <Icons.Layers className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">Tree Explorer</span>
+                <span className="sm:hidden">Tree</span>
               </button>
             </div>
 
-            {activeRightTab === 'output' && (
+            {(activeRightTab === 'output' && mobileTab !== 'tree') && (
               <button
                 onClick={() => handleCopy(outputJSON, 'Output')}
                 disabled={!outputJSON}
-                className={`text-xs font-bold transition-all flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
+                className={`text-[10px] sm:text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border ${
                   outputJSON
                     ? 'bg-secondary/30 hover:bg-secondary/60 text-foreground border-border/60'
                     : 'bg-secondary/20 text-muted-foreground border-border/40 opacity-50 cursor-not-allowed'
                 }`}
                 title="Copy formatted JSON output (Ctrl+Shift+C)"
               >
-                <Icons.Copy className="h-3.5 w-3.5" />
-                <span>Copy Output</span>
+                <Icons.Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">Copy Output</span>
+                <span className="sm:hidden">Copy</span>
               </button>
             )}
           </div>
 
           <div
             className={`relative border-2 border-border rounded-2xl overflow-hidden shadow-premium-sm bg-card transition-all ${
-              isFullscreen ? 'h-[calc(100vh-280px)] min-h-[450px]' : 'h-[580px]'
+              isFullscreen ? 'h-[calc(100vh-280px)] min-h-[350px]' : 'h-[calc(100vh-190px)] sm:h-[480px] lg:h-[580px]'
             }`}
           >
-            {activeRightTab === 'output' ? (
+            {(activeRightTab === 'output' && mobileTab !== 'tree') ? (
               outputJSON ? (
                 <MonacoEditor
                   value={outputJSON}
@@ -1094,6 +1164,7 @@ export default function JSONFormatter() {
                     inputEditor.setPosition({ lineNumber: line, column: 1 });
                     inputEditor.focus();
                   }
+                  setMobileTab('input');
                 }}
               />
             )}
@@ -1102,34 +1173,34 @@ export default function JSONFormatter() {
       </div>
 
       {/* 5. IDE Status Bar */}
-      <div className="flex flex-wrap items-center justify-between bg-card border-2 border-border/80 rounded-2xl px-4 py-2 text-xs font-mono-calc font-bold text-foreground shadow-premium-sm">
+      <div className="flex flex-wrap items-center justify-between gap-1.5 bg-card border-2 border-border/80 rounded-2xl px-2.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-mono-calc font-bold text-foreground shadow-premium-sm">
         {/* Left Side: Status & Diagnostics Toggle */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => setIsProblemsExpanded(!isProblemsExpanded)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-xs"
+            className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition-opacity cursor-pointer text-[10px] sm:text-xs"
             title="Toggle Diagnostics Panel (F8)"
           >
             {!inputJSON.trim() ? (
-              <span className="flex items-center gap-2 text-muted-foreground font-semibold">
-                <span className="h-2 w-2 rounded-full bg-muted-foreground/40" />
+              <span className="flex items-center gap-1.5 text-muted-foreground font-semibold">
+                <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-muted-foreground/40" />
                 <span>Empty Workspace</span>
               </span>
             ) : errors.length === 0 ? (
-              <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-extrabold">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-extrabold">
+                <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>✓ Valid JSON</span>
               </span>
             ) : (
-              <span className="flex items-center gap-2 text-destructive font-black bg-destructive/10 px-2 py-0.5 rounded-lg border border-destructive/20">
-                <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+              <span className="flex items-center gap-1.5 text-destructive font-black bg-destructive/10 px-1.5 py-0.5 rounded-lg border border-destructive/20">
+                <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-destructive animate-pulse" />
                 <span>❌ {errors.filter(e => e.severity === 'error').length} Errors</span>
               </span>
             )}
           </button>
 
           {isLargeFile && (
-            <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-md font-black text-[11px] flex items-center gap-1">
+            <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-md font-black text-[10px] flex items-center gap-1">
               <Icons.AlertCircle className="h-3 w-3" />
               <span>&gt;2MB</span>
             </span>
@@ -1137,26 +1208,25 @@ export default function JSONFormatter() {
         </div>
 
         {/* Right Side: Cursor, Stats, Indent & Wrap Interactive Controls */}
-        <div className="flex items-center gap-3 text-xs font-bold text-foreground">
+        <div className="flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs font-bold text-foreground">
           <span>Ln {cursorPos.line}, Col {cursorPos.column}</span>
-          <span className="h-3.5 w-px bg-border/80" />
-          <span>{inputJSON.split('\n').length} lines</span>
-          <span className="h-3.5 w-px bg-border/80" />
+          <span className="h-3 w-px bg-border/80 hidden sm:inline" />
+          <span className="hidden sm:inline">{inputJSON.split('\n').length} lines</span>
+          <span className="h-3 w-px bg-border/80" />
 
           {/* Indent Selector Button */}
           <button
             onClick={() => setIndentSize(prev => (prev === 2 ? 4 : prev === 4 ? 'tab' : 2))}
-            className="hover:text-primary transition-colors flex items-center gap-1 bg-secondary/30 hover:bg-secondary/60 px-2 py-0.5 rounded border border-border/60"
+            className="hover:text-primary transition-colors flex items-center gap-1 bg-secondary/30 hover:bg-secondary/60 px-1.5 py-0.5 rounded border border-border/60 text-[10px] sm:text-xs"
             title="Click to cycle Indentation (2 spaces / 4 spaces / Tab)"
           >
             <span>Spaces: {indentSize === 'tab' ? 'Tab' : indentSize}</span>
           </button>
-          <span className="h-3.5 w-px bg-border/80" />
 
           {/* Line Wrap Toggle */}
           <button
             onClick={() => setWrapLines(!wrapLines)}
-            className={`transition-colors flex items-center gap-1 px-2 py-0.5 rounded border ${
+            className={`hidden sm:flex transition-colors items-center gap-1 px-2 py-0.5 rounded border text-[10px] sm:text-xs ${
               wrapLines
                 ? 'bg-primary/15 text-primary border-primary/40 font-extrabold'
                 : 'bg-secondary/30 text-foreground/70 hover:text-foreground border-border/60'
@@ -1165,12 +1235,11 @@ export default function JSONFormatter() {
           >
             <span>Wrap: {wrapLines ? 'On' : 'Off'}</span>
           </button>
-          <span className="h-3.5 w-px bg-border/80" />
 
           {/* Analytics Toggle */}
           <button
             onClick={() => setIsStatsOpen(!isStatsOpen)}
-            className={`transition-colors flex items-center gap-1 px-2 py-0.5 rounded border ${
+            className={`hidden sm:flex transition-colors items-center gap-1 px-2 py-0.5 rounded border text-[10px] sm:text-xs ${
               isStatsOpen
                 ? 'bg-primary/15 text-primary border-primary/40 font-extrabold'
                 : 'bg-secondary/30 text-foreground/70 hover:text-foreground border-border/60'
@@ -1178,7 +1247,7 @@ export default function JSONFormatter() {
             title="Toggle Structural Analytics"
           >
             <Icons.BarChart2 className="h-3 w-3" />
-            <span className="hidden sm:inline">Analytics</span>
+            <span>Analytics</span>
           </button>
         </div>
       </div>
@@ -1194,6 +1263,180 @@ export default function JSONFormatter() {
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
       />
+
+      {/* Mobile Floating Bottom Bar for 1-Tap Copy & Quick View Switching (< sm) */}
+      <div className="sm:hidden fixed bottom-3 left-3 right-3 z-40 bg-card/90 backdrop-blur-md border-2 border-border/80 shadow-2xl rounded-2xl p-2 flex items-center justify-between gap-2 font-outfit">
+        <button
+          onClick={() => handleCopy(outputJSON || inputJSON, 'Output')}
+          disabled={!outputJSON && !inputJSON}
+          className="flex-1 py-2 px-3 bg-primary text-primary-foreground font-extrabold text-xs rounded-xl shadow-premium-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+        >
+          <Icons.Copy className="h-4 w-4" />
+          <span>Copy</span>
+        </button>
+
+        <div className="flex items-center gap-1 bg-secondary/40 p-1 rounded-xl border border-border/60">
+          <button
+            onClick={() => setMobileTab('input')}
+            className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
+              mobileTab === 'input' ? 'bg-primary text-primary-foreground' : 'text-foreground/80'
+            }`}
+          >
+            Input
+          </button>
+          <button
+            onClick={() => setMobileTab('output')}
+            className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
+              mobileTab === 'output' ? 'bg-primary text-primary-foreground' : 'text-foreground/80'
+            }`}
+          >
+            Code
+          </button>
+          <button
+            onClick={() => setMobileTab('tree')}
+            className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
+              mobileTab === 'tree' ? 'bg-primary text-primary-foreground' : 'text-foreground/80'
+            }`}
+          >
+            Tree
+          </button>
+        </div>
+
+        <button
+          onClick={() => setIsMobileDrawerOpen(true)}
+          className="p-2 bg-secondary/60 border border-border rounded-xl text-foreground font-bold active:scale-95 transition-all shrink-0"
+          title="More Tools & Actions"
+        >
+          <Icons.MoreHorizontal className="h-4 w-4 text-primary" />
+        </button>
+      </div>
+
+      {/* Mobile Actions Drawer (Bottom Sheet) */}
+      <AnimatePresence>
+        {isMobileDrawerOpen && (
+          <div className="fixed inset-0 z-50 flex flex-col justify-end sm:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileDrawerOpen(false)}
+              className="fixed inset-0 bg-background/80 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+              className="relative z-50 bg-card border-t-2 border-border rounded-t-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto font-outfit"
+            >
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <Icons.Zap className="h-5 w-5 text-primary" />
+                  <h3 className="font-extrabold text-base text-foreground">Developer Actions & Tools</h3>
+                </div>
+                <button
+                  onClick={() => setIsMobileDrawerOpen(false)}
+                  className="p-1 text-muted-foreground hover:text-foreground rounded-lg"
+                >
+                  <Icons.X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 pt-1">
+                <button
+                  onClick={() => { handleLoadSample(); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Files className="h-4 w-4 text-primary shrink-0" />
+                  <span>Sample JSON</span>
+                </button>
+
+                <button
+                  onClick={() => { fileInputRef.current?.click(); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Download className="h-4 w-4 rotate-180 text-primary shrink-0" />
+                  <span>Upload File</span>
+                </button>
+
+                <button
+                  onClick={() => { handleMinify(); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Terminal className="h-4 w-4 text-primary shrink-0" />
+                  <span>Minify JSON</span>
+                </button>
+
+                <button
+                  onClick={() => { handleValidate(); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Shield className="h-4 w-4 text-primary shrink-0" />
+                  <span>Validate Syntax</span>
+                </button>
+
+                <button
+                  onClick={() => { handleAutoFix(); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Sparkles className="h-4 w-4 text-primary shrink-0" />
+                  <span>Auto-Fix Syntax</span>
+                </button>
+
+                <button
+                  onClick={() => { setIsStatsOpen(prev => !prev); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.BarChart2 className="h-4 w-4 text-primary shrink-0" />
+                  <span>JSON Statistics</span>
+                </button>
+
+                <button
+                  onClick={() => { setIsCommandPaletteOpen(true); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Search className="h-4 w-4 text-primary shrink-0" />
+                  <span>Command Palette</span>
+                </button>
+
+                <button
+                  onClick={() => { setIsShortcutsOpen(true); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Code className="h-4 w-4 text-primary shrink-0" />
+                  <span>Shortcuts</span>
+                </button>
+
+                <button
+                  onClick={() => { handleDownload(); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Download className="h-4 w-4 text-primary shrink-0" />
+                  <span>Download .json</span>
+                </button>
+
+                <button
+                  onClick={() => { setIsFullscreen(prev => !prev); setIsMobileDrawerOpen(false); }}
+                  className="p-3 bg-secondary/30 hover:bg-secondary border border-border rounded-xl flex items-center gap-2.5 text-xs font-bold text-foreground text-left"
+                >
+                  <Icons.Maximize2 className="h-4 w-4 text-primary shrink-0" />
+                  <span>Fullscreen</span>
+                </button>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => { handleClear(); setIsMobileDrawerOpen(false); }}
+                  className="w-full p-3 border border-destructive/30 text-destructive bg-destructive/10 hover:bg-destructive/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2"
+                >
+                  <Icons.X className="h-4 w-4" />
+                  <span>Clear Workspace</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 

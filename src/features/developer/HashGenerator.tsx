@@ -48,6 +48,7 @@ export default function HashGenerator() {
   const [liveUpdate, setLiveUpdate] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   // Sync scroll references
   const leftTextAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -380,8 +381,43 @@ export default function HashGenerator() {
           : 'relative min-h-screen pb-12'
       }`}
     >
-      {/* 1. Header Area with toggles */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-border/50">
+      {/* Mobile 1-Row Action Bar (< 640px) */}
+      <div className="flex sm:hidden items-center justify-between gap-2 p-2 bg-card border-2 border-border/80 rounded-2xl shadow-premium-sm">
+        <button
+          onClick={handleGenerateClick}
+          className="flex-1 py-2 bg-primary text-primary-foreground text-[10px] font-extrabold uppercase rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5"
+        >
+          <Icons.Zap className="h-3.5 w-3.5" />
+          Generate Hash
+        </button>
+
+        <div className="flex items-center gap-1 rounded-xl bg-secondary/30 p-0.5 border border-border/70 overflow-x-auto max-w-[150px] no-scrollbar">
+          {ALGORITHMS.map((algo) => (
+            <button
+              key={algo}
+              onClick={() => setSelectedAlgorithm(algo)}
+              className={`px-2 py-1 text-[9px] font-bold rounded-lg transition-all shrink-0 ${
+                selectedAlgorithm === algo
+                  ? 'bg-primary text-primary-foreground font-black'
+                  : 'text-foreground/80 hover:text-foreground'
+              }`}
+            >
+              {algo}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => setIsMobileDrawerOpen(true)}
+          className="h-9 w-9 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/60 text-foreground hover:bg-secondary transition-all shrink-0"
+          title="More Actions"
+        >
+          <Icons.MoreHorizontal className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Desktop Header Area (>= 640px) */}
+      <div className="hidden sm:flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-border/50">
         <div className="space-y-1">
           <h3 className="text-sm font-bold font-outfit text-foreground uppercase tracking-widest flex items-center gap-2">
             <Icons.Shield className="h-4.5 w-4.5 text-primary animate-pulse" />
@@ -428,8 +464,8 @@ export default function HashGenerator() {
         </div>
       </div>
 
-      {/* 2. Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-secondary/25 border border-border/80">
+      {/* Desktop Toolbar (>= 640px) */}
+      <div className="hidden sm:flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-secondary/25 border border-border/80">
         <div className="flex flex-wrap items-center gap-3">
           {/* Live Hashing Toggle */}
           <button
@@ -449,7 +485,7 @@ export default function HashGenerator() {
           </button>
 
           {/* Active Algorithm Tabs Selector */}
-          <div className="flex items-center gap-1 rounded-xl bg-card border border-border p-0.5">
+          <div className="flex items-center gap-1 rounded-xl bg-card border border-border p-0.5 overflow-x-auto no-scrollbar max-w-full">
             {ALGORITHMS.map((algo) => (
               <button
                 key={algo}
@@ -457,7 +493,7 @@ export default function HashGenerator() {
                   setSelectedAlgorithm(algo);
                   trackEvent('Algorithm Used', { algorithm: algo });
                 }}
-                className={`px-2.5 py-1 text-[10px] font-bold rounded-lg transition-all ${
+                className={`px-2.5 py-1.5 text-[10px] sm:text-xs font-bold rounded-lg transition-all shrink-0 touch-target ${
                   selectedAlgorithm === algo
                     ? 'bg-secondary text-foreground font-black shadow-sm border border-border/40'
                     : 'text-muted hover:text-foreground'
@@ -597,7 +633,7 @@ export default function HashGenerator() {
 
           {inputMode === 'text' ? (
             /* Text input area with line numbers gutter */
-            <div className="relative border border-border bg-card hover:border-primary/20 focus-within:border-primary/55 rounded-2xl overflow-hidden flex h-[380px] shadow-premium-sm transition-all">
+            <div className="relative border border-border bg-card hover:border-primary/20 focus-within:border-primary/55 rounded-2xl overflow-hidden flex h-[calc(100vh-190px)] sm:h-[380px] shadow-premium-sm transition-all">
               <div
                 ref={leftGutterRef}
                 className="w-12 bg-secondary/15 border-r border-border select-none overflow-hidden flex flex-col font-mono text-xs text-right pr-2 pt-4"
@@ -628,7 +664,7 @@ export default function HashGenerator() {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`relative border-2 border-dashed rounded-2xl h-[380px] flex flex-col items-center justify-center p-6 text-center transition-all ${
+              className={`relative border-2 border-dashed rounded-2xl h-[calc(100vh-190px)] sm:h-[380px] flex flex-col items-center justify-center p-6 text-center transition-all ${
                 dragActive
                   ? 'border-primary bg-primary/5'
                   : file
@@ -711,7 +747,7 @@ export default function HashGenerator() {
             )}
           </div>
 
-          <div className="relative border border-border bg-card rounded-2xl p-5 flex flex-col justify-between h-[380px] shadow-premium-sm">
+          <div className="relative border border-border bg-card rounded-2xl p-5 flex flex-col justify-between h-[calc(100vh-190px)] sm:h-[380px] shadow-premium-sm">
             {/* Hash content container */}
             <div className="flex-1 flex flex-col justify-center">
               {activeHash ? (
@@ -822,6 +858,134 @@ export default function HashGenerator() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Slide-Up Actions Bottom Sheet */}
+      <AnimatePresence>
+        {isMobileDrawerOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileDrawerOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] sm:hidden"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+              className="fixed bottom-0 left-0 right-0 z-[9999] bg-card border-t-2 border-border/80 rounded-t-3xl p-5 space-y-4 shadow-2xl sm:hidden font-outfit"
+            >
+              <div className="w-12 h-1.5 bg-border/80 rounded-full mx-auto" />
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h4 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+                  <Icons.Shield className="h-4 w-4 text-primary" />
+                  Hash Workspace Utilities
+                </h4>
+                <button
+                  onClick={() => setIsMobileDrawerOpen(false)}
+                  className="text-muted-foreground hover:text-foreground p-1"
+                >
+                  <Icons.X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 text-xs font-bold">
+                <button
+                  onClick={() => {
+                    setInputMode(inputMode === 'text' ? 'file' : 'text');
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.FileText className="h-4 w-4 text-primary" />
+                  Mode: {inputMode === 'text' ? 'Text' : 'File'}
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleLoadSample();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.FileText className="h-4 w-4 text-primary" />
+                  Paste Sample
+                </button>
+
+                <button
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Download className="h-4 w-4 text-primary rotate-180" />
+                  Upload File
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleDownload();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  disabled={!activeHash}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground disabled:opacity-40"
+                >
+                  <Icons.Download className="h-4 w-4 text-emerald-500" />
+                  Download Checksum
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleCopy(activeHash, selectedAlgorithm);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  disabled={!activeHash}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground disabled:opacity-40"
+                >
+                  <Icons.Copy className="h-4 w-4 text-amber-500" />
+                  Copy Hash
+                </button>
+
+                <button
+                  onClick={() => {
+                    setLiveUpdate(!liveUpdate);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Zap className="h-4 w-4 text-primary" />
+                  Live: {liveUpdate ? 'ON' : 'OFF'}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsFullscreen(!isFullscreen);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Maximize2 className="h-4 w-4 text-primary" />
+                  Fullscreen
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleClear();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20"
+                >
+                  <Icons.X className="h-4 w-4" />
+                  Clear All
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 

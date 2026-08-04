@@ -273,6 +273,20 @@ Calculated locally on Toolora.com`;
                 className="block w-full pl-8 pr-4 py-3 text-xs font-bold border border-border bg-card rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
+            <div className="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
+              {[500000, 1000000, 2500000, 5000000, 10000000].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => handleChange('amount', val)}
+                  className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all shrink-0 touch-target ${
+                    principal === val ? 'bg-primary text-primary-foreground border-primary' : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  ₹{val >= 10000000 ? `${(val / 10000000).toFixed(0)}Cr` : `${(val / 100000).toFixed(0)}L`}
+                </button>
+              ))}
+            </div>
             <p className="text-[10px] text-muted/60 mt-1">
               The total sum of money you want to borrow from the bank or lender.
             </p>
@@ -287,7 +301,7 @@ Calculated locally on Toolora.com`;
               {annualRate}% P.A.
             </span>
           </div>
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-premium-sm">
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-3 shadow-premium-sm">
             <input
               type="range"
               min="1"
@@ -312,6 +326,20 @@ Calculated locally on Toolora.com`;
                 %
               </span>
             </div>
+            <div className="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
+              {[7.5, 8.5, 9.5, 10.5, 12].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => handleChange('rate', val)}
+                  className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all shrink-0 touch-target ${
+                    annualRate === val ? 'bg-primary text-primary-foreground border-primary' : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  {val}%
+                </button>
+              ))}
+            </div>
             <p className="text-[10px] text-muted/60 mt-1">
               The yearly interest percentage charged by the bank on this loan.
             </p>
@@ -326,7 +354,7 @@ Calculated locally on Toolora.com`;
               {rawTenure} {values.isYears ? 'Years' : 'Months'}
             </span>
           </div>
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-premium-sm">
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-3 shadow-premium-sm">
             <input
               type="range"
               min="1"
@@ -345,6 +373,20 @@ Calculated locally on Toolora.com`;
                 onChange={handleInputChange}
                 className="block w-full px-3.5 py-3 text-xs font-bold border border-border bg-card rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
+            </div>
+            <div className="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
+              {[5, 10, 15, 20, 25, 30].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => handleChange('tenure', val)}
+                  className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all shrink-0 touch-target ${
+                    rawTenure === val ? 'bg-primary text-primary-foreground border-primary' : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  {val} Yrs
+                </button>
+              ))}
             </div>
             <p className="text-[10px] text-muted/60 mt-1">
               How many years you have to completely pay back this loan.
@@ -420,7 +462,7 @@ Calculated locally on Toolora.com`;
             <AnimatedIndianAmount
               value={emi}
               label="Monthly Payment (EMI)"
-              sizeClass="text-3xl sm:text-4xl md:text-5xl font-extrabold"
+              sizeClass="text-2xl sm:text-3xl md:text-4xl font-extrabold"
               exactSizeClass="text-xs"
             />
             <p className="text-[11px] text-muted/80 leading-normal pt-1">

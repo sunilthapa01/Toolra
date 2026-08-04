@@ -85,6 +85,7 @@ export default function Base64EncoderDecoder() {
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [isValidated, setIsValidated] = useState(false);
   const [isSuccessAnimated, setIsSuccessAnimated] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   // Sync scroll references
   const leftTextAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -451,8 +452,44 @@ export default function Base64EncoderDecoder() {
           : 'relative min-h-screen pb-12'
       }`}
     >
-      {/* 1. Header with primary mode toggles */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-border/50">
+      {/* 1. Mobile-First 1-Row Toolbar (< 640px) */}
+      <div className="flex sm:hidden items-center justify-between gap-2 p-2 bg-card border-2 border-border/80 rounded-2xl shadow-premium-sm">
+        <div className="flex items-center gap-1.5 bg-secondary/30 p-1 rounded-xl border border-border/70 flex-1">
+          <button
+            onClick={() => toggleMode('encode')}
+            className={`flex-1 py-1.5 text-[10px] font-extrabold uppercase rounded-lg transition-all flex items-center justify-center gap-1 ${
+              mode === 'encode'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-foreground/80 hover:text-foreground'
+            }`}
+          >
+            <Icons.Zap className="h-3 w-3" />
+            Encode
+          </button>
+          <button
+            onClick={() => toggleMode('decode')}
+            className={`flex-1 py-1.5 text-[10px] font-extrabold uppercase rounded-lg transition-all flex items-center justify-center gap-1 ${
+              mode === 'decode'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-foreground/80 hover:text-foreground'
+            }`}
+          >
+            <Icons.Code className="h-3 w-3" />
+            Decode
+          </button>
+        </div>
+
+        <button
+          onClick={() => setIsMobileDrawerOpen(true)}
+          className="h-9 w-9 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/60 text-foreground hover:bg-secondary transition-all"
+          title="More Actions"
+        >
+          <Icons.MoreHorizontal className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Desktop Header Area (>= 640px) */}
+      <div className="hidden sm:flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-border/50">
         <div className="space-y-1">
           <h3 className="text-sm font-bold font-outfit text-foreground uppercase tracking-widest flex items-center gap-2">
             <Icons.Code className="h-4 w-4 text-primary" />
@@ -490,8 +527,8 @@ export default function Base64EncoderDecoder() {
         </div>
       </div>
 
-      {/* 2. Top Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-secondary/25 border border-border/80">
+      {/* Desktop Top Toolbar (>= 640px) */}
+      <div className="hidden sm:flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-secondary/25 border border-border/80">
         {/* Toggle options */}
         <div className="flex flex-wrap items-center gap-4">
           {/* Live conversion switch */}
@@ -640,7 +677,7 @@ export default function Base64EncoderDecoder() {
             </div>
           </div>
 
-          <div className="relative border border-border bg-card hover:border-primary/20 focus-within:border-primary/55 rounded-2xl overflow-hidden flex h-[380px] shadow-premium-sm transition-all">
+          <div className="relative border border-border bg-card hover:border-primary/20 focus-within:border-primary/55 rounded-2xl overflow-hidden flex h-[calc(100vh-190px)] sm:h-[380px] shadow-premium-sm transition-all">
             {/* Gutter Line Numbers */}
             <div
               ref={leftGutterRef}
@@ -686,7 +723,7 @@ export default function Base64EncoderDecoder() {
                     : 'Paste Base64 string here to decode...'
                 }
                 spellCheck={false}
-                className="w-full h-full bg-transparent border-0 outline-none text-foreground font-mono-calc text-xs leading-6 p-4 resize-none overflow-y-auto whitespace-pre-wrap break-all"
+                className="w-full h-full bg-transparent border-0 outline-none text-foreground font-mono-calc text-sm sm:text-xs leading-6 p-4 resize-none overflow-y-auto whitespace-pre-wrap break-all"
               />
             </div>
           </div>
@@ -716,7 +753,7 @@ export default function Base64EncoderDecoder() {
             </div>
           </div>
 
-          <div className="relative border border-border bg-card rounded-2xl overflow-hidden flex h-[380px] shadow-premium-sm transition-all">
+          <div className="relative border border-border bg-card rounded-2xl overflow-hidden flex h-[calc(100vh-190px)] sm:h-[380px] shadow-premium-sm transition-all">
             {/* Gutter Line Numbers */}
             <div
               ref={rightGutterRef}
@@ -743,7 +780,7 @@ export default function Base64EncoderDecoder() {
                 onScroll={handleRightScroll}
                 placeholder="Conversion output will display here..."
                 spellCheck={false}
-                className="w-full h-full bg-transparent border-0 outline-none text-foreground font-mono-calc text-xs leading-6 p-4 resize-none overflow-y-auto whitespace-pre-wrap break-all cursor-text select-text"
+                className="w-full h-full bg-transparent border-0 outline-none text-foreground font-mono-calc text-sm sm:text-xs leading-6 p-4 resize-none overflow-y-auto whitespace-pre-wrap break-all cursor-text select-text"
               />
             </div>
           </div>
@@ -880,6 +917,132 @@ export default function Base64EncoderDecoder() {
               )}
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile Slide-Up Actions Bottom Sheet */}
+      <AnimatePresence>
+        {isMobileDrawerOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileDrawerOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] sm:hidden"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+              className="fixed bottom-0 left-0 right-0 z-[9999] bg-card border-t-2 border-border/80 rounded-t-3xl p-5 space-y-4 shadow-2xl sm:hidden font-outfit"
+            >
+              <div className="w-12 h-1.5 bg-border/80 rounded-full mx-auto" />
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h4 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+                  <Icons.Code className="h-4 w-4 text-primary" />
+                  Base64 Utilities
+                </h4>
+                <button
+                  onClick={() => setIsMobileDrawerOpen(false)}
+                  className="text-muted-foreground hover:text-foreground p-1"
+                >
+                  <Icons.X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 text-xs font-bold">
+                <button
+                  onClick={() => {
+                    handleLoadSample();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.FileText className="h-4 w-4 text-primary" />
+                  Load Sample
+                </button>
+
+                <button
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Download className="h-4 w-4 text-primary rotate-180" />
+                  Upload File
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleDownload();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Download className="h-4 w-4 text-emerald-500" />
+                  Download File
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleSwap();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.ArrowLeftRight className="h-4 w-4 text-amber-500" />
+                  Swap Panels
+                </button>
+
+                <button
+                  onClick={() => {
+                    setLiveConversion(!liveConversion);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Zap className="h-4 w-4 text-primary" />
+                  Live: {liveConversion ? 'ON' : 'OFF'}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setAutoDetect(!autoDetect);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Shield className="h-4 w-4 text-primary" />
+                  Auto-Detect: {autoDetect ? 'ON' : 'OFF'}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsFullscreen(!isFullscreen);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Maximize2 className="h-4 w-4 text-primary" />
+                  Fullscreen
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleClear();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20"
+                >
+                  <Icons.X className="h-4 w-4" />
+                  Clear All
+                </button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

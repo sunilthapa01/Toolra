@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ToastProvider';
 import { useTheme } from '@/components/ThemeProvider';
 import * as Icons from '@/components/Icons';
@@ -129,6 +130,7 @@ export default function MarkdownPreview() {
   const [isMounted, setIsMounted] = useState(false);
   const [wrapLines, setWrapLines] = useState(true);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -628,8 +630,55 @@ export default function MarkdownPreview() {
         </div>
       )}
 
-      {/* Main Top Bar Options & View Switcher */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-secondary/20 border border-border/80 shadow-premium-sm">
+      {/* Mobile 1-Row View Mode & Drawer Bar (< 640px) */}
+      <div className="flex sm:hidden items-center justify-between gap-2 p-2 bg-card border-2 border-border/80 rounded-2xl shadow-premium-sm">
+        <div className="flex items-center gap-1 bg-secondary/30 p-1 rounded-xl border border-border/70 flex-1">
+          <button
+            onClick={() => setLayoutMode('editor')}
+            className={`flex-1 py-1.5 text-[10px] font-extrabold uppercase rounded-lg transition-all flex items-center justify-center gap-1 ${
+              layoutMode === 'editor'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-foreground/80 hover:text-foreground'
+            }`}
+          >
+            <Icons.Code className="h-3 w-3" />
+            Code
+          </button>
+          <button
+            onClick={() => setLayoutMode('preview')}
+            className={`flex-1 py-1.5 text-[10px] font-extrabold uppercase rounded-lg transition-all flex items-center justify-center gap-1 ${
+              layoutMode === 'preview'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-foreground/80 hover:text-foreground'
+            }`}
+          >
+            <Icons.Zap className="h-3 w-3" />
+            Preview
+          </button>
+          <button
+            onClick={() => setLayoutMode('split')}
+            className={`flex-1 py-1.5 text-[10px] font-extrabold uppercase rounded-lg transition-all flex items-center justify-center gap-1 ${
+              layoutMode === 'split'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-foreground/80 hover:text-foreground'
+            }`}
+          >
+            <Icons.Columns className="h-3 w-3" />
+            Split
+          </button>
+        </div>
+
+        <button
+          onClick={() => setIsMobileDrawerOpen(true)}
+          className="h-9 w-9 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/60 text-foreground hover:bg-secondary transition-all shrink-0"
+          title="More Actions"
+        >
+          <Icons.MoreHorizontal className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Main Top Bar Options & View Switcher (>= 640px) */}
+      <div className="hidden sm:flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-secondary/20 border border-border/80 shadow-premium-sm">
         {/* Left Options Group */}
         <div className="flex flex-wrap items-center gap-3">
           {/* File Operations */}
@@ -827,7 +876,7 @@ export default function MarkdownPreview() {
 
           <div className={`relative border border-border/80 rounded-2xl overflow-hidden shadow-premium-md bg-card transition-all ${
             isDraggingFile ? 'ring-2 ring-primary border-primary bg-primary/5' : ''
-          } ${isFullScreen ? 'flex-1 h-full' : 'h-[640px]'}`}>
+          } ${isFullScreen ? 'flex-1 h-full' : 'h-[calc(100vh-190px)] sm:h-[480px] lg:h-[640px]'}`}>
             {isDraggingFile && (
               <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-card/90 backdrop-blur-sm text-primary font-bold text-base gap-3">
                 <Icons.Upload className="h-10 w-10 animate-bounce" />
@@ -875,8 +924,8 @@ export default function MarkdownPreview() {
           <div
             ref={previewScrollRef}
             onScroll={handlePreviewScroll}
-            className={`border border-border/80 rounded-2xl overflow-y-auto shadow-premium-md bg-card p-6 md:p-8 transition-all ${
-              isFullScreen ? 'flex-1 h-full' : 'h-[640px]'
+            className={`border border-border/80 rounded-2xl overflow-y-auto shadow-premium-md bg-card p-4 sm:p-6 md:p-8 transition-all ${
+              isFullScreen ? 'flex-1 h-full' : 'h-[calc(100vh-190px)] lg:h-[640px]'
             }`}
           >
             {!inputMarkdown.trim() ? (
@@ -908,6 +957,154 @@ export default function MarkdownPreview() {
         isOpen={showShortcutModal}
         onClose={() => setShowShortcutModal(false)}
       />
+
+      {/* Mobile Slide-Up Actions Bottom Sheet */}
+      <AnimatePresence>
+        {isMobileDrawerOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileDrawerOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] sm:hidden"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+              className="fixed bottom-0 left-0 right-0 z-[9999] bg-card border-t-2 border-border/80 rounded-t-3xl p-5 space-y-4 shadow-2xl sm:hidden font-outfit max-h-[85vh] overflow-y-auto"
+            >
+              <div className="w-12 h-1.5 bg-border/80 rounded-full mx-auto" />
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h4 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-2">
+                  <Icons.FileText className="h-4 w-4 text-primary" />
+                  Markdown Studio Actions
+                </h4>
+                <button
+                  onClick={() => setIsMobileDrawerOpen(false)}
+                  className="text-muted-foreground hover:text-foreground p-1"
+                >
+                  <Icons.X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 text-xs font-bold">
+                <button
+                  onClick={() => {
+                    handleLoadSample();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Files className="h-4 w-4 text-primary" />
+                  Load Sample
+                </button>
+
+                <button
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Upload className="h-4 w-4 text-primary" />
+                  Upload File
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleExportMarkdown();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Download className="h-4 w-4 text-primary" />
+                  Save .md
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleExportHTML();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Download className="h-4 w-4 text-emerald-500" />
+                  Export HTML
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleCopyMarkdown();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Copy className="h-4 w-4 text-amber-500" />
+                  Copy MD
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleCopyHTML();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Code className="h-4 w-4 text-primary" />
+                  Copy HTML
+                </button>
+
+                <button
+                  onClick={() => {
+                    handlePrintPDF();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.Printer className="h-4 w-4 text-primary" />
+                  Print / PDF
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowShortcutModal(true);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground"
+                >
+                  <Icons.HelpCircle className="h-4 w-4 text-primary" />
+                  Shortcuts
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsFullScreen(!isFullScreen);
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-secondary/30 hover:bg-secondary/60 rounded-xl border border-border/60 text-foreground col-span-2"
+                >
+                  <Icons.Maximize2 className="h-4 w-4 text-primary" />
+                  Toggle Fullscreen Mode
+                </button>
+
+                <button
+                  onClick={() => {
+                    handleClear();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl border border-red-500/20 col-span-2 justify-center"
+                >
+                  <Icons.Trash2 className="h-4 w-4" />
+                  Clear Workspace Buffer
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 

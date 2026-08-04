@@ -26,7 +26,22 @@ export function HomeContent({ initialToolSlug }: HomeContentProps) {
 
   const initialTool = initialToolSlug ? toolsRegistry[initialToolSlug] : null;
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const prevIsMobileRef = useRef<boolean | null>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if (prevIsMobileRef.current !== isMobile) {
+        prevIsMobileRef.current = isMobile;
+        setSidebarOpen(!isMobile);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialTool?.category || 'developer');
   const [selectedToolSlug, setSelectedToolSlug] = useState<string | null>(initialToolSlug || null);
@@ -156,6 +171,13 @@ export function HomeContent({ initialToolSlug }: HomeContentProps) {
       <Navbar
         onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
         searchQuery={searchQuery}
+        onLogoClick={() => {
+          setSelectedToolSlug(null);
+          setSearchQuery('');
+          if (window.location.pathname !== '/') {
+            window.history.pushState(null, '', '/');
+          }
+        }}
         onSearchChange={(q) => {
           setSearchQuery(q);
           if (q.trim() && selectedToolSlug) {
@@ -173,19 +195,20 @@ export function HomeContent({ initialToolSlug }: HomeContentProps) {
           onSelectCategory={handleSelectWorkspace}
           categoryCounts={categoryCounts}
           isOpen={sidebarOpen}
+          onCloseMobile={() => setSidebarOpen(false)}
         />
 
         {/* MAIN LAUNCHER CONTENT */}
-        <section className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 min-w-0 transition-all duration-200 overflow-y-auto">
+        <section className="flex-1 p-2 sm:p-6 lg:p-8 space-y-3 sm:space-y-6 min-w-0 transition-all duration-200 overflow-y-auto">
           
           {/* ACTIVE INLINE TOOL WORKSPACE OR TOOLS GRID */}
           {activeTool && ActiveToolComponent ? (
-            <div className="space-y-8 animate-in fade-in duration-200">
+            <div className="space-y-3 sm:space-y-8 animate-in fade-in duration-200">
               {/* Tool Title & Meta */}
-              <div className="space-y-2 border-b border-border/60 pb-5">
-                <div className="flex items-center justify-between gap-4">
+              <div className="space-y-1 sm:space-y-2 border-b border-border/60 pb-2 sm:pb-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
                       {['finance', 'text', 'business', 'everyday'].includes(activeTool.category)
                         ? 'Everyday'
                         : activeTool.category === 'pdf'
@@ -194,28 +217,29 @@ export function HomeContent({ initialToolSlug }: HomeContentProps) {
                         ? 'Developer'
                         : activeTool.categoryName} Workspace
                     </span>
-                    <span className="text-xs text-muted">•</span>
-                    <span className="text-xs text-muted font-medium">Instant Local Engine</span>
+                    <span className="text-xs text-muted hidden sm:inline">•</span>
+                    <span className="text-xs text-muted font-medium hidden sm:inline">Instant Local Engine</span>
                   </div>
                   <button
                     onClick={handleCloseTool}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-secondary text-xs font-bold text-foreground transition-all cursor-pointer shrink-0"
+                    className="flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl border border-border bg-card hover:bg-secondary text-xs font-bold text-foreground transition-all cursor-pointer shrink-0"
                   >
-                    <Icons.ChevronLeft className="h-4 w-4 text-primary" />
-                    <span>Back to Tools Grid</span>
+                    <Icons.ChevronLeft className="h-3.5 w-3.5 text-primary" />
+                    <span className="hidden sm:inline">Back to Tools Grid</span>
+                    <span className="sm:hidden">Back</span>
                   </button>
                 </div>
 
-                <h1 className="font-outfit text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
+                <h1 className="font-outfit text-lg sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
                   {activeTool.title}
                 </h1>
-                <p className="text-sm sm:text-base text-muted max-w-5xl leading-relaxed font-normal">
+                <p className="text-xs sm:text-base text-muted max-w-5xl leading-relaxed font-normal hidden sm:block">
                   {activeTool.description}
                 </p>
               </div>
 
               {/* Primary Active Tool Component Container */}
-              <div className="w-full rounded-2xl border border-border bg-card p-4 sm:p-6 md:p-8 shadow-sm min-h-[450px]">
+              <div className="w-full rounded-2xl border border-border bg-card p-1.5 sm:p-6 md:p-8 shadow-sm min-h-[350px] sm:min-h-[450px]">
                 <ActiveToolComponent />
               </div>
 

@@ -23,8 +23,8 @@ export default function MarkdownToolbar({
   const popularEmojis = Object.entries(EMOJI_MAP).slice(0, 24);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2.5 p-2.5 rounded-2xl bg-card border border-border/80 shadow-premium-sm text-foreground select-none">
-      <div className="flex flex-wrap items-center gap-1.5">
+    <div className="flex items-center justify-between gap-2 p-2 rounded-2xl bg-card border border-border/80 shadow-premium-sm text-foreground select-none overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-1.5 shrink-0">
         {/* Undo / Redo */}
         <div className="flex items-center gap-1 pr-2 border-r border-border/60">
           <button

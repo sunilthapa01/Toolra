@@ -274,19 +274,19 @@ Your calculations remain completely private.
           <div className="flex bg-card border border-border p-1 rounded-2xl relative shadow-premium-sm">
             <button
               onClick={() => handleChange('isInterstate', false)}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 !values.isInterstate ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
-              Same State (Local Sale)
+              Same State (Local)
             </button>
             <button
               onClick={() => handleChange('isInterstate', true)}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
+              className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-3 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-center transition-all rounded-xl relative z-10 ${
                 values.isInterstate ? 'text-primary-foreground bg-primary shadow-premium-sm' : 'text-muted hover:text-foreground'
               }`}
             >
-              Different State (Out of State)
+              Out of State (IGST)
             </button>
           </div>
           <p className="text-[10px] text-muted/60 leading-normal">

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Navbar from './Navbar';
 import Breadcrumb from './Breadcrumb';
 import * as Icons from './Icons';
@@ -36,7 +36,22 @@ export default function ToolLayout({
 }: ToolLayoutProps) {
   const [activeSection, setActiveSection] = useState('hero');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const prevIsMobileRef = useRef<boolean | null>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if (prevIsMobileRef.current !== isMobile) {
+        prevIsMobileRef.current = isMobile;
+        setSidebarOpen(!isMobile);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const { navigate } = usePageTransition();
 
 
@@ -149,31 +164,63 @@ export default function ToolLayout({
           }}
           categoryCounts={categoryCounts}
           isOpen={sidebarOpen}
+          onCloseMobile={() => setSidebarOpen(false)}
         />
 
-        {/* Fluid 80-90% Viewport Workspace Container */}
-        <main className="flex-1 w-full min-w-0 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto">
-          <div className="max-w-[1800px] mx-auto space-y-8">
+        {/* Fluid Workspace Container */}
+        <main className="flex-1 w-full min-w-0 py-2 sm:py-6 px-1.5 sm:px-6 lg:px-8 overflow-y-auto">
+          <div className="max-w-[1800px] mx-auto space-y-3 sm:space-y-8">
             {/* Header: Breadcrumb, Title & Short Description */}
-            <div className="space-y-2">
-              <Breadcrumb steps={breadcrumbSteps} />
-              <h1 className="font-outfit text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
+            <div className="space-y-1 sm:space-y-2">
+              <div className="hidden sm:block">
+                <Breadcrumb steps={breadcrumbSteps} />
+              </div>
+              <h1 className="font-outfit text-lg sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
                 {title}
               </h1>
-              <p className="text-sm sm:text-base text-muted max-w-5xl leading-relaxed font-normal">
+              <p className="text-xs sm:text-base text-muted max-w-5xl leading-relaxed font-normal hidden sm:block">
                 {description}
               </p>
             </div>
 
             {/* Primary Hero Workspace (Tool / Calculator / Editor) */}
-            <div id="hero" className="w-full rounded-2xl border border-border bg-card p-4 sm:p-6 md:p-8 shadow-sm transition-all min-h-[450px]">
+            <div id="hero" className="w-full rounded-2xl border border-border bg-card p-1.5 sm:p-6 md:p-8 shadow-sm transition-all min-h-[350px] sm:min-h-[450px]">
               {children}
             </div>
 
 
             {/* Educational Content & Compact TOC Layout (If available) */}
             {hasEducationalContent && (
-              <div className="border-t border-border pt-10 mt-10">
+              <div className="border-t border-border pt-6 sm:pt-10 mt-6 sm:mt-10">
+                {/* Mobile Horizontal Table of Contents Pills */}
+                {activeSections.length > 2 && (
+                  <div className="lg:hidden mb-6 overflow-x-auto no-scrollbar py-1">
+                    <div className="flex items-center gap-2 text-xs font-bold whitespace-nowrap">
+                      <span className="text-[10px] uppercase font-extrabold text-muted tracking-wider shrink-0">
+                        Jump to:
+                      </span>
+                      {activeSections.map((sec) => (
+                        <a
+                          key={sec.id}
+                          href={`#${sec.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const el = document.getElementById(sec.id);
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className={`px-3 py-1.5 rounded-xl border transition-all text-xs shrink-0 ${
+                            activeSection === sec.id
+                              ? 'bg-primary text-primary-foreground border-primary shadow-xs font-black'
+                              : 'bg-card border-border text-foreground hover:bg-secondary'
+                          }`}
+                        >
+                          {sec.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                   {/* Educational Articles Column */}
                   <div className={`${activeSections.length > 2 ? 'lg:col-span-8 xl:col-span-9' : 'lg:col-span-12'} space-y-10`}>
